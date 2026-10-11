@@ -4147,6 +4147,7 @@
     "noProvider": "(không có)",
     "failover": "Failover",
     "routeSettings": "Cài đặt routing",
+    "copyEndpoint": "Sao chép endpoint URL",
     "routeSettingsTitle": "Cài đặt routing",
     "moreRouteSettings": "Thêm cài đặt routing",
     "queueMoved": "Đã chuyển {{name}} lên vị trí {{position}}.",

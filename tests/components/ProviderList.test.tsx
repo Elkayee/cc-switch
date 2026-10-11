@@ -700,7 +700,7 @@ describe("ProviderList Component", () => {
     expect(handleCreate).toHaveBeenCalledTimes(1);
   });
 
-  it("shows dashed Add Provider on Pi when providers exist", async () => {
+  it("has no bottom Add Provider button when providers exist (the header has it)", async () => {
     const handleCreate = vi.fn();
     const provider = createProvider({ id: "pi-1", name: "Pi One" });
     useDragSortMock.mockReturnValue({
@@ -730,12 +730,13 @@ describe("ProviderList Component", () => {
       />,
     );
 
-    const addButton = await screen.findByRole("button", {
-      name: "provider.addProvider",
-    });
-    expect(addButton).toHaveClass("border-dashed");
-    fireEvent.click(addButton);
-    expect(handleCreate).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.getAllByRole("button").length).toBeGreaterThan(0),
+    );
+    expect(
+      screen.queryByRole("button", { name: "provider.addProvider" }),
+    ).not.toBeInTheDocument();
+    expect(handleCreate).not.toHaveBeenCalled();
   });
 
   it("does not tell MiniMax Code users to click a missing import button", async () => {

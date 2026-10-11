@@ -13,7 +13,6 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
@@ -39,7 +38,6 @@ import {
   useCurrentOmoProviderId,
   useCurrentOmoSlimProviderId,
 } from "@/lib/query/omo";
-import { Button } from "@/components/ui/button";
 import { ManagementListSearch } from "@/components/common/ManagementListSearch";
 import { HelpTip } from "@/components/ui/help-tip";
 import { Notice } from "@/components/ui/notice";
@@ -483,7 +481,7 @@ export function ProviderList({
 
   // 卡片列表铺满主区域，和页头同宽
   return (
-    <div className="mt-2 space-y-2">
+    <div className="mt-2 space-y-3">
       {piStateErrorNotice}
       {isSearchVisible && (
         <ManagementListSearch
@@ -543,17 +541,6 @@ export function ProviderList({
             </section>
           ))}
         </DndContext>
-      )}
-      {onCreate && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCreate}
-          className="w-full border-dashed"
-        >
-          <Plus className="h-4 w-4" />
-          {t("provider.addProvider")}
-        </Button>
       )}
     </div>
   );

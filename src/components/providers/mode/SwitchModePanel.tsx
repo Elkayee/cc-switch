@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
+import { isTauri } from "@tauri-apps/api/core";
 import { toast } from "@/lib/toast";
 import type { Provider } from "@/types";
 import type { AppMode, StartupAttachFailure } from "@/types/proxy";
@@ -26,6 +27,7 @@ import {
   useSetAutoFailoverEnabled,
 } from "@/lib/query/failover";
 import { useModeActions } from "@/hooks/useModeActions";
+import { routeProxyUrl } from "@/lib/pinnedProxyUrl";
 import { getRoutingReason } from "@/utils/routingReason";
 import { extractErrorMessage } from "@/utils/errorUtils";
 import { Button } from "@/components/ui/button";
@@ -309,6 +311,23 @@ export function SwitchModePanel({
               }),
             };
 
+  // Routing endpoint a client can point at: only while this app is actually routed
+  const endpoint =
+    view === "route" && active === "route"
+      ? (routeProxyUrl({
+          appId: app,
+          takeoverOn: listCallbacks.pinnedTakeoverOn ?? false,
+          proxyRunning: listCallbacks.isProxyRunning ?? false,
+          isTauri: isTauri(),
+          pageHostname:
+            typeof window === "undefined"
+              ? "localhost"
+              : window.location.hostname,
+          listenAddress: listCallbacks.proxyListenAddress ?? "",
+          port: listCallbacks.proxyListenPort ?? 0,
+        }) ?? undefined)
+      : undefined;
+
   const handleFailoverChange = (enabled: boolean) => {
     if (enabled && !settings?.failoverConfirmed) {
       setConfirmFailover(true);
@@ -524,6 +543,7 @@ export function SwitchModePanel({
         view={view}
         onView={setView}
         status={status}
+        endpoint={endpoint}
         failover={
           view === "route" && active === "route"
             ? {

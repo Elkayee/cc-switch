@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pinnedProxyUrl } from "@/lib/pinnedProxyUrl";
+import { pinnedProxyUrl, routeProxyUrl } from "@/lib/pinnedProxyUrl";
 
 const base = {
   providerId: "prov 1",
@@ -53,5 +53,28 @@ describe("pinnedProxyUrl", () => {
     expect(pinnedProxyUrl({ ...base, appId: "opencode" })).toBe(null);
     expect(pinnedProxyUrl({ ...base, appId: "openclaw" })).toBe(null);
     expect(pinnedProxyUrl({ ...base, appId: "hermes" })).toBe(null);
+  });
+});
+
+describe("routeProxyUrl", () => {
+  const { providerId: _id, ...route } = base;
+
+  it("is the proxy origin plus the app suffix, with no provider id", () => {
+    expect(routeProxyUrl({ ...route, appId: "claude" })).toBe(
+      "http://localhost:18000",
+    );
+    expect(routeProxyUrl({ ...route, appId: "codex" })).toBe(
+      "http://localhost:18000/v1",
+    );
+    expect(routeProxyUrl({ ...route, appId: "grokbuild" })).toBe(
+      "http://localhost:18000/grokbuild/v1",
+    );
+  });
+
+  it("is absent when the proxy is down or the app is not on the listener", () => {
+    expect(routeProxyUrl({ ...route, appId: "claude", proxyRunning: false })).toBe(
+      null,
+    );
+    expect(routeProxyUrl({ ...route, appId: "opencode" })).toBe(null);
   });
 });

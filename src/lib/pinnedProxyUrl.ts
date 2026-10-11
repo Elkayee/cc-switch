@@ -19,6 +19,20 @@ export interface PinnedProxyUrlInput {
 
 /** Base URL for a pinned provider, or null when the copy button must be absent. */
 export function pinnedProxyUrl(input: PinnedProxyUrlInput): string | null {
+  return proxyEndpoint(input, `/${encodeURIComponent(input.providerId)}`);
+}
+
+/** Routing endpoint (no provider id): what a client points at while the app is routed. */
+export function routeProxyUrl(
+  input: Omit<PinnedProxyUrlInput, "providerId">,
+): string | null {
+  return proxyEndpoint(input, "");
+}
+
+function proxyEndpoint(
+  input: Omit<PinnedProxyUrlInput, "providerId">,
+  idSegment: string,
+): string | null {
   const suffix = PINNED_SUFFIX[input.appId];
   if (
     suffix === undefined ||
@@ -37,5 +51,5 @@ export function pinnedProxyUrl(input: PinnedProxyUrlInput): string | null {
         : input.listenAddress
     : input.pageHostname;
   const host = raw.includes(":") && !raw.startsWith("[") ? `[${raw}]` : raw;
-  return `http://${host}:${input.port}/${encodeURIComponent(input.providerId)}${suffix}`;
+  return `http://${host}:${input.port}${idSegment}${suffix}`;
 }

@@ -306,7 +306,7 @@ export function ProviderCard({
         dragHandleProps?.isDragging && "z-10 cursor-grabbing shadow-sm",
       )}
     >
-      <div className="flex items-center gap-2 p-2">
+      <div className="flex items-center gap-2 p-3">
         {dragHandleProps ? (
           <Button
             type="button"
@@ -340,7 +340,7 @@ export function ProviderCard({
           fallbackClassName="bg-transparent text-neutral-600"
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <div className="flex min-w-0 items-center gap-1">
             <h3
               className={cn(

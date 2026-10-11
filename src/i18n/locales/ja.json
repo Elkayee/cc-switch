@@ -4147,6 +4147,7 @@
     "noProvider": "（未選択）",
     "failover": "フェイルオーバー",
     "routeSettings": "ルーティング設定",
+    "copyEndpoint": "エンドポイント URL をコピー",
     "routeSettingsTitle": "ルーティング設定",
     "moreRouteSettings": "その他のルーティング設定",
     "queueMoved": "{{name}} を {{position}} 番目に移動しました。",

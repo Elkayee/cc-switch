@@ -1,5 +1,14 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Layers, Plug, Route, Settings2, Shuffle } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Layers,
+  Plug,
+  Route,
+  Settings2,
+  Shuffle,
+} from "lucide-react";
 import type { AppMode } from "@/types/proxy";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -9,6 +18,8 @@ import {
   SegmentThumb,
   useSlidingIndicator,
 } from "@/components/ui/sliding-indicator";
+import { copyText } from "@/lib/clipboard";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 const MODE_ICON = { direct: Plug, route: Route, stack: Layers } as const;
@@ -45,6 +56,8 @@ interface ModeTabsProps {
   onView: (mode: AppMode) => void;
   /** 状态行：「前导 + 值」，空间不够先截前导；值仅在独自超出整栏时才截断 */
   status?: { lead: string; value: string };
+  /** Routing endpoint URL, shown with a copy button */
+  endpoint?: string;
   failover?: {
     enabled: boolean;
     disabled?: boolean;
@@ -64,6 +77,7 @@ export function ModeTabs({
   view,
   onView,
   status,
+  endpoint,
   failover,
   onOpenRouteSettings,
 }: ModeTabsProps) {
@@ -140,6 +154,8 @@ export function ModeTabs({
       )}
       {!status && <div className="flex-1" />}
 
+      {endpoint && <EndpointCopy url={endpoint} />}
+
       {failover && (
         <HoverTip content={t("mode.failover")}>
           <label className="flex shrink-0 cursor-pointer items-center gap-1">
@@ -170,6 +186,53 @@ export function ModeTabs({
           </Button>
         </HoverTip>
       )}
+    </div>
+  );
+}
+
+/** Read-only endpoint URL + copy button. Truncates before it pushes the controls off the row. */
+function EndpointCopy({ url }: { url: string }) {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
+  const copy = () => {
+    void copyText(url)
+      .then(() => setCopied(true))
+      .catch((error: unknown) => {
+        toast.error(error instanceof Error ? error.message : String(error));
+      });
+  };
+
+  const label = t("mode.copyEndpoint");
+  return (
+    <div className="flex min-w-0 shrink items-center gap-1">
+      <span
+        className="min-w-0 truncate font-mono text-[12.35px] leading-[1.3] text-fg-2"
+        title={url}
+      >
+        {url}
+      </span>
+      <HoverTip content={label}>
+        <Button
+          variant="quiet"
+          size="icon-compact"
+          className="shrink-0"
+          aria-label={label}
+          onClick={copy}
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" strokeWidth={1.5} />
+          ) : (
+            <Copy className="h-4 w-4" strokeWidth={1.5} />
+          )}
+        </Button>
+      </HoverTip>
     </div>
   );
 }

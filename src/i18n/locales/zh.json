@@ -4147,6 +4147,7 @@
     "noProvider": "（未选择）",
     "failover": "故障转移",
     "routeSettings": "路由设置",
+    "copyEndpoint": "复制端点地址",
     "routeSettingsTitle": "路由设置",
     "moreRouteSettings": "更多路由设置",
     "queueMoved": "{{name}} 移到第 {{position}} 位。",

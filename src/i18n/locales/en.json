@@ -4147,6 +4147,7 @@
     "noProvider": "(none)",
     "failover": "Failover",
     "routeSettings": "Routing settings",
+    "copyEndpoint": "Copy endpoint URL",
     "routeSettingsTitle": "Routing settings",
     "moreRouteSettings": "More routing settings",
     "queueMoved": "{{name}} moved to position {{position}}.",

@@ -373,11 +373,13 @@ function App() {
   const headerRowRef = useRef<HTMLDivElement>(null);
   const headerSlotRef = useRef<HTMLDivElement>(null);
   const headerClusterRef = useRef<HTMLDivElement>(null);
+  const headerBrandRef = useRef<HTMLDivElement>(null);
   const [appsFullWidth, setAppsFullWidth] = useState(0);
-  const navLabelCount = useHeaderNavLabels({
+  const { count: navLabelCount, showBrand } = useHeaderNavLabels({
     rowRef: headerRowRef,
     slotRef: headerSlotRef,
     clusterRef: headerClusterRef,
+    brandRef: headerBrandRef,
     appsWidth: appsFullWidth,
     itemCount: HEADER_NAV_COUNT,
     labelKey: i18n.language,
@@ -1714,9 +1716,24 @@ function App() {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <ViberSwitchLogo
-              className={cn(!inAppPage && "max-[479px]:hidden")}
-            />
+            <div
+              ref={headerBrandRef}
+              className={cn("flex items-center gap-2", !inAppPage && "hidden")}
+            >
+              <ViberSwitchLogo />
+              {/* Always rendered so useHeaderNavLabels can measure it; hidden takes no space. */}
+              <span
+                data-brand-word
+                data-brand-hidden={showBrand ? undefined : ""}
+                aria-hidden="true"
+                className={cn(
+                  "select-none whitespace-nowrap text-[12.35px] font-semibold leading-[1.3] text-foreground",
+                  !showBrand && "pointer-events-none invisible absolute",
+                )}
+              >
+                {t("app.title")}
+              </span>
+            </div>
           </div>
 
           <div
