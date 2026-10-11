@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { ToolInstallation } from "@/lib/api/settings";
 
@@ -5,7 +6,14 @@ import type { ToolInstallation } from "@/lib/api/settings";
  * 单处工具安装的信息行：来源徽章 + 路径 + 版本（或「无法运行」）+「默认」标记。
  * 冲突诊断列表与升级确认对话框共用，确保两处的视觉与「默认」判定始终一致。
  */
-export function ToolInstallRow({ inst }: { inst: ToolInstallation }) {
+export function ToolInstallRow({
+  inst,
+  action,
+}: {
+  inst: ToolInstallation;
+  /** 行尾操作（如卸载按钮） */
+  action?: ReactNode;
+}) {
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-1 text-ui">
@@ -32,6 +40,7 @@ export function ToolInstallRow({ inst }: { inst: ToolInstallation }) {
           {t("settings.toolConflictDefault")}
         </span>
       )}
+      {action}
     </div>
   );
 }

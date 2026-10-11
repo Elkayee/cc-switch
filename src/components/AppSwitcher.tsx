@@ -24,6 +24,8 @@ interface AppSwitcherProps {
   activeApp: AppId;
   onSwitch: (app: AppId) => void;
   visibleApps?: VisibleApps;
+  /** Width needed to show every app with no overflow menu (for header layout budgeting). */
+  onFullWidthChange?: (width: number) => void;
 }
 
 const STORAGE_KEY = "cc-switch-last-app";
@@ -104,6 +106,7 @@ export function AppSwitcher({
   activeApp,
   onSwitch,
   visibleApps,
+  onFullWidthChange,
 }: AppSwitcherProps) {
   const { t } = useTranslation();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -147,6 +150,7 @@ export function AppSwitcher({
         if (buttonCount <= 0) return padding;
         return padding + buttonCount * itemWidth + (buttonCount - 1) * gap;
       };
+      onFullWidthChange?.(rowWidth(appCount));
       if (rowWidth(appCount) <= available) {
         setVisibleCount(appCount);
         return;
@@ -164,7 +168,7 @@ export function AppSwitcher({
     const observer = new ResizeObserver(compute);
     observer.observe(slot);
     return () => observer.disconnect();
-  }, [appCount]);
+  }, [appCount, onFullWidthChange]);
 
   const visibleList = appsToShow.slice(0, Math.max(0, visibleCount));
   // 激活应用被收进溢出区时，顶替最后一个可见位，保证始终可点亮

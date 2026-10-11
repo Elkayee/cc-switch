@@ -43,6 +43,7 @@ import {
 } from "@/lib/api";
 import { checkAllEnvConflicts, checkEnvConflicts } from "@/lib/api/env";
 import { useProviderActions } from "@/hooks/useProviderActions";
+import { useHeaderNavLabels } from "@/hooks/useHeaderNavLabels";
 import { openclawKeys, useOpenClawHealth } from "@/hooks/useOpenClaw";
 import { hermesKeys, useOpenHermesWebUI } from "@/hooks/useHermes";
 import { hermesApi } from "@/lib/api/hermes";
@@ -170,6 +171,9 @@ const getInitialApp = (): AppId => {
   return "claude";
 };
 
+/** Header nav buttons in DOM order; labels appear left to right as space allows. */
+const HEADER_NAV_COUNT = 6;
+
 function HeaderNavButton({
   label,
   title,
@@ -178,6 +182,7 @@ function HeaderNavButton({
   visible = true,
   showLabel = true,
   dot = false,
+  active = false,
   children,
 }: {
   label: string;
@@ -188,6 +193,8 @@ function HeaderNavButton({
   showLabel?: boolean;
   /** Small indicator (e.g. "updates available") */
   dot?: boolean;
+  /** Current page: same raised chip as the active app in AppSwitcher */
+  active?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -198,8 +205,12 @@ function HeaderNavButton({
       onClick={onClick}
       title={title ?? label}
       aria-label={title ?? label}
+      aria-current={active ? "page" : undefined}
       className={cn(
-        "relative h-7 min-w-0 gap-1 rounded-[8px] px-2 text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5",
+        "relative h-7 min-w-0 gap-1 rounded-[8px] px-2",
+        active
+          ? "bg-background text-foreground shadow-sm hover:bg-background"
+          : "text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5",
         "transition-all duration-200 ease-in-out",
         !showLabel && "w-7 px-1",
         visible
@@ -208,7 +219,18 @@ function HeaderNavButton({
       )}
     >
       {children}
-      {showLabel ? <span>{label}</span> : null}
+      {/* Always rendered so useHeaderNavLabels can measure it; hidden ones take no space. */}
+      <span
+        data-nav-label
+        data-nav-hidden={showLabel ? undefined : ""}
+        aria-hidden={showLabel ? undefined : true}
+        className={cn(
+          !showLabel &&
+            "pointer-events-none invisible absolute whitespace-nowrap",
+        )}
+      >
+        {label}
+      </span>
       {dot ? (
         <span
           aria-hidden="true"
@@ -220,7 +242,7 @@ function HeaderNavButton({
 }
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   useDesktopAppUpdateToast();
 
@@ -348,6 +370,18 @@ function App() {
   const effectiveEditingProvider = useLastValidValue(editingProvider);
   const effectiveUsageProvider = useLastValidValue(usageProvider);
   const mainScrollRef = useRef<HTMLElement>(null);
+  const headerRowRef = useRef<HTMLDivElement>(null);
+  const headerSlotRef = useRef<HTMLDivElement>(null);
+  const headerClusterRef = useRef<HTMLDivElement>(null);
+  const [appsFullWidth, setAppsFullWidth] = useState(0);
+  const navLabelCount = useHeaderNavLabels({
+    rowRef: headerRowRef,
+    slotRef: headerSlotRef,
+    clusterRef: headerClusterRef,
+    appsWidth: appsFullWidth,
+    itemCount: HEADER_NAV_COUNT,
+    labelKey: i18n.language,
+  });
   const providerScrollContainerRef = useRef<HTMLDivElement>(null);
 
   useUsageCacheBridge();
@@ -1685,7 +1719,10 @@ function App() {
             />
           </div>
 
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
+          <div
+            ref={headerRowRef}
+            className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden"
+          >
             {currentView === "providers" &&
               activeApp !== "mcode" &&
               (settingsData?.showProfileSwitcher ?? true) && (
@@ -1695,21 +1732,37 @@ function App() {
               )}
             {/* 弹性中段：空间不足时由 AppSwitcher 自行收纳溢出应用；
                 justify-end + overflow-hidden 只裁剪 resize 瞬间的过渡帧 */}
-            <div className="flex min-w-0 flex-1 items-center justify-end overflow-hidden">
+            <div
+              ref={headerSlotRef}
+              className="flex min-w-0 flex-1 items-center justify-end overflow-hidden"
+            >
               <AppSwitcher
                 activeApp={activeApp}
                 onSwitch={selectApp}
                 visibleApps={visibleApps}
+                onFullWidthChange={setAppsFullWidth}
               />
             </div>
             {/* 固定右端：页面导航 + 主题 / 设置，shrink-0，任何配置下不被挤出 */}
-            <div className="flex shrink-0 items-center gap-1.5" style={noDrag}>
-              <div className="flex items-center gap-1 rounded-[8px] bg-muted p-1">
+            <div
+              ref={headerClusterRef}
+              className="flex shrink-0 items-center gap-1.5"
+              style={noDrag}
+            >
+              <div
+                data-header-nav
+                className="flex items-center gap-1 rounded-[8px] bg-muted p-1"
+              >
                 <HeaderNavButton
                   label={t("skills.manage")}
+                  showLabel={navLabelCount > 0}
+                  active={
+                    currentView === "skills" ||
+                    currentView === "skillsDiscovery"
+                  }
                   onClick={() => openPageFromNav("skills")}
                 >
-                  <SkillsIcon className="h-5 w-5 shrink-0" />
+                  <SkillsIcon className="h-4 w-4 shrink-0" />
                 </HeaderNavButton>
                 {/* Fork: keep Prompts out of the header toolbar. Do not restore on upstream merge.
                   <HeaderNavButton
@@ -1722,30 +1775,35 @@ function App() {
                 <HeaderNavButton
                   label={t("mcp.nav", { defaultValue: "MCP" })}
                   title={t("mcp.title")}
+                  showLabel={navLabelCount > 1}
+                  active={currentView === "mcp"}
                   onClick={() => openPageFromNav("mcp")}
                 >
-                  <McpIcon size={20} />
+                  <McpIcon size={16} />
                 </HeaderNavButton>
                 <HeaderNavButton
                   label={t("nav.usage")}
-                  showLabel={false}
+                  showLabel={navLabelCount > 2}
+                  active={currentView === "usage"}
                   onClick={() => openPageFromNav("usage")}
                 >
-                  <BarChart2 className="h-5 w-5 shrink-0" />
+                  <BarChart2 className="h-4 w-4 shrink-0" />
                 </HeaderNavButton>
                 <HeaderNavButton
                   label={t("sessionManager.title")}
-                  showLabel={false}
+                  showLabel={navLabelCount > 3}
+                  active={currentView === "sessions"}
                   onClick={() => openPageFromNav("sessions")}
                 >
-                  <History className="h-5 w-5 shrink-0" />
+                  <History className="h-4 w-4 shrink-0" />
                 </HeaderNavButton>
                 <HeaderNavButton
                   label={t("nav.auth")}
-                  showLabel={false}
+                  showLabel={navLabelCount > 4}
+                  active={currentView === "auth"}
                   onClick={() => openPageFromNav("auth")}
                 >
-                  <KeyRound className="h-5 w-5 shrink-0" />
+                  <KeyRound className="h-4 w-4 shrink-0" />
                 </HeaderNavButton>
                 <HeaderNavButton
                   label={t("nav.apps")}
@@ -1754,11 +1812,12 @@ function App() {
                       ? t("nav.appsHasUpdate")
                       : t("nav.appsTitle")
                   }
-                  showLabel={false}
+                  showLabel={navLabelCount > 5}
+                  active={currentView === "apps"}
                   dot={appsUpdateAvailable}
                   onClick={() => openPageFromNav("apps")}
                 >
-                  <LayoutGrid className="h-5 w-5 shrink-0" />
+                  <LayoutGrid className="h-4 w-4 shrink-0" />
                 </HeaderNavButton>
               </div>
               <div className="inline-flex h-7 shrink-0 items-center gap-1 rounded-[8px] bg-muted/50 px-1.5">

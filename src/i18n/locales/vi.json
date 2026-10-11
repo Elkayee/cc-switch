@@ -4064,6 +4064,20 @@
     "notRunnable": "Không chạy được",
     "otherInstalls": "Còn {{count}} bản cài khác",
     "installsFound": "Tìm thấy {{count}} bản cài",
+    "uninstall": "Gỡ bản cài này",
+    "uninstallConfirmTitle": "Gỡ bản cài này?",
+    "uninstallConfirmDesc": "Chỉ gỡ bản cài tại {{path}}. Bản còn lại được giữ nguyên. Nếu đây là bản terminal đang dùng, lệnh sẽ chuyển sang bản còn lại.",
+    "uninstallConfirmDescFile": "Bản cài này không do trình quản lý gói tạo ra, nên chỉ xóa file thực thi {{path}}. Bản còn lại được giữ nguyên.",
+    "uninstallConfirm": "Gỡ cài đặt",
+    "uninstallDone": "Đã gỡ {{path}}",
+    "uninstallFailed": "Gỡ cài đặt thất bại",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "Đây là bản cài duy nhất, không thể gỡ ở đây.",
+      "UNINSTALL_NOT_FOUND": "Bản cài này không còn tồn tại. Hãy làm mới rồi thử lại.",
+      "UNINSTALL_UNSUPPORTED": "Bản cài này không do trình quản lý gói mà Viber Switch gỡ được tạo ra.",
+      "UNINSTALL_INCOMPLETE": "Trình quản lý gói đã chạy xong nhưng file thực thi vẫn còn và không thể tự xóa. Hãy xóa thủ công.",
+      "UNINSTALL_IN_USE": "Bản cài này đang được dùng. Hãy đóng mọi {{tool}} đang chạy (terminal, editor, tiến trình nền) rồi thử lại."
+    },
     "wslFlag": "Flag",
     "installHint": {
       "claude": "Cài bằng script chính thức, nếu lỗi thì dùng npm",

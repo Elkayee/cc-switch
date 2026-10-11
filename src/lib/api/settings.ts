@@ -288,6 +288,11 @@ export const settingsApi = {
     });
   },
 
+  /** 卸载工具的某一处安装（仅多处安装时可用）。path 必须是探测结果里的入口。 */
+  async uninstallToolInstallation(tool: string, path: string): Promise<void> {
+    await invoke("uninstall_tool_installation", { tool, path });
+  },
+
   /** 探测各工具安装分布：枚举所有安装、标记冲突、生成锚定升级命令。
    *  诊断按钮、升级前确认、升级后补诊共用此命令，各取所需字段。 */
   async probeToolInstallations(
@@ -336,6 +341,10 @@ export interface ToolInstallation {
   error: string | null;
   source: string;
   is_path_default: boolean;
+  /** 后端认得出包管理器，能卸载这一处（原生安装器等为 false）。 */
+  can_uninstall: boolean;
+  /** true 时没有包管理器可调用，卸载 = 只删这个可执行文件。 */
+  uninstall_removes_file: boolean;
 }
 
 /** 一次"探测工具安装分布"的结果。字段对应后端 ToolInstallationReport。 */

@@ -11,16 +11,21 @@ import {
   Loader2,
   MoreHorizontal,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 import type { AppId } from "@/lib/api";
 import { providersApi } from "@/lib/api/providers";
-import type { ToolInstallationReport } from "@/lib/api/settings";
+import type {
+  ToolInstallation,
+  ToolInstallationReport,
+} from "@/lib/api/settings";
 import type { VisibleApps } from "@/types";
 import { DEFAULT_VISIBLE_APPS } from "@/config/appConfig";
 import { useSettings } from "@/hooks/useSettings";
 import { isUpdateAvailable } from "@/lib/version";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Switch } from "@/components/ui/switch";
 import { HelpTip } from "@/components/ui/help-tip";
 import { HoverTip } from "@/components/ui/hover-tip";
@@ -410,6 +415,8 @@ function ToolRow({
   visibility: React.ReactNode;
 }) {
   const { t } = useTranslation();
+  const [uninstallTarget, setUninstallTarget] =
+    useState<ToolInstallation | null>(null);
   const info = tools.toolVersionByName.get(tool);
   const report: ToolInstallationReport | undefined =
     tools.installReports?.[tool];
@@ -579,7 +586,28 @@ function ToolRow({
         <ul className="space-y-1">
           {installs.map((install) => (
             <li key={install.path}>
-              <ToolInstallRow inst={install} />
+              <ToolInstallRow
+                inst={install}
+                action={
+                  install.can_uninstall ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-muted-foreground hover:text-destructive"
+                      title={t("appsPage.uninstall")}
+                      aria-label={t("appsPage.uninstall")}
+                      disabled={isBusy || tools.uninstallingPath !== null}
+                      onClick={() => setUninstallTarget(install)}
+                    >
+                      {tools.uninstallingPath === install.path ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  ) : undefined
+                }
+              />
             </li>
           ))}
         </ul>
@@ -592,6 +620,23 @@ function ToolRow({
         {errorLine}
         {wslControls}
         {conflictList}
+        <ConfirmDialog
+          isOpen={uninstallTarget !== null}
+          title={t("appsPage.uninstallConfirmTitle")}
+          message={t(
+            uninstallTarget?.uninstall_removes_file
+              ? "appsPage.uninstallConfirmDescFile"
+              : "appsPage.uninstallConfirmDesc",
+            { path: uninstallTarget?.path ?? "" },
+          )}
+          confirmText={t("appsPage.uninstallConfirm")}
+          onConfirm={() => {
+            const target = uninstallTarget;
+            setUninstallTarget(null);
+            if (target) void tools.handleUninstallInstall(tool, target);
+          }}
+          onCancel={() => setUninstallTarget(null)}
+        />
       </div>
     ) : undefined;
 

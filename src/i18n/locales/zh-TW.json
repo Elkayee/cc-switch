@@ -4064,6 +4064,20 @@
     "notRunnable": "無法執行",
     "otherInstalls": "另有 {{count}} 處安裝",
     "installsFound": "偵測到 {{count}} 處安裝",
+    "uninstall": "解除安裝這處安裝",
+    "uninstallConfirmTitle": "解除安裝這處安裝？",
+    "uninstallConfirmDesc": "只會解除安裝 {{path}} 這一處，另一處保持不變。若這是終端機正在使用的那處，指令會切換到剩下的安裝。",
+    "uninstallConfirmDescFile": "這處安裝不是由套件管理員安裝的，只會刪除執行檔 {{path}}，另一處保持不變。",
+    "uninstallConfirm": "解除安裝",
+    "uninstallDone": "已解除安裝 {{path}}",
+    "uninstallFailed": "解除安裝失敗",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "這是唯一的安裝，無法在此解除安裝。",
+      "UNINSTALL_NOT_FOUND": "這處安裝已不存在，請重新整理後再試。",
+      "UNINSTALL_UNSUPPORTED": "這處安裝不是由 Viber Switch 能解除安裝的套件管理員安裝的。",
+      "UNINSTALL_INCOMPLETE": "套件管理員已執行完畢，但執行檔仍然存在且無法自動刪除，請手動刪除。",
+      "UNINSTALL_IN_USE": "這處安裝正在被使用。請關閉所有正在執行的 {{tool}}（終端機、編輯器、背景程序）後重試。"
+    },
     "wslFlag": "旗標",
     "installHint": {
       "claude": "安裝時執行官方安裝腳本，失敗時改用 npm",

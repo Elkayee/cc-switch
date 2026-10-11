@@ -4064,6 +4064,20 @@
     "notRunnable": "実行できません",
     "otherInstalls": "ほかに {{count}} 件のインストール",
     "installsFound": "{{count}} 件のインストールを検出",
+    "uninstall": "このインストールを削除",
+    "uninstallConfirmTitle": "このインストールを削除しますか？",
+    "uninstallConfirmDesc": "{{path}} のインストールだけを削除します。もう一方は残ります。ターミナルが使っているのがこれなら、コマンドは残りのインストールに切り替わります。",
+    "uninstallConfirmDescFile": "このインストールはパッケージマネージャー経由ではないため、実行ファイル {{path}} だけを削除します。もう一方は残ります。",
+    "uninstallConfirm": "削除",
+    "uninstallDone": "{{path}} を削除しました",
+    "uninstallFailed": "削除に失敗しました",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "唯一のインストールのため、ここでは削除できません。",
+      "UNINSTALL_NOT_FOUND": "このインストールはすでに存在しません。更新してもう一度お試しください。",
+      "UNINSTALL_UNSUPPORTED": "Viber Switch が削除できるパッケージマネージャーで入れたものではありません。",
+      "UNINSTALL_INCOMPLETE": "パッケージマネージャーは完了しましたが、実行ファイルが残っており自動では削除できません。手動で削除してください。",
+      "UNINSTALL_IN_USE": "このインストールは使用中です。実行中の {{tool}}（ターミナル、エディター、バックグラウンドプロセス）をすべて閉じてからもう一度お試しください。"
+    },
     "wslFlag": "フラグ",
     "installHint": {
       "claude": "公式インストールスクリプトで入れ、失敗したら npm を使います",

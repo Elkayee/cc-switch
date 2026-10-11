@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   probeToolInstallations: vi.fn(),
   listToolInstallations: vi.fn(),
   runToolLifecycleAction: vi.fn(),
+  uninstallToolInstallation: vi.fn(),
   info: vi.fn(),
   success: vi.fn(),
   warning: vi.fn(),
@@ -853,6 +854,8 @@ describe("AppsPage concurrent CLI upgrades", () => {
       error: null,
       source: "npm",
       is_path_default: isDefault,
+      can_uninstall: false,
+      uninstall_removes_file: false,
     });
     // 打开页面时只有一处安装；之后外部又装了一份，诊断才发现
     mocks.probeToolInstallations.mockImplementation(async (tools: string[]) =>
@@ -892,6 +895,121 @@ describe("AppsPage concurrent CLI upgrades", () => {
       expect.anything(),
     );
     expect(mocks.info).not.toHaveBeenCalled();
+  });
+
+  it("uninstalls one of two installs after confirmation and refreshes the row", async () => {
+    vi.resetModules();
+    const install = (path: string, isDefault: boolean, can: boolean) => ({
+      path,
+      version: "2.0.0",
+      runnable: true,
+      error: null,
+      source: "bun",
+      is_path_default: isDefault,
+      can_uninstall: can,
+      uninstall_removes_file: false,
+    });
+    const both = report("claude", {
+      is_conflict: true,
+      installs: [
+        install("/usr/local/bin/claude", true, false),
+        install("/Users/me/.bun/bin/claude", false, true),
+      ],
+    });
+    let removed = false;
+    mocks.uninstallToolInstallation.mockImplementation(async () => {
+      removed = true;
+    });
+    mocks.probeToolInstallations.mockImplementation(async (tools: string[]) =>
+      tools.map((tool) =>
+        tool === "claude" && !removed
+          ? both
+          : report(tool, {
+              installs:
+                tool === "claude"
+                  ? [install("/usr/local/bin/claude", true, false)]
+                  : [],
+            }),
+      ),
+    );
+    await renderApps();
+    await userEvent.click(
+      screen.getByRole("button", { name: "appsPage.moreActions" }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: "settings.toolDiagnose" }),
+    );
+    expect(
+      await card("Claude Code").findByText("/Users/me/.bun/bin/claude"),
+    ).toBeInTheDocument();
+
+    // only the removable install gets a trash button
+    const trash = card("Claude Code").getAllByRole("button", {
+      name: "appsPage.uninstall",
+    });
+    expect(trash).toHaveLength(1);
+    await userEvent.click(trash[0]);
+    expect(mocks.uninstallToolInstallation).not.toHaveBeenCalled();
+    await userEvent.click(
+      await screen.findByRole("button", { name: "appsPage.uninstallConfirm" }),
+    );
+
+    await waitFor(() =>
+      expect(mocks.uninstallToolInstallation).toHaveBeenCalledWith(
+        "claude",
+        "/Users/me/.bun/bin/claude",
+      ),
+    );
+    await waitFor(() =>
+      expect(
+        card("Claude Code").queryByText("/Users/me/.bun/bin/claude"),
+      ).toBeNull(),
+    );
+    expect(mocks.success).toHaveBeenCalled();
+  });
+
+  it("offers file deletion with its own warning when no package manager owns the install", async () => {
+    vi.resetModules();
+    const install = (path: string, isDefault: boolean, byFile: boolean) => ({
+      path,
+      version: "2.0.0",
+      runnable: true,
+      error: null,
+      source: "system",
+      is_path_default: isDefault,
+      can_uninstall: true,
+      uninstall_removes_file: byFile,
+    });
+    mocks.probeToolInstallations.mockImplementation(async (tools: string[]) =>
+      tools.map((tool) =>
+        tool === "claude"
+          ? report(tool, {
+              is_conflict: true,
+              installs: [
+                install("/usr/local/bin/claude", true, false),
+                install("/Users/me/.cherrystudio/bin/claude", false, true),
+              ],
+            })
+          : report(tool),
+      ),
+    );
+    await renderApps();
+    await userEvent.click(
+      screen.getByRole("button", { name: "appsPage.moreActions" }),
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: "settings.toolDiagnose" }),
+    );
+    await card("Claude Code").findByText("/Users/me/.cherrystudio/bin/claude");
+    // both rows are removable
+    const trash = card("Claude Code").getAllByRole("button", {
+      name: "appsPage.uninstall",
+    });
+    expect(trash).toHaveLength(2);
+    await userEvent.click(trash[1]);
+    expect(
+      await screen.findByText("appsPage.uninstallConfirmDescFile"),
+    ).toBeInTheDocument();
   });
 });
 

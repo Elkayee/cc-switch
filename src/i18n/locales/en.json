@@ -4064,6 +4064,20 @@
     "notRunnable": "Can't run",
     "otherInstalls": "{{count}} more install(s)",
     "installsFound": "{{count}} installs found",
+    "uninstall": "Uninstall this install",
+    "uninstallConfirmTitle": "Uninstall this install?",
+    "uninstallConfirmDesc": "This removes only the install at {{path}}. The other install stays. If this is the one your terminal uses, the command will switch to the remaining install.",
+    "uninstallConfirmDescFile": "This install wasn't set up by a package manager, so only the executable file {{path}} will be deleted. The other install stays.",
+    "uninstallConfirm": "Uninstall",
+    "uninstallDone": "Uninstalled {{path}}",
+    "uninstallFailed": "Uninstall failed",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "This is the only install; it can't be removed here.",
+      "UNINSTALL_NOT_FOUND": "That install no longer exists. Refresh and try again.",
+      "UNINSTALL_UNSUPPORTED": "This install wasn't set up by a package manager Viber Switch can uninstall.",
+      "UNINSTALL_INCOMPLETE": "The package manager finished but the executable is still there and can't be removed automatically. Delete it by hand.",
+      "UNINSTALL_IN_USE": "This install is in use. Close every running {{tool}} (terminals, editors, background processes) and try again."
+    },
     "wslFlag": "Flag",
     "installHint": {
       "claude": "Installs with the official script, falls back to npm",

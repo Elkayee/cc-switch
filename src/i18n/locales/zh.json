@@ -4064,6 +4064,20 @@
     "notRunnable": "无法运行",
     "otherInstalls": "另有 {{count}} 处安装",
     "installsFound": "检测到 {{count}} 处安装",
+    "uninstall": "卸载这处安装",
+    "uninstallConfirmTitle": "卸载这处安装？",
+    "uninstallConfirmDesc": "只会卸载 {{path}} 这一处，另一处保持不变。若这是终端正在使用的那处，命令会切换到剩下的安装。",
+    "uninstallConfirmDescFile": "这处安装不是由包管理器安装的，只会删除可执行文件 {{path}}，另一处保持不变。",
+    "uninstallConfirm": "卸载",
+    "uninstallDone": "已卸载 {{path}}",
+    "uninstallFailed": "卸载失败",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "这是唯一的安装，无法在此卸载。",
+      "UNINSTALL_NOT_FOUND": "这处安装已不存在，请刷新后重试。",
+      "UNINSTALL_UNSUPPORTED": "这处安装不是由 Viber Switch 能卸载的包管理器安装的。",
+      "UNINSTALL_INCOMPLETE": "包管理器已执行完毕，但可执行文件仍然存在且无法自动删除，请手动删除。",
+      "UNINSTALL_IN_USE": "这处安装正在被使用。请关闭所有正在运行的 {{tool}}（终端、编辑器、后台进程）后重试。"
+    },
     "wslFlag": "标志",
     "installHint": {
       "claude": "安装时运行官方安装脚本，失败时改用 npm",
