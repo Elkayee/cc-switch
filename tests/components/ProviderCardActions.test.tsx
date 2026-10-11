@@ -9,6 +9,8 @@ async function openMenu(presentation: CardPresentation) {
   render(
     <ProviderCardActions
       providerName="Kimi"
+      appId="claude"
+      providerId="kimi"
       presentation={presentation}
       onEdit={vi.fn()}
       onDelete={vi.fn()}

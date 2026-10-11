@@ -28,6 +28,7 @@ import {
   extractCodexExperimentalBearerToken,
   extractProviderBaseUrl,
 } from "@/utils/providerConfigUtils";
+import { extractUpstreamInfo } from "@/lib/upstreamInfo";
 import { resolveManagedAccountId } from "@/lib/authBinding";
 import { resolveCodexOfficialIdentity } from "@/utils/providerCapabilities";
 import { useProviderHealth } from "@/lib/query/failover";
@@ -530,8 +531,13 @@ export function ProviderCard({
           </div>
           <ProviderCardActions
             providerName={provider.name}
+            appId={appId}
+            providerId={provider.id}
             presentation={presentation}
             copyProxyUrl={copyProxyUrl}
+            upstream={
+              copyProxyUrl ? extractUpstreamInfo(appId, provider) : undefined
+            }
             onEdit={() => onEdit(provider)}
             onDelete={() => onDelete(provider)}
             onDuplicate={onDuplicate ? () => onDuplicate(provider) : undefined}

@@ -72,6 +72,7 @@ const RESERVED: &[&str] = &[
     "chat",
     "images",
     "alpha",
+    "auth",
 ];
 
 fn split_first_segment(path: &str) -> Option<(&str, &str)> {

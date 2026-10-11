@@ -439,6 +439,9 @@ pub struct CopilotToken {
     pub token: String,
     /// 过期时间戳（Unix 秒）
     pub expires_at: i64,
+    /// Unix seconds when the token was obtained; 0 when unknown (tokens from older versions).
+    #[serde(default)]
+    pub issued_at: i64,
 }
 
 impl CopilotToken {
@@ -918,6 +921,47 @@ impl CopilotAuthManager {
         tokens.get(account_id).map(|t| t.token.clone()).ok_or(
             CopilotAuthError::CopilotTokenFetchFailed("still no token after refresh".to_string()),
         )
+    }
+
+    /// Cached Copilot token and its expiry (`expires_at` is unix seconds), for the
+    /// direct-token lease. `lifetime_ms` is 0 when the issue time is unknown, which
+    /// keeps such a token out of early renewal.
+    pub(crate) async fn cached_token_view(
+        &self,
+        account_id: &str,
+    ) -> Option<crate::proxy::direct_token::TokenView> {
+        let tokens = self.copilot_tokens.read().await;
+        let cached = tokens.get(account_id)?;
+        Some(crate::proxy::direct_token::TokenView {
+            token: cached.token.clone(),
+            expires_at_ms: Some(cached.expires_at.saturating_mul(1_000)),
+            lifetime_ms: if cached.issued_at > 0 {
+                (cached.expires_at - cached.issued_at)
+                    .max(0)
+                    .saturating_mul(1_000)
+            } else {
+                0
+            },
+        })
+    }
+
+    pub(crate) async fn evict_cached_token(&self, account_id: &str) {
+        self.copilot_tokens.write().await.remove(account_id);
+    }
+
+    /// GitHub Enterprise Server accounts use the long-lived GitHub OAuth token as the
+    /// bearer; that must never be handed out.
+    pub(crate) async fn is_ghes_account(&self, account_id: &str) -> bool {
+        is_ghes(&self.get_account_domain(account_id).await)
+    }
+
+    /// Account a provider uses: its bound account, else the default account.
+    pub async fn account_id_for_provider(&self, bound: Option<String>) -> Option<String> {
+        let _ = self.ensure_migration_complete().await;
+        match bound.as_deref().map(str::trim).filter(|id| !id.is_empty()) {
+            Some(id) => Some(id.to_string()),
+            None => self.resolve_default_account_id().await,
+        }
     }
 
     /// 获取有效的 Copilot Token（向后兼容：使用第一个账号）
@@ -1560,6 +1604,7 @@ impl CopilotAuthManager {
         let copilot_token = CopilotToken {
             token: token_response.token,
             expires_at: token_response.expires_at,
+            issued_at: chrono::Utc::now().timestamp(),
         };
 
         let mut tokens = self.copilot_tokens.write().await;
@@ -1834,6 +1879,7 @@ mod tests {
         let token = CopilotToken {
             token: "test".to_string(),
             expires_at: now + 3600,
+            issued_at: 0,
         };
         assert!(!token.is_expiring_soon());
 
@@ -1841,6 +1887,7 @@ mod tests {
         let token = CopilotToken {
             token: "test".to_string(),
             expires_at: now + 30,
+            issued_at: 0,
         };
         assert!(token.is_expiring_soon());
 
@@ -1848,6 +1895,7 @@ mod tests {
         let token = CopilotToken {
             token: "test".to_string(),
             expires_at: now - 100,
+            issued_at: 0,
         };
         assert!(token.is_expiring_soon());
     }

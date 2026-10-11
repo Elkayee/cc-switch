@@ -756,7 +756,7 @@ pub fn run() {
 
     #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+        let single_instance = tauri_plugin_single_instance::init(|app, args, _cwd| {
             log::info!("=== Single Instance Callback Triggered ===");
             log::debug!("Args count: {}", args.len());
             for (i, arg) in args.iter().enumerate() {
@@ -799,7 +799,11 @@ pub fn run() {
                     linux_fix::nudge_main_window(window.clone(), "single-instance");
                 }
             }
-        }));
+        });
+        // A dev session runs next to the installed release, so it must not hand off to it.
+        if !config::is_dev_session() {
+            builder = builder.plugin(single_instance);
+        }
     }
 
     #[cfg(target_os = "windows")]
@@ -1767,6 +1771,7 @@ pub fn run() {
             commands::auth_cancel_login,
             commands::auth_list_accounts,
             commands::auth_get_status,
+            commands::get_provider_direct_token,
             commands::auth_remove_account,
             commands::auth_set_default_account,
             commands::auth_logout,

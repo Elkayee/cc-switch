@@ -159,7 +159,7 @@ impl ProxyServer {
             loop {
                 tokio::select! {
                     result = listener.accept() => {
-                        let (stream, _remote_addr) = match result {
+                        let (stream, remote_addr) = match result {
                             Ok(v) => v,
                             Err(e) => {
                                 log::error!("[{SRV}] accept 失败: {e}", SRV = log_srv::ACCEPT_ERR);
@@ -169,6 +169,7 @@ impl ProxyServer {
                         };
 
                         let app = app.clone();
+                        let peer = super::direct_token::PeerAddr(remote_addr);
                         tokio::spawn(async move {
                             // Peek raw TCP bytes to capture original header casing
                             // before hyper parses (and lowercases) the header names.
@@ -200,6 +201,7 @@ impl ProxyServer {
 
                                     // Insert our own header case map alongside hyper's internal one
                                     parts.extensions.insert(cases);
+                                    parts.extensions.insert(peer);
 
                                     let body = axum::body::Body::new(body);
                                     let axum_req = http::Request::from_parts(parts, body);
@@ -309,6 +311,11 @@ impl ProxyServer {
             // 健康检查
             .route("/health", get(handlers::health_check))
             .route("/status", get(handlers::get_status))
+            // 托管 OAuth 的直连 token（仅本机、非浏览器调用方）
+            .route(
+                "/auth/token/:app/:provider_id",
+                get(super::direct_token::handle_direct_token),
+            )
             // Claude API (支持带前缀和不带前缀两种格式)
             .route("/v1/messages", post(handlers::handle_messages))
             .route("/claude/v1/messages", post(handlers::handle_messages))

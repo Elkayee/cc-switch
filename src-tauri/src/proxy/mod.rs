@@ -7,6 +7,7 @@ pub mod cache_injector;
 pub mod circuit_breaker;
 pub(crate) mod content_encoding;
 pub mod copilot_optimizer;
+pub(crate) mod direct_token;
 pub mod error;
 pub mod error_mapper;
 pub(crate) mod failover_switch;

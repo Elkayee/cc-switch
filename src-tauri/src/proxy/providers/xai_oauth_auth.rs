@@ -26,6 +26,9 @@ const POLLING_SAFETY_MARGIN_SECS: u64 = 3;
 const MAX_DEVICE_CODE_LIFETIME_SECS: u64 = 24 * 60 * 60;
 const MAX_POLL_INTERVAL_SECS: u64 = 60;
 const MAX_OAUTH_RESPONSE_BYTES: usize = 64 * 1024;
+/// After a failed refresh (network / 5xx) answer queued callers from the failure
+/// instead of letting each of them hit the token endpoint again.
+const REFRESH_FAILURE_BACKOFF_MS: i64 = 5_000;
 
 #[derive(Debug, thiserror::Error)]
 pub enum XaiOAuthError {
@@ -115,9 +118,20 @@ struct XaiTokenClaims {
 struct CachedAccessToken {
     token: String,
     expires_at_ms: i64,
+    /// Total life the token was issued with (ms). Decides whether it is worth renewing early.
+    lifetime_ms: i64,
 }
 
 impl CachedAccessToken {
+    /// A token that was just issued and expires at `expires_at_ms`.
+    fn issued_now(token: String, expires_at_ms: i64) -> Self {
+        Self {
+            token,
+            expires_at_ms,
+            lifetime_ms: (expires_at_ms - chrono::Utc::now().timestamp_millis()).max(0),
+        }
+    }
+
     fn is_expiring_soon(&self) -> bool {
         self.expires_at_ms - chrono::Utc::now().timestamp_millis() < TOKEN_REFRESH_BUFFER_MS
     }
@@ -192,6 +206,8 @@ pub struct XaiOAuthManager {
     default_account_id: Arc<RwLock<Option<String>>>,
     access_tokens: Arc<RwLock<HashMap<String, CachedAccessToken>>>,
     refresh_locks: Arc<RwLock<HashMap<String, Arc<Mutex<()>>>>>,
+    /// account id -> (when, message) of the last failed refresh (ms).
+    refresh_failures: Arc<std::sync::Mutex<HashMap<String, (i64, String)>>>,
     pending_device_codes: Arc<RwLock<HashMap<String, PendingDeviceCode>>>,
     discovered_endpoints: Arc<RwLock<Option<OAuthEndpoints>>>,
     mutation_lock: Arc<Mutex<()>>,
@@ -205,6 +221,7 @@ impl XaiOAuthManager {
             default_account_id: Arc::new(RwLock::new(None)),
             access_tokens: Arc::new(RwLock::new(HashMap::new())),
             refresh_locks: Arc::new(RwLock::new(HashMap::new())),
+            refresh_failures: Arc::new(std::sync::Mutex::new(HashMap::new())),
             pending_device_codes: Arc::new(RwLock::new(HashMap::new())),
             discovered_endpoints: Arc::new(RwLock::new(None)),
             mutation_lock: Arc::new(Mutex::new(())),
@@ -350,10 +367,10 @@ impl XaiOAuthManager {
             )
         })?;
 
-        let cached_access_token = CachedAccessToken {
-            token: tokens.access_token,
-            expires_at_ms: compute_expires_at_ms(tokens.expires_in),
-        };
+        let cached_access_token = CachedAccessToken::issued_now(
+            tokens.access_token,
+            compute_expires_at_ms(tokens.expires_in),
+        );
         let account = self
             .add_account_internal(
                 account_id,
@@ -391,17 +408,89 @@ impl XaiOAuthManager {
             return Err(XaiOAuthError::ReauthRequired(account_id.to_string()));
         }
 
+        if let Some(message) = self.recent_refresh_failure(account_id) {
+            return Err(XaiOAuthError::TokenFetchFailed(message));
+        }
+
         let tokens = match self.refresh_with_token(&account.refresh_token).await {
             Ok(tokens) => tokens,
             Err(XaiOAuthError::RefreshTokenInvalid) => {
                 self.mark_reauth_required(account_id).await?;
                 return Err(XaiOAuthError::ReauthRequired(account_id.to_string()));
             }
-            Err(error) => return Err(error),
+            Err(error) => {
+                self.record_refresh_failure(account_id, error.to_string());
+                return Err(error);
+            }
         };
+        self.clear_refresh_failure(account_id);
 
         self.commit_refreshed_tokens(account_id, &account.refresh_token, tokens)
             .await
+    }
+
+    /// Account a provider uses: its bound account, else the default account.
+    /// The forwarder and the direct-token endpoint both resolve through here so
+    /// they can never pick different accounts.
+    pub async fn account_id_for_provider(&self, bound: Option<String>) -> Option<String> {
+        match bound.as_deref().map(str::trim).filter(|id| !id.is_empty()) {
+            Some(id) => Some(id.to_string()),
+            None => self.resolve_default_account_id().await,
+        }
+    }
+
+    /// Cached token and its expiry, for the direct-token lease (`proxy::direct_token`).
+    pub(crate) async fn cached_token_view(
+        &self,
+        account_id: &str,
+    ) -> Option<crate::proxy::direct_token::TokenView> {
+        let cache = self.access_tokens.read().await;
+        let cached = cache.get(account_id)?;
+        Some(crate::proxy::direct_token::TokenView {
+            token: cached.token.clone(),
+            expires_at_ms: Some(cached.expires_at_ms),
+            lifetime_ms: cached.lifetime_ms,
+        })
+    }
+
+    /// Drop the cached token so the next `get_valid_token_for_account` refreshes
+    /// (through the same single-flight path as the proxy).
+    pub(crate) async fn evict_cached_token(&self, account_id: &str) {
+        self.access_tokens.write().await.remove(account_id);
+    }
+
+    fn recent_refresh_failure(&self, account_id: &str) -> Option<String> {
+        let now = chrono::Utc::now().timestamp_millis();
+        let map = self.refresh_failures.lock().ok()?;
+        let (at, message) = map.get(account_id)?;
+        (now - at < REFRESH_FAILURE_BACKOFF_MS).then(|| message.clone())
+    }
+
+    fn record_refresh_failure(&self, account_id: &str, message: String) {
+        if let Ok(mut map) = self.refresh_failures.lock() {
+            map.insert(
+                account_id.to_string(),
+                (chrono::Utc::now().timestamp_millis(), message),
+            );
+        }
+    }
+
+    /// Forget failure memory for one account, or all of them.
+    fn clear_refresh_state(&self, account_id: Option<&str>) {
+        match account_id {
+            Some(id) => self.clear_refresh_failure(id),
+            None => {
+                if let Ok(mut failures) = self.refresh_failures.lock() {
+                    failures.clear();
+                }
+            }
+        }
+    }
+
+    fn clear_refresh_failure(&self, account_id: &str) {
+        if let Ok(mut map) = self.refresh_failures.lock() {
+            map.remove(account_id);
+        }
     }
 
     pub async fn get_valid_token(&self) -> Result<String, XaiOAuthError> {
@@ -455,6 +544,7 @@ impl XaiOAuthManager {
             .await?;
         self.access_tokens.write().await.remove(account_id);
         self.refresh_locks.write().await.remove(account_id);
+        self.clear_refresh_state(Some(account_id));
         Ok(())
     }
 
@@ -480,6 +570,7 @@ impl XaiOAuthManager {
         *self.default_account_id.write().await = None;
         self.access_tokens.write().await.clear();
         self.refresh_locks.write().await.clear();
+        self.clear_refresh_state(None);
         self.pending_device_codes.write().await.clear();
         Ok(())
     }
@@ -648,10 +739,10 @@ impl XaiOAuthManager {
         let access_token = tokens.access_token;
         self.access_tokens.write().await.insert(
             account_id.to_string(),
-            CachedAccessToken {
-                token: access_token.clone(),
-                expires_at_ms: compute_expires_at_ms(tokens.expires_in),
-            },
+            CachedAccessToken::issued_now(
+                access_token.clone(),
+                compute_expires_at_ms(tokens.expires_in),
+            ),
         );
         Ok(access_token)
     }
@@ -1218,6 +1309,7 @@ mod tests {
         let cached_token = CachedAccessToken {
             token: "cached-access-token".to_string(),
             expires_at_ms: chrono::Utc::now().timestamp_millis() + 3_600_000,
+            lifetime_ms: 3_600_000,
         };
 
         manager
@@ -1348,6 +1440,7 @@ mod tests {
                 Some(CachedAccessToken {
                     token: "access-token".to_string(),
                     expires_at_ms: chrono::Utc::now().timestamp_millis() + 3_600_000,
+                    lifetime_ms: 3_600_000,
                 }),
             )
             .await;
@@ -1356,5 +1449,99 @@ mod tests {
         assert!(manager.list_accounts().await.is_empty());
         assert!(manager.access_tokens.read().await.is_empty());
         assert!(!data_dir.path().join("xai_oauth_auth.json").exists());
+    }
+}
+
+/// The shared lease policy against the real manager (mock token endpoint).
+#[cfg(test)]
+mod lease_tests {
+    use super::*;
+    use crate::proxy::direct_token::{lease, LeaseGate, XaiSource};
+    use axum::{extract::State, http::StatusCode, routing::post, Json, Router};
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    #[derive(Clone)]
+    struct MockToken {
+        calls: Arc<AtomicUsize>,
+    }
+
+    async fn mock_token(State(mock): State<MockToken>) -> (StatusCode, Json<serde_json::Value>) {
+        let n = mock.calls.fetch_add(1, Ordering::SeqCst) + 1;
+        // Keep the call open long enough for concurrent callers to pile up.
+        tokio::time::sleep(std::time::Duration::from_millis(50)).await;
+        (
+            StatusCode::OK,
+            Json(serde_json::json!({ "access_token": format!("token-{n}"), "expires_in": 3600 })),
+        )
+    }
+
+    /// Manager with one account, a cached token "old", and a mock refresh endpoint.
+    async fn setup(
+        lifetime_ms: i64,
+        remaining_ms: i64,
+    ) -> (XaiOAuthManager, Arc<AtomicUsize>, tempfile::TempDir) {
+        let calls = Arc::new(AtomicUsize::new(0));
+        let app = Router::new()
+            .route("/token", post(mock_token))
+            .with_state(MockToken {
+                calls: calls.clone(),
+            });
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/token", listener.local_addr().unwrap());
+        tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
+
+        let dir = tempfile::tempdir().unwrap();
+        let manager = XaiOAuthManager::new(dir.path().to_path_buf());
+        manager
+            .add_account_internal("acc".to_string(), None, "refresh".to_string(), None, None)
+            .await
+            .unwrap();
+        *manager.discovered_endpoints.write().await = Some(OAuthEndpoints {
+            token_endpoint: url.clone(),
+            device_authorization_endpoint: url,
+        });
+        manager.access_tokens.write().await.insert(
+            "acc".to_string(),
+            CachedAccessToken {
+                token: "old".to_string(),
+                expires_at_ms: chrono::Utc::now().timestamp_millis() + remaining_ms,
+                lifetime_ms,
+            },
+        );
+        (manager, calls, dir)
+    }
+
+    const HOUR: i64 = 3_600_000;
+
+    #[tokio::test]
+    async fn concurrent_reports_of_a_stale_token_hit_the_token_endpoint_once() {
+        let (manager, calls, _dir) = setup(HOUR, HOUR).await;
+        let manager = Arc::new(manager);
+        let gate = Arc::new(LeaseGate::default());
+        let handles: Vec<_> = (0..16)
+            .map(|_| {
+                let (manager, gate) = (manager.clone(), gate.clone());
+                tokio::spawn(async move {
+                    lease(&gate, "k", &XaiSource(&manager), "acc", Some("old")).await
+                })
+            })
+            .collect();
+        for handle in handles {
+            assert_eq!(handle.await.unwrap().unwrap().token, "token-1");
+        }
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+    }
+
+    #[tokio::test]
+    async fn a_long_lived_token_nearing_expiry_is_renewed_once_then_left_alone() {
+        let (manager, calls, _dir) = setup(6 * HOUR, HOUR / 2).await;
+        let gate = LeaseGate::default();
+        for _ in 0..10 {
+            let lease = lease(&gate, "k", &XaiSource(&manager), "acc", None)
+                .await
+                .unwrap();
+            assert_eq!(lease.token, "token-1");
+        }
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
     }
 }

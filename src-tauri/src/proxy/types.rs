@@ -39,11 +39,40 @@ fn default_non_streaming_timeout() -> u64 {
     600
 }
 
+pub const DEFAULT_LISTEN_PORT: u16 = 15721;
+/// A `CC_SWITCH_DEV` session runs beside the installed release, so it must not take its port.
+pub const DEV_LISTEN_PORT: u16 = 15731;
+
+/// Port a fresh proxy config starts with.
+pub fn default_listen_port() -> u16 {
+    // Unit tests assert the stock port; `CC_SWITCH_DEV=1` (how they are run) must not change it.
+    listen_port_for(!cfg!(test) && crate::config::is_dev_session())
+}
+
+fn listen_port_for(is_dev: bool) -> u16 {
+    if is_dev {
+        DEV_LISTEN_PORT
+    } else {
+        DEFAULT_LISTEN_PORT
+    }
+}
+
+#[cfg(test)]
+mod default_port_tests {
+    use super::*;
+
+    #[test]
+    fn dev_session_gets_its_own_port() {
+        assert_eq!(listen_port_for(false), 15721);
+        assert_eq!(listen_port_for(true), 15731);
+    }
+}
+
 impl Default for ProxyConfig {
     fn default() -> Self {
         Self {
             listen_address: "127.0.0.1".to_string(),
-            listen_port: 15721, // 使用较少占用的高位端口
+            listen_port: default_listen_port(), // 使用较少占用的高位端口
             max_retries: 3,
             request_timeout: 600,
             enable_logging: true,

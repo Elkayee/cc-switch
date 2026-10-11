@@ -68,8 +68,7 @@ fn create_backup(conflicts: &[EnvConflict]) -> Result<BackupInfo, String> {
 
 /// Get backup directory path
 pub(crate) fn backup_dir() -> Result<PathBuf, String> {
-    let home = dirs::home_dir().ok_or("Cannot determine user home directory")?;
-    Ok(home.join(".cc-switch").join("backups"))
+    Ok(crate::config::device_dir().join("backups"))
 }
 
 /// Delete a single environment variable

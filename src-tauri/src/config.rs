@@ -52,6 +52,17 @@ fn env_flag_enabled(name: &str) -> bool {
         .unwrap_or(false)
 }
 
+/// True when `CC_SWITCH_DEV` isolates this process from the installed release.
+pub(crate) fn is_dev_session() -> bool {
+    dir_suffix().is_some()
+}
+
+/// Per-device data dir (`settings.json`, write-ahead intents, backups): `~/.cc-switch`,
+/// or `~/.cc-switch-dev` in a dev session. Never follows `app_config_dir` overrides.
+pub(crate) fn device_dir() -> PathBuf {
+    apply_dir_suffix(get_home_dir().join(".cc-switch"))
+}
+
 fn resolve_dir_suffix(is_dev: bool, has_test_home_override: bool) -> Option<&'static str> {
     if !is_dev || has_test_home_override {
         None
@@ -787,6 +798,95 @@ mod tests {
         assert_eq!(resolve_dir_suffix(true, true), None);
         assert_eq!(resolve_dir_suffix(false, false), None);
         assert_eq!(resolve_dir_suffix(false, true), None);
+    }
+
+    /// Guard for `CC_SWITCH_DEV`: a dev session must never touch the release's
+    /// `~/.cc-switch` or its proxy port. Upstream code (and merges) tend to add
+    /// `.join(".cc-switch")` / `15721` directly; route them through
+    /// `config::device_dir()` / `proxy::types::default_listen_port()` instead.
+    #[test]
+    fn no_hardcoded_release_dir_or_port_outside_the_dev_aware_helpers() {
+        // Files that own the literal. Test modules are skipped (scan stops at the first `#[cfg(test)]`).
+        const DIR_ALLOWED: &[&str] = &["config.rs"];
+        const PORT_ALLOWED: &[&str] = &["proxy/types.rs", "database/schema.rs"];
+
+        // `15721` as a number, not inside a longer digit run (the Claude Desktop profile UUID).
+        fn has_port_literal(line: &str) -> bool {
+            line.match_indices("15721").any(|(at, hit)| {
+                let before = line[..at].chars().next_back();
+                let after = line[at + hit.len()..].chars().next();
+                !before.is_some_and(|c| c.is_ascii_digit())
+                    && !after.is_some_and(|c| c.is_ascii_digit())
+            })
+        }
+
+        fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap().flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().is_some_and(|ext| ext == "rs") {
+                    out.push(path);
+                }
+            }
+        }
+
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let mut files = Vec::new();
+        walk(&root, &mut files);
+
+        let mut offenders = Vec::new();
+        for file in files {
+            let rel = file
+                .strip_prefix(&root)
+                .unwrap()
+                .to_string_lossy()
+                .replace('\\', "/");
+            let text = fs::read_to_string(&file).unwrap();
+            for (index, line) in text.lines().enumerate() {
+                if line.trim() == "#[cfg(test)]" {
+                    break;
+                }
+                let trimmed = line.trim_start();
+                if trimmed.starts_with("//") {
+                    continue;
+                }
+                if line.contains("\".cc-switch\"") && !DIR_ALLOWED.contains(&rel.as_str()) {
+                    offenders.push(format!("{rel}:{}: \".cc-switch\"", index + 1));
+                }
+                if has_port_literal(line) && !PORT_ALLOWED.contains(&rel.as_str()) {
+                    offenders.push(format!("{rel}:{}: 15721", index + 1));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "use config::device_dir() / proxy::types::default_listen_port() so CC_SWITCH_DEV stays isolated:
+{}",
+            offenders.join("
+")
+        );
+    }
+
+    #[test]
+    fn single_instance_plugin_stays_behind_the_dev_check() {
+        let lib =
+            fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("src/lib.rs")).unwrap();
+        let gate = lib
+            .find("if !config::is_dev_session()")
+            .expect("lib.rs must skip single-instance when CC_SWITCH_DEV is set");
+        let plugin = lib
+            .find("builder.plugin(single_instance)")
+            .expect("single-instance plugin registration moved");
+        assert!(gate < plugin && plugin - gate < 200);
+    }
+
+    #[test]
+    fn dev_suffix_never_resolves_to_the_release_data_dir() {
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.cc-switch"), Some("-dev")),
+            PathBuf::from("/home/u/.cc-switch-dev")
+        );
     }
 
     #[test]

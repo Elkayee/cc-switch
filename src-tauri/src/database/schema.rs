@@ -14,6 +14,17 @@ struct LegacySkillMigrationRow {
 }
 
 impl Database {
+    /// Point freshly seeded proxy rows at the session's default port (dev sessions only).
+    pub(crate) fn apply_default_listen_port(conn: &Connection) -> Result<(), AppError> {
+        let port = crate::proxy::types::default_listen_port();
+        if port == crate::proxy::types::DEFAULT_LISTEN_PORT {
+            return Ok(());
+        }
+        conn.execute("UPDATE proxy_config SET listen_port = ?1", [port])
+            .map_err(|e| AppError::Database(e.to_string()))?;
+        Ok(())
+    }
+
     /// 创建所有数据库表
     pub(crate) fn create_tables(&self) -> Result<(), AppError> {
         let conn = lock_conn!(self.conn);
@@ -147,6 +158,12 @@ impl Database {
         // - 老版本 proxy_config 是单例表（没有 app_type 列），此时不能执行三行 seed insert；
         // - 旧表会在 apply_schema_migrations() 中迁移为三行结构后再插入。
         if Self::has_column(conn, "proxy_config", "app_type")? {
+            let fresh = conn
+                .query_row("SELECT COUNT(*) FROM proxy_config", [], |row| {
+                    row.get::<_, i64>(0)
+                })
+                .map_err(|e| AppError::Database(e.to_string()))?
+                == 0;
             conn.execute(
                 "INSERT OR IGNORE INTO proxy_config (app_type, max_retries,
                 streaming_first_byte_timeout, streaming_idle_timeout, non_streaming_timeout,
@@ -183,6 +200,9 @@ impl Database {
                 [],
             )
             .map_err(|e| AppError::Database(e.to_string()))?;
+            if fresh {
+                Self::apply_default_listen_port(conn)?;
+            }
         }
 
         // 9. Provider Health 表

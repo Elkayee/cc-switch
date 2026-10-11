@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import {
   ArrowDown,
   ArrowUp,
-  Check,
   ChevronDown,
   CircleDot,
   ListMinus,
@@ -23,8 +22,7 @@ import {
   Star,
   type LucideIcon,
 } from "lucide-react";
-import { toast } from "@/lib/toast";
-import { copyText } from "@/lib/clipboard";
+import type { UpstreamInfo } from "@/lib/upstreamInfo";
 import { Button } from "@/components/ui/button";
 import { DisabledReason } from "@/components/ui/help-tip";
 import { HoverTip } from "@/components/ui/hover-tip";
@@ -37,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { ProxyConnectDialog } from "./ProxyConnectDialog";
 import type { CardButton, CardPresentation, CardTone } from "./presentation";
 
 const DOT: Record<CardTone | "muted", string> = {
@@ -64,6 +63,8 @@ const BUTTON_ICON: Record<string, LucideIcon> = {
 
 interface ProviderCardActionsProps {
   providerName: string;
+  appId: string;
+  providerId: string;
   presentation: CardPresentation;
   onEdit: () => void;
   onDelete: () => void;
@@ -74,6 +75,8 @@ interface ProviderCardActionsProps {
   onOpenTerminal?: () => void;
   /** Pinned proxy base URL (fork). Absent means the copy button is not rendered. */
   copyProxyUrl?: string;
+  /** Direct-connect values shown next to the proxy URL in the connect popup. */
+  upstream?: UpstreamInfo;
 }
 
 /**
@@ -84,6 +87,8 @@ interface ProviderCardActionsProps {
  */
 export function ProviderCardActions({
   providerName,
+  appId,
+  providerId,
   presentation,
   onEdit,
   onDelete,
@@ -93,9 +98,10 @@ export function ProviderCardActions({
   onConfigureUsage,
   onOpenTerminal,
   copyProxyUrl,
+  upstream,
 }: ProviderCardActionsProps) {
   const { t } = useTranslation();
-  const [copiedProxyUrl, setCopiedProxyUrl] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
   const { status, buttons, move, menuItems = [] } = presentation;
 
   return (
@@ -150,33 +156,28 @@ export function ProviderCardActions({
         </div>
       )}
 
-      {copyProxyUrl && (
-        <HoverTip content={t("provider.copyProxyUrl")}>
-          <Button
-            variant="quiet"
-            size="icon-compact"
-            aria-label={t("provider.copyProxyUrl")}
-            onClick={() => {
-              const url = copyProxyUrl;
-              void copyText(url)
-                .then(() => {
-                  setCopiedProxyUrl(true);
-                  window.setTimeout(() => setCopiedProxyUrl(false), 2000);
-                })
-                .catch((error: unknown) => {
-                  toast.error(
-                    error instanceof Error ? error.message : String(error),
-                  );
-                });
-            }}
-          >
-            {copiedProxyUrl ? (
-              <Check className="h-4 w-4 text-green-500" strokeWidth={1.5} />
-            ) : (
+      {copyProxyUrl && upstream && (
+        <>
+          <HoverTip content={t("provider.copyProxyUrl")}>
+            <Button
+              variant="quiet"
+              size="icon-compact"
+              aria-label={t("provider.copyProxyUrl")}
+              onClick={() => setConnectOpen(true)}
+            >
               <Link2 className="h-4 w-4" strokeWidth={1.5} />
-            )}
-          </Button>
-        </HoverTip>
+            </Button>
+          </HoverTip>
+          <ProxyConnectDialog
+            open={connectOpen}
+            onOpenChange={setConnectOpen}
+            providerName={providerName}
+            appId={appId}
+            providerId={providerId}
+            proxyUrl={copyProxyUrl}
+            upstream={upstream}
+          />
+        </>
       )}
 
       <IconAction

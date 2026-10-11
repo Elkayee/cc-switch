@@ -2231,10 +2231,14 @@ impl RequestForwarder {
                     let xai_state = app_handle.state::<XaiOAuthState>();
                     let xai_auth: tokio::sync::RwLockReadGuard<'_, XaiOAuthManager> =
                         xai_state.0.read().await;
-                    let account_id = provider
-                        .meta
-                        .as_ref()
-                        .and_then(|meta| meta.managed_account_id_for("xai_oauth"));
+                    let account_id = xai_auth
+                        .account_id_for_provider(
+                            provider
+                                .meta
+                                .as_ref()
+                                .and_then(|meta| meta.managed_account_id_for("xai_oauth")),
+                        )
+                        .await;
                     let token_result = match &account_id {
                         Some(id) => xai_auth.get_valid_token_for_account(id).await,
                         None => xai_auth.get_valid_token().await,

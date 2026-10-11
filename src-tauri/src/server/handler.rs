@@ -357,6 +357,7 @@ pub fn invoke_handler() -> impl Fn(Invoke<AppRuntime>) -> bool + Send + Sync + '
         commands::auth_cancel_login,
         commands::auth_list_accounts,
         commands::auth_get_status,
+        commands::get_provider_direct_token,
         commands::auth_remove_account,
         commands::auth_set_default_account,
         commands::auth_logout,

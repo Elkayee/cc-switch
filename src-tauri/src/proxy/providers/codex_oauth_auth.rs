@@ -1356,6 +1356,35 @@ impl CodexOAuthManager {
         self.resolve_default_account_id().await
     }
 
+    /// Cached token and its expiry, for the direct-token lease (`proxy::direct_token`).
+    pub(crate) async fn cached_token_view(
+        &self,
+        account_id: &str,
+    ) -> Option<crate::proxy::direct_token::TokenView> {
+        let tokens = self.access_tokens.read().await;
+        let cached = tokens.get(account_id)?;
+        Some(crate::proxy::direct_token::TokenView {
+            token: cached.token.clone(),
+            expires_at_ms: Some(cached.expires_at_ms),
+            lifetime_ms: (cached.expires_at_ms - cached.obtained_at_ms).max(0),
+        })
+    }
+
+    /// Drop the cached access token so the next `get_valid_token_for_account` refreshes
+    /// through the normal path (which also writes the rotated refresh token back to
+    /// the account store and the Codex live auth under the lifecycle/refresh locks).
+    pub(crate) async fn evict_cached_token(&self, account_id: &str) {
+        self.access_tokens.write().await.remove(account_id);
+    }
+
+    /// Account a provider uses: its bound account, else the default account.
+    pub async fn account_id_for_provider(&self, bound: Option<String>) -> Option<String> {
+        match bound.as_deref().map(str::trim).filter(|id| !id.is_empty()) {
+            Some(id) => Some(id.to_string()),
+            None => self.resolve_default_account_id().await,
+        }
+    }
+
     /// 将本地账号 ID 解析为上游 ChatGPT workspace ID。
     pub async fn chatgpt_account_id_for_account(
         &self,
