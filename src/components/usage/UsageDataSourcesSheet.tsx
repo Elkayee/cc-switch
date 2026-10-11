@@ -71,7 +71,7 @@ function LoggingStatus() {
   return (
     <span
       className={cn(
-        "rounded-[5px] px-2 text-ui leading-5",
+        "rounded-[3px] px-2 text-[12.35px] leading-[1.3]",
         on
           ? "bg-success-soft text-success-text"
           : "bg-subtle text-muted-foreground",

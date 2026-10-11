@@ -30,21 +30,21 @@ export function DatabaseUpgrade({ payload }: DatabaseUpgradeProps) {
     <div className="flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
       <div className="w-full max-w-lg space-y-5 rounded-2xl border border-border/60 bg-card/80 p-7 shadow-xl">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
             <Database className="h-6 w-6" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-lg font-semibold">
+            <h1 className="text-[12.35px] leading-[1.3] font-semibold">
               {t("dbUpgrade.title", "数据库版本过新")}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
               {t(
                 "dbUpgrade.description",
                 "当前数据库由更新版本的 Viber Switch 创建，需要安装更新版本后才能继续使用。升级不会删除你的数据。",
               )}
             </p>
             {dbVersion != null && supportedVersion != null && (
-              <p className="pt-0.5 text-xs text-muted-foreground tabular-nums">
+              <p className="pt-0.5 text-[12.35px] leading-[1.3] text-muted-foreground tabular-nums">
                 {t("dbUpgrade.versionInfo", {
                   db: dbVersion,
                   supported: supportedVersion,
@@ -56,7 +56,7 @@ export function DatabaseUpgrade({ payload }: DatabaseUpgradeProps) {
         </div>
 
         {/* 错误详情 / 数据库路径 */}
-        <div className="space-y-1 rounded-lg border border-border/50 bg-muted/40 p-3 text-xs text-muted-foreground">
+        <div className="space-y-1 rounded-[8px] border border-border/50 bg-muted/40 p-3 text-[12.35px] leading-[1.3] text-muted-foreground">
           {payload.error && (
             <p className="break-words font-mono">{payload.error}</p>
           )}

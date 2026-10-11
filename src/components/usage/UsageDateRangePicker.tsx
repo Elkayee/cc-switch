@@ -286,7 +286,7 @@ export function UsageDateRangePicker({
           <Input
             type="date"
             className={cn(
-              "h-7 flex-1 border-0 bg-transparent p-0 text-ui shadow-none focus:ring-0 focus-visible:ring-0",
+              "h-7 flex-1 border-0 bg-transparent p-0 text-[12.35px] leading-[1.3] shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtDate(ts)}
@@ -307,7 +307,7 @@ export function UsageDateRangePicker({
             type="time"
             step={60}
             className={cn(
-              "h-7 w-[90px] flex-none border-0 bg-transparent p-0 text-ui shadow-none focus:ring-0 focus-visible:ring-0",
+              "h-7 w-[90px] flex-none border-0 bg-transparent p-0 text-[12.35px] leading-[1.3] shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtTime(ts)}
@@ -511,7 +511,7 @@ export function UsageDateRangePicker({
                     aria-current={isToday ? "date" : undefined}
                     aria-pressed={isEndpoint}
                     className={cn(
-                      "relative h-7 rounded text-ui transition-colors",
+                      "relative h-7 rounded text-[12.35px] leading-[1.3] transition-colors",
                       !isCurrentMonth && "text-muted-foreground",
                       isCurrentMonth && !inRange && "hover:bg-subtle",
                       inRange && !isEndpoint && "bg-selected text-foreground",

@@ -745,7 +745,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                     <li
                       key={`${item.name}-${index}`}
                       className={cn(
-                        "flex min-h-12 items-center gap-2.5 py-1.5 pe-2.5 ps-3.5",
+                        "flex min-h-12 items-center gap-2 py-1.5 pe-2 ps-3",
                         index > 0 && "border-t border-border",
                       )}
                     >
@@ -864,7 +864,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                   </h3>
                   <SegmentedControl
                     aria-label={t("mcpPage.drawer.editMode")}
-                    className="h-8 rounded-[8px]"
+                    className="h-7"
                     value={tab}
                     onValueChange={switchTab}
                     items={[
@@ -872,12 +872,12 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         value: "form",
                         label: t("mcpPage.drawer.tabForm"),
                         disabled: tab === "json" && jsonError !== null,
-                        className: "min-w-[60px] rounded-[5px]",
+                        className: "min-w-[60px]",
                       },
                       {
                         value: "json",
                         label: "JSON",
-                        className: "min-w-[60px] rounded-[5px]",
+                        className: "min-w-[60px]",
                       },
                     ]}
                   />
@@ -891,7 +891,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       </span>
                       <SegmentedControl<McpTransport>
                         aria-label={t("mcpPage.drawer.transport")}
-                        className="h-8 self-start rounded-[8px]"
+                        className="h-7 self-start"
                         value={conn.transport}
                         onValueChange={(value) =>
                           patchConn({ transport: value })
@@ -900,17 +900,17 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                           {
                             value: "stdio",
                             label: t("mcpPage.drawer.transportStdio"),
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                           {
                             value: "http",
                             label: "HTTP",
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                           {
                             value: "sse",
                             label: "SSE",
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                         ]}
                       />
@@ -1141,7 +1141,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       wrap="off"
                       className={cn(
                         MONO_FIELD_CLASS,
-                        "h-[300px] resize-y overflow-auto whitespace-pre px-3 py-2.5 leading-[18px]",
+                        "h-[300px] resize-y overflow-auto whitespace-pre px-3 py-2 leading-[18px]",
                       )}
                     />
                     {jsonError && (
@@ -1214,7 +1214,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                 {t("mcpPage.drawer.meta")}
               </DisclosureButton>
               {metaOpen && (
-                <div id="mcp-meta" className="flex flex-col gap-3.5">
+                <div id="mcp-meta" className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-0.5">
                       <label htmlFor="mcp-meta-name" className={LABEL_CLASS}>

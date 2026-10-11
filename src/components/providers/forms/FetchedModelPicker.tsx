@@ -33,7 +33,7 @@ export function FetchedModelPicker({
 
   return (
     <fieldset className="min-w-0 space-y-2 rounded-[8px] border border-border-default p-3">
-      <legend className="px-1 text-sm font-medium">
+      <legend className="px-1 text-[12.35px] leading-[1.3] font-medium">
         {t("providerForm.fetchedModelsTitle", {
           count: models.length,
           defaultValue: "Available models ({{count}})",
@@ -57,7 +57,7 @@ export function FetchedModelPicker({
       <ScrollArea className="h-48" type="auto">
         <div className="space-y-1 pr-3">
           {visibleModels.length === 0 && (
-            <p className="py-4 text-center text-sm text-fg-2">
+            <p className="py-4 text-center text-[12.35px] leading-[1.3] text-fg-2">
               {t("providerForm.searchModelEmpty", {
                 defaultValue: "No matching models.",
               })}
@@ -84,16 +84,16 @@ export function FetchedModelPicker({
                   }
                   className="shrink-0"
                 />
-                <span className="min-w-0 flex-1 break-all text-sm">
+                <span className="min-w-0 flex-1 break-all text-[12.35px] leading-[1.3]">
                   {model.id}
                   {model.ownedBy && (
-                    <span className="block text-xs text-fg-2">
+                    <span className="block text-[12.35px] leading-[1.3] text-fg-2">
                       {model.ownedBy}
                     </span>
                   )}
                 </span>
                 {isConfigured && (
-                  <span className="shrink-0 text-xs text-fg-2">
+                  <span className="shrink-0 text-[12.35px] leading-[1.3] text-fg-2">
                     {t("providerForm.modelAlreadyAdded", {
                       defaultValue: "Already added",
                     })}

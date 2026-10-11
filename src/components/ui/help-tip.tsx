@@ -236,7 +236,7 @@ export function DisabledReason({
     <PopoverPrimitive.Root open={hover.open} onOpenChange={hover.onOpenChange}>
       <PopoverPrimitive.Anchor asChild>
         <span
-          className="inline-flex"
+          className="inline-flex text-[12.35px] leading-[1.3]"
           onPointerEnter={hover.onPointerEnter}
           onPointerLeave={hover.onPointerLeave}
           onFocus={hover.onFocus}

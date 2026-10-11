@@ -220,7 +220,7 @@ function QuotaRowCells({
         </span>
       )}
       {/* 旁边已有额度条，正常时数值不上色 */}
-      <span className="w-14 shrink-0 whitespace-nowrap text-end tabular-nums text-foreground">
+      <span className="min-w-14 shrink-0 whitespace-nowrap text-end tabular-nums text-foreground">
         <TonedText
           text={value}
           line={line}

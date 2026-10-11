@@ -527,7 +527,7 @@ export function SessionReader({
       <div className="relative pe-10 ps-10">
         {start && (
           <>
-            <span className="absolute start-0 top-0">
+            <span className="absolute start-0 top-0 flex">
               <SessionAgentAvatar />
             </span>
             {/* Agent 名 · 时间 · 模型 与头像同一行；最终回复不再重复这一行 */}
@@ -628,7 +628,7 @@ export function SessionReader({
         <p className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-1">
           {t("sessionManager.readFailed", { defaultValue: "无法读取这个会话" })}
         </p>
-        <code className="max-w-[560px] whitespace-pre-wrap rounded-[8px] bg-subtle px-2.5 py-1.5 text-left font-mono text-[12.35px] leading-[1.3] text-fg-2 [overflow-wrap:anywhere]">
+        <code className="max-w-[560px] whitespace-pre-wrap rounded-[8px] bg-subtle px-2 py-1.5 text-left font-mono text-[12.35px] leading-[1.3] text-fg-2 [overflow-wrap:anywhere]">
           {extractErrorMessage(transcript.error) || String(transcript.error)}
         </code>
         <div className="mt-2 flex gap-2">
@@ -797,7 +797,7 @@ export function SessionReader({
                   defaultValue: "跳到最新消息",
                 })}
                 onClick={scrollToLatest}
-                className="absolute bottom-4 end-6 gap-1.5 pe-3 ps-2.5 shadow-sm"
+                className="absolute bottom-4 end-6 gap-1.5 pe-3 ps-2 shadow-sm"
               >
                 <ArrowDown className="h-3.5 w-3.5" strokeWidth={2} />
                 {t("sessionManager.latest", { defaultValue: "最新" })}

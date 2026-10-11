@@ -444,7 +444,7 @@ function VersionSwitch({
             items={layout.plans.map((plan) => ({
               value: plan,
               label: presetPlanLabel(plan, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -461,7 +461,7 @@ function VersionSwitch({
             items={layout.regions.map((region) => ({
               value: region,
               label: presetRegionLabel(region, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -476,7 +476,7 @@ function VersionSwitch({
             items={versions.map((version) => ({
               value: version.id,
               label: presetVersionShortLabel(version, layout.dimension, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -929,7 +929,7 @@ function CategoryButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex h-6 items-center justify-between gap-2 rounded-[4px] px-2 text-start text-ui transition-colors",
+        "flex h-6 items-center justify-between gap-2 rounded-[4px] px-2 text-start text-[12.35px] leading-[1.3] transition-colors",
         active ? "bg-selected font-medium text-foreground" : "hover:bg-muted",
         !active && (dim ? "text-muted-foreground" : "text-foreground"),
       )}
@@ -965,12 +965,12 @@ function PresetRow({
       aria-label={name}
       aria-description={detail}
       className={cn(
-        "flex h-12 min-w-0 items-center gap-2 rounded-[8px] border bg-background px-2 text-start transition-colors hover:bg-muted",
+        "flex h-12 min-w-0 items-center gap-2 rounded-[8px] border bg-background px-2 text-start text-[12.35px] leading-[1.3] transition-colors hover:bg-muted",
         selected ? "border-border-default" : "border-border-default",
       )}
     >
       {icon}
-      <span className="min-w-0 flex-1">
+      <span className="min-w-0 flex-1 text-[12.35px] leading-[1.3]">
         <span
           className="block truncate text-ui font-medium text-foreground"
           title={name}

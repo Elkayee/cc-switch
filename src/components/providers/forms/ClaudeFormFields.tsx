@@ -872,7 +872,7 @@ export function ClaudeFormFields({
               </SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs leading-relaxed text-muted-foreground">
+          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
             {t("providerForm.apiFormatHint", {
               defaultValue:
                 "供应商原生为 Anthropic Messages API 就选 Anthropic Messages（直连，不转换格式）；使用 Chat Completions 协议就选 Chat；使用 Responses API 就选 Responses；使用 Gemini generateContent 协议就选 Gemini Native。Chat、Responses 与 Gemini Native 均需开启路由接管才能转换为 Anthropic Messages。",
@@ -909,7 +909,7 @@ export function ClaudeFormFields({
           </SelectItem>
         </SelectContent>
       </Select>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
         {t("providerForm.authFieldHint", {
           defaultValue: "选择写入配置的认证环境变量名",
         })}
@@ -957,14 +957,14 @@ export function ClaudeFormFields({
         <Collapsible
           open={stackAdvancedExpanded}
           onOpenChange={setStackAdvancedExpanded}
-          className="rounded-lg border border-border-default p-4"
+          className="rounded-[8px] border border-border-default p-4"
         >
           <CollapsibleTrigger asChild>
             <Button
               type="button"
               variant={null}
               size="sm"
-              className="h-8 w-full justify-start gap-1.5 px-0 text-sm font-medium text-foreground hover:opacity-70"
+              className="h-8 w-full justify-start gap-1.5 px-0 text-[12.35px] leading-[1.3] font-medium text-foreground hover:opacity-70"
             >
               {stackAdvancedExpanded ? (
                 <ChevronDown className="h-4 w-4" />
@@ -975,7 +975,7 @@ export function ClaudeFormFields({
             </Button>
           </CollapsibleTrigger>
           {!stackAdvancedExpanded && (
-            <p className="text-xs text-muted-foreground mt-1 ml-1">
+            <p className="text-[12.35px] leading-[1.3] text-muted-foreground mt-1 ml-1">
               {t("providerForm.stackLayout.advancedHint", {
                 defaultValue: "自定义 User-Agent 与请求覆盖，一般无需修改。",
               })}

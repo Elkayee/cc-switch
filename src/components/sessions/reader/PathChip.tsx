@@ -126,7 +126,7 @@ export const PathChip = memo(function PathChip({
     <span
       data-path-chip=""
       className={cn(
-        "inline-flex max-w-full items-center rounded-[4px] border border-border bg-subtle align-baseline text-[12.35px] leading-[1.3] text-fg-1",
+        "inline-flex h-5 max-w-full items-center rounded-[3px] border border-border bg-subtle align-baseline text-[12.35px] leading-[1.3] text-fg-1",
         className,
       )}
     >
@@ -135,7 +135,7 @@ export const PathChip = memo(function PathChip({
         title={localPath}
         aria-label={`${copyLabel}: ${localPath}`}
         onClick={() => void handleCopy()}
-        className="inline-flex min-w-0 items-center gap-1 rounded-s-control py-px pe-1 ps-1.5 font-mono transition-colors hover:bg-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex h-5 min-w-0 items-center gap-1 rounded-s-[3px] pe-1 ps-1 font-mono transition-colors hover:bg-selected focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <FileText aria-hidden className="size-3 shrink-0 text-fg-3" />
         <span className="truncate">
@@ -148,7 +148,7 @@ export const PathChip = memo(function PathChip({
           type="button"
           aria-label={revealLabel}
           onClick={() => void handleReveal()}
-          className="inline-flex h-full shrink-0 items-center rounded-e-control border-s border-border px-1 py-0.5 text-fg-3 transition-colors hover:bg-selected hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex h-5 shrink-0 items-center rounded-e-[3px] border-s border-border px-1 text-fg-3 transition-colors hover:bg-selected hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <FolderOpen aria-hidden className="size-3" />
         </button>

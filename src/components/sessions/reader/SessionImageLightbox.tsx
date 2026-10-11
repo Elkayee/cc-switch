@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { useReaderT } from "./i18n";
 
 const toolButton =
-  "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export interface SessionImageLightboxProps {
   open: boolean;

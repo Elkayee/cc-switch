@@ -1201,7 +1201,6 @@ function App() {
           <Button
             variant="quiet"
             size="icon-compact"
-            className="h-8 w-8"
             aria-label={t("appPage.moreActions", {
               name: APP_DISPLAY_NAME[activeApp],
             })}
@@ -1282,7 +1281,6 @@ function App() {
                 <Button
                   variant="quiet"
                   size="icon-compact"
-                  className="h-8 w-8"
                   aria-label={t("provider.searchAriaLabel")}
                   aria-pressed={providerSearchOpen}
                   onClick={() => setProviderSearchOpen((open) => !open)}
@@ -1404,7 +1402,7 @@ function App() {
         id="main-content"
         className="min-h-0 flex-1 overflow-y-auto scroll-stable overflow-x-hidden px-6 pb-12 pt-4"
       >
-        <div className="space-y-4">
+        <div className="space-y-2">
           {activeApp === "claude-desktop" && (
             <DesktopAccessBar
               current={providers[currentProviderId]}
@@ -1682,7 +1680,9 @@ function App() {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             )}
-            <ViberSwitchLogo />
+            <ViberSwitchLogo
+              className={cn(!inAppPage && "max-[479px]:hidden")}
+            />
           </div>
 
           <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">

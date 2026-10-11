@@ -92,14 +92,14 @@ export function ProfileManageDialog({
           </DialogHeader>
           <div className="max-h-[50vh] space-y-1 overflow-y-auto px-6 pb-4 pt-3">
             {profiles.length === 0 && (
-              <div className="py-4 text-center text-sm text-fg-2">
+              <div className="py-4 text-center text-[12.35px] leading-[1.3] text-fg-2">
                 {t("profiles.empty")}
               </div>
             )}
             {profiles.map((profile) => (
               <div
                 key={profile.id}
-                className="flex items-center gap-1.5 rounded-md px-2 py-1.5 hover:bg-subtle"
+                className="flex items-center gap-1.5 rounded-[4px] px-2 py-1.5 hover:bg-subtle"
               >
                 {editingId === profile.id ? (
                   <>
@@ -141,7 +141,7 @@ export function ProfileManageDialog({
                   </>
                 ) : (
                   <>
-                    <span className="flex-1 truncate text-sm">
+                    <span className="flex-1 truncate text-[12.35px] leading-[1.3]">
                       {profile.name}
                     </span>
                     <HoverTip content={t("profiles.rename")}>

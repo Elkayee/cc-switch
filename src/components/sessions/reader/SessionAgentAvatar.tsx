@@ -19,12 +19,12 @@ export const SessionAgentAvatar = memo(function SessionAgentAvatar() {
   return (
     <span
       aria-hidden
-      className="inline-flex h-7 w-7 shrink-0 select-none items-center justify-center rounded-full border border-border bg-surface"
+      className="inline-flex h-6 w-6 shrink-0 select-none items-center justify-center rounded-full border border-border bg-surface"
     >
       {known ? (
         <AppGlyph app={known} size={16} badgeClassName="bg-surface" />
       ) : (
-        <span className="font-mono text-[12.35px] leading-[1.3] font-semibold leading-none text-[var(--reader-accent)]">
+        <span className="font-mono text-[12.35px] leading-[1.3] font-semibold text-[var(--reader-accent)]">
           {fallback}
         </span>
       )}
@@ -56,7 +56,7 @@ export const SessionAgentHeader = memo(function SessionAgentHeader({
 }) {
   const { appName } = useReaderContext();
   return (
-    <div className="flex h-7 min-w-0 items-center gap-1.5 px-1.5 text-[12.35px] leading-[1.3]">
+    <div className="flex h-6 min-w-0 items-center gap-1.5 px-1.5 text-[12.35px] leading-[1.3]">
       <span className="shrink-0 font-semibold text-fg-1">{appName}</span>
       {ts ? (
         <time

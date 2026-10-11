@@ -255,7 +255,7 @@ const PromptFormPanel: React.FC<PromptFormPanelProps> = ({
               }
               className={cn(
                 promptFieldClass,
-                "min-h-[180px] flex-1 resize-none px-3 py-2.5 font-mono text-[12.35px] leading-[1.3] leading-[18px]",
+                "min-h-[180px] flex-1 resize-none px-3 py-2 font-mono text-[12.35px] leading-[1.3] leading-[18px]",
               )}
             />
             <div className="flex items-start gap-3">

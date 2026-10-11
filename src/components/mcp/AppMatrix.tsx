@@ -86,6 +86,9 @@ function useColumnTracking(app: AppId | undefined) {
   }, [app, setColumn]);
 }
 
+/** 列宽只在这里定：列头与每行单元格共用，保证对齐（40 = 单行列头 icon 16 + 两位数） */
+export const MATRIX_COLUMN_CLASS = "flex w-10 shrink-0 justify-center";
+
 // ─── 单元格 ─────────────────────────────────────────────────────────────
 export type MatrixCellState = "on" | "off" | "fail";
 
@@ -100,7 +103,7 @@ interface MatrixCellProps {
 }
 
 /**
- * 勾选框：开、关、写入失败三种状态是同一个 16px 圆角方框、同一个 28px 点击区，
+ * 勾选框：开、关、写入失败三种状态是同一个 16px 圆角方框、同一个 24px 点击区，
  * 只换填充和里面的符号（关 = 淡描边空框，开 = 操作色实心 + 勾，失败 = 警告描边 + ⚠）。
  */
 export function MatrixCell({
@@ -112,7 +115,7 @@ export function MatrixCell({
 }: MatrixCellProps) {
   const tracking = useColumnTracking(app);
   return (
-    <span className="flex w-9 shrink-0 justify-center" {...tracking}>
+    <span className={MATRIX_COLUMN_CLASS} {...tracking}>
       <HoverTip content={label}>
         <button
           type="button"
@@ -124,7 +127,7 @@ export function MatrixCell({
             event.stopPropagation();
             onClick();
           }}
-          className="group/cell flex h-7 w-7 items-center justify-center rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45"
+          className="group/cell flex h-6 w-6 items-center justify-center rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45"
         >
           <span
             aria-hidden="true"
@@ -219,7 +222,7 @@ export function MatrixColumnHeader({
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <span
-        className="relative flex w-9 shrink-0 justify-center"
+        className={cn("relative", MATRIX_COLUMN_CLASS)}
         data-column={app}
         {...tracking}
       >
@@ -236,7 +239,7 @@ export function MatrixColumnHeader({
               })}
               data-highlighted={highlighted ? "" : undefined}
               className={cn(
-                "flex h-10 w-[34px] flex-col items-center justify-center gap-0.5 rounded-[4px] text-fg-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60",
+                "flex h-6 w-full flex-row items-center justify-center gap-1 rounded-[4px] text-[12.35px] leading-[1.3] text-fg-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60",
                 highlighted && "bg-selected text-fg-1",
               )}
             >
@@ -272,7 +275,7 @@ export function MatrixColumnHeader({
           align="end"
           sideOffset={4}
           collisionPadding={8}
-          className="z-[110] flex w-[260px] flex-col gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 pb-3.5 pt-3 text-fg-1 shadow-sm outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+          className="z-[110] flex w-[260px] flex-col gap-2 rounded-[8px] border border-border bg-surface p-2 text-fg-1 shadow-sm outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
         >
           <div className="flex items-center gap-2">
             <AppGlyph app={app} size={16} badgeClassName="bg-surface" />
@@ -334,7 +337,7 @@ export function MatrixColumnHeader({
             <button
               type="button"
               onClick={() => run(extraAction.onClick)}
-              className="self-start text-[12.35px] leading-[1.3] font-medium text-fg-1 underline underline-offset-[3px] hover:text-fg-2"
+              className="self-start text-[12.35px] leading-[1.3] font-medium text-fg-1 underline underline-offset-4 hover:text-fg-2"
             >
               {extraAction.label}
             </button>

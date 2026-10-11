@@ -68,7 +68,9 @@ function DetailSection({ title, rows }: { title: string; rows: DetailRow[] }) {
             <dd
               className={cn(
                 "m-0 min-w-0 flex-1 truncate text-end tabular-nums",
-                row.mono ? "font-mono text-ui" : "text-ui",
+                row.mono
+                  ? "font-mono text-[12.35px] leading-[1.3]"
+                  : "text-[12.35px] leading-[1.3]",
                 row.strong && "font-semibold",
                 row.muted ? "text-muted-foreground" : "text-foreground",
               )}

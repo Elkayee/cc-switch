@@ -190,7 +190,7 @@ export function RepoManagerPanel({
                     <li
                       key={id}
                       className={cn(
-                        "flex min-h-12 items-center gap-2.5 py-1.5 pe-2 ps-3.5",
+                        "flex min-h-12 items-center gap-2 py-1.5 pe-2 ps-3",
                         index > 0 && "border-t border-border",
                       )}
                     >

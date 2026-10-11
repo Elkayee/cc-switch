@@ -1112,7 +1112,7 @@ export function CodexFormFields({
           )}
         </SelectContent>
       </Select>
-      <p className="text-xs leading-relaxed text-muted-foreground">
+      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
         {isCopilotPreset
           ? t("codexConfig.upstreamFormatCopilotHint")
           : t("codexConfig.upstreamFormatHint", {
@@ -1152,7 +1152,7 @@ export function CodexFormFields({
           </SelectItem>
         </SelectContent>
       </Select>
-      <p className="text-xs leading-relaxed text-muted-foreground">
+      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
         {t("codexConfig.anthropicAuthFieldHint", {
           defaultValue:
             "选择网关接收 API Key 的请求头：ANTHROPIC_AUTH_TOKEN 发送 Authorization: Bearer；ANTHROPIC_API_KEY 发送 x-api-key。两者只发其一。",
@@ -1169,7 +1169,7 @@ export function CodexFormFields({
             defaultValue: "模拟 Claude Code 客户端",
           })}
         </FormLabel>
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("codexConfig.impersonateClaudeCodeHint", {
             defaultValue:
               "网关或其上游限制只能通过 Claude Code 使用时开启：伪装 User-Agent、anthropic-beta、x-app 请求头，并在系统提示首行注入 Claude Code 身份。",
@@ -1206,7 +1206,7 @@ export function CodexFormFields({
           defaultValue: "留空则使用默认 8192",
         })}
       />
-      <p className="text-xs leading-relaxed text-muted-foreground">
+      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
         {isGrokBuild
           ? t("grokBuild.maxOutputTokensHint", {
               defaultValue:
@@ -1255,7 +1255,7 @@ export function CodexFormFields({
             </SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("codexConfig.promptCacheRoutingHint", {
             defaultValue:
               "自动模式仅对已确认兼容的上游发送 prompt_cache_key；开启可用于其他兼容网关，关闭可避免严格网关因未知字段返回 400。只使用客户端提供的稳定会话 ID。",
@@ -1269,7 +1269,7 @@ export function CodexFormFields({
             defaultValue: "思考能力",
           })}
         </FormLabel>
-        <p className="text-xs leading-relaxed text-muted-foreground">
+        <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("codexConfig.reasoningSectionHint", {
             defaultValue:
               "预设供应商已自动配置；自定义供应商会按名称/地址自动推断。仅当自动识别不准时才需手动覆盖。",
@@ -1284,7 +1284,7 @@ export function CodexFormFields({
               defaultValue: "支持思考模式",
             })}
           </FormLabel>
-          <p className="text-xs leading-relaxed text-muted-foreground">
+          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
             {t("codexConfig.reasoningModeHint", {
               defaultValue:
                 "上游 Chat Completions 接口支持开启或关闭 thinking 时启用。Kimi、GLM、Qwen 等通常属于这一类。",
@@ -1307,7 +1307,7 @@ export function CodexFormFields({
               defaultValue: "支持思考等级",
             })}
           </FormLabel>
-          <p className="text-xs leading-relaxed text-muted-foreground">
+          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
             {isGrokBuild
               ? t("grokBuild.reasoningEffortHint", {
                   defaultValue:
@@ -1384,7 +1384,7 @@ export function CodexFormFields({
       {/* 列头：md+ 显示 */}
       <div
         className={cn(
-          "hidden gap-2 px-1 text-xs font-medium text-muted-foreground md:grid",
+          "hidden gap-2 px-1 text-[12.35px] leading-[1.3] font-medium text-muted-foreground md:grid",
           withDefault
             ? "grid-cols-[36px_minmax(0,1fr)_minmax(0,1fr)_140px_minmax(0,1fr)_36px]"
             : "grid-cols-[minmax(0,1fr)_minmax(0,1fr)_140px_minmax(0,1fr)_36px]",
@@ -1656,7 +1656,7 @@ export function CodexFormFields({
                   }),
                 )}
               </div>
-              <p className="text-xs leading-relaxed text-muted-foreground">
+              <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
                 {t("codexConfig.stackModelListHint", {
                   defaultValue:
                     "这些模型会出现在 Codex 的 /model 里，选中后请求直达这家。★ 是这家的默认模型：这家被设为默认时 Codex 默认用它。修改后需要重启 Codex。",
@@ -1671,7 +1671,7 @@ export function CodexFormFields({
               />
             )}
             {isDefaultModelOutsideCatalog && (
-              <p className="flex flex-wrap items-center gap-x-2 text-xs leading-relaxed text-muted-foreground">
+              <p className="flex flex-wrap items-center gap-x-2 text-[12.35px] leading-[1.3] text-muted-foreground">
                 {t("codexConfig.stackDefaultNotInList", {
                   model: trimmedDefaultModel,
                   defaultValue:
@@ -1681,7 +1681,7 @@ export function CodexFormFields({
                   type="button"
                   variant="link"
                   size="sm"
-                  className="h-auto p-0 text-xs"
+                  className="h-auto p-0 text-[12.35px] leading-[1.3]"
                   onClick={handleAddDefaultModelToCatalog}
                 >
                   {t("codexConfig.addToModelList", {
@@ -1693,7 +1693,7 @@ export function CodexFormFields({
             {catalogRows.length > 0 ? (
               renderCatalogRows(true)
             ) : (
-              <p className="text-xs leading-relaxed text-muted-foreground">
+              <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
                 {t("codexConfig.modelListEmpty", {
                   defaultValue:
                     "未配置模型：聚合模式下只发布这家的默认模型（config.toml 的 model）。",
@@ -1706,14 +1706,14 @@ export function CodexFormFields({
         <Collapsible
           open={stackAdvancedExpanded}
           onOpenChange={setStackAdvancedExpanded}
-          className="rounded-lg border border-border-default p-4"
+          className="rounded-[8px] border border-border-default p-4"
         >
           <CollapsibleTrigger asChild>
             <Button
               type="button"
               variant={null}
               size="sm"
-              className="h-8 w-full justify-start gap-1.5 px-0 text-sm font-medium text-foreground hover:opacity-70"
+              className="h-8 w-full justify-start gap-1.5 px-0 text-[12.35px] leading-[1.3] font-medium text-foreground hover:opacity-70"
             >
               {stackAdvancedExpanded ? (
                 <ChevronDown className="h-4 w-4" />
@@ -1726,7 +1726,7 @@ export function CodexFormFields({
             </Button>
           </CollapsibleTrigger>
           {!stackAdvancedExpanded && (
-            <p className="mt-1 ml-1 text-xs text-muted-foreground">
+            <p className="mt-1 ml-1 text-[12.35px] leading-[1.3] text-muted-foreground">
               {t("codexConfig.stackAdvancedHint", {
                 defaultValue:
                   "思考能力、Anthropic 专有项、自定义 User-Agent 与请求覆盖，一般无需修改。",

@@ -88,7 +88,7 @@ export const SessionTimeline = memo(function SessionTimeline({
         aria-expanded={expanded}
         aria-label={`${actionLabel}：${rt("timelineSummary", { steps })}`}
         onClick={() => onToggle(turnKey, expanded)}
-        className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-[4px] px-1.5 text-left text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="flex h-6 min-w-0 flex-1 items-center gap-2 rounded-[4px] px-1.5 text-left text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <ChevronRight
           aria-hidden
@@ -126,7 +126,7 @@ export const SessionTimeline = memo(function SessionTimeline({
           type="button"
           aria-label={rt("copyTurn")}
           onClick={() => onCopyTurn(turnKey)}
-          className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[4px] text-fg-3 opacity-0 transition-[opacity,color] hover:bg-subtle hover:text-fg-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover/timeline:opacity-100"
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-fg-3 opacity-0 transition-[opacity,color] hover:bg-subtle hover:text-fg-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover/timeline:opacity-100"
         >
           <Copy aria-hidden className="h-3.5 w-3.5" strokeWidth={1.5} />
         </button>

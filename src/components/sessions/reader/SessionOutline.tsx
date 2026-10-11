@@ -95,7 +95,7 @@ export const SessionOutline = memo(function SessionOutline({
       aria-label={rt("outlineTitle")}
       className="flex min-h-0 w-[260px] shrink-0 flex-col border-s border-border max-lg:hidden"
     >
-      <div className="flex h-9 shrink-0 items-center px-4 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
+      <div className="flex h-8 shrink-0 items-center px-2 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
         {rt("outlineTitle")}
         <span className="ms-1.5 font-normal tabular-nums text-fg-3">
           {entries.length}

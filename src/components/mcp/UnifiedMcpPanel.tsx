@@ -601,7 +601,6 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
                     type="button"
                     variant="quiet"
                     size="icon-compact"
-                    className="h-8 w-8"
                     aria-label={t("mcpPage.moreActions")}
                   >
                     <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
@@ -696,11 +695,11 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
               {t("mcp.loading")}
             </div>
           ) : isError ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2.5 px-10 pb-12 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
               <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
                 {t("mcpPage.loadFailed")}
               </h2>
-              <code className="max-w-[520px] rounded-[8px] bg-subtle px-3 py-2 text-left font-mono text-[12.35px] leading-[1.3] text-fg-2 [overflow-wrap:anywhere]">
+              <code className="max-w-[520px] rounded-[8px] bg-subtle px-2 py-2 text-left font-mono text-[12.35px] leading-[1.3] text-fg-2 [overflow-wrap:anywhere]">
                 {extractErrorMessage(loadError) || String(loadError)}
               </code>
               <p className="m-0 text-[12.35px] leading-[1.3] text-fg-2">
@@ -717,7 +716,7 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
               </Button>
             </div>
           ) : !hasServers ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 px-10 pb-12 text-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
               <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
                 {t("mcpPage.emptyTitle")}
               </h2>
@@ -759,7 +758,7 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
             >
               <MatrixColumnHighlight>
                 <div className="min-w-[560px]">
-                  <div className="sticky top-0 z-10 flex h-11 items-center border-b border-border bg-subtle pe-2 ps-4">
+                  <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-subtle px-2">
                     <span className="min-w-0 flex-1 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
                       {t("mcpPage.columnName")}
                     </span>
@@ -835,11 +834,11 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
                             key={id}
                             onClick={() => openEdit(id)}
                             className={cn(
-                              "flex h-14 cursor-pointer items-center pe-2 ps-4 transition-colors duration-150 hover:bg-subtle",
+                              "flex min-h-10 cursor-pointer items-center px-2 py-1 transition-colors duration-150 hover:bg-subtle",
                               index > 0 && "border-t border-border",
                             )}
                           >
-                            <div className="flex min-w-0 flex-1 flex-col pe-3">
+                            <div className="flex min-w-0 flex-1 flex-col pe-2">
                               <div className="flex min-w-0 items-center gap-1.5">
                                 <span
                                   title={id}
@@ -864,14 +863,14 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
                                   {summary}
                                 </span>
                                 {rowFailedApps.length > 0 && (
-                                  <span className="ms-2.5 shrink-0 whitespace-nowrap text-warning-text">
+                                  <span className="ms-2 shrink-0 whitespace-nowrap text-warning-text">
                                     {t("mcpPage.rowFail", {
                                       apps: failedNames,
                                     })}
                                     {" · "}
                                     <button
                                       type="button"
-                                      className="font-medium underline underline-offset-[3px]"
+                                      className="font-medium underline underline-offset-4"
                                       aria-label={t("mcpPage.rowRetryAria", {
                                         id,
                                         apps: failedNames,
@@ -1096,7 +1095,7 @@ const UnifiedMcpPanel: React.FC<UnifiedMcpPanelProps> = ({
                 {importFilesOpen && (
                   <ul
                     id="mcp-import-files"
-                    className="m-0 flex list-none flex-col gap-1 rounded-[8px] bg-subtle px-3.5 py-2.5"
+                    className="m-0 flex list-none flex-col gap-1 rounded-[8px] bg-subtle px-2 py-2"
                   >
                     {appIds.map((app) => (
                       <li

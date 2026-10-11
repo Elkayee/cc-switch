@@ -157,7 +157,7 @@ export function PromptEmptyState({
       {hasFile ? (
         <div
           id="prompt-empty-file"
-          className="mt-2 flex w-[460px] max-w-full items-start gap-2.5 rounded-[8px] bg-subtle px-3.5 py-3 text-left"
+          className="mt-2 flex w-[460px] max-w-full items-start gap-2 rounded-[8px] bg-subtle px-3 py-3 text-left"
         >
           <FileText
             aria-hidden="true"

@@ -212,7 +212,7 @@ export const SessionEventRow = memo(function SessionEventRow({
       <div
         role="note"
         className={cn(
-          "flex min-w-0 items-center justify-center gap-2.5 text-[12.35px] leading-[1.3]",
+          "flex min-w-0 items-center justify-center gap-2 text-[12.35px] leading-[1.3]",
           tone,
         )}
       >

@@ -111,16 +111,16 @@ export function GeminiFormFields({
     <>
       {/* Google OAuth 提示 */}
       {isGoogleOfficial && (
-        <div className="rounded-lg border border-border-strong bg-subtle p-4">
+        <div className="rounded-[8px] border border-border-strong bg-subtle p-4">
           <div className="flex gap-3">
             <Info className="h-5 w-5 flex-shrink-0 text-fg-1" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-fg-1">
+              <p className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
                 {t("provider.form.gemini.oauthTitle", {
                   defaultValue: "OAuth 认证模式",
                 })}
               </p>
-              <p className="text-sm text-fg-1">
+              <p className="text-[12.35px] leading-[1.3] text-fg-1">
                 {t("provider.form.gemini.oauthHint", {
                   defaultValue:
                     "Google 官方使用 OAuth 个人认证，无需填写 API Key。首次使用时会自动打开浏览器进行登录。",

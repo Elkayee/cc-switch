@@ -913,16 +913,18 @@ export function OmoFormFields({
       <div key={key} className="border-b border-border/30 last:border-b-0">
         <div className="flex items-center gap-2 py-1.5">
           <div className="w-32 shrink-0">
-            <div className="flex items-center gap-1 text-sm font-medium">
+            <div className="flex items-center gap-1 text-[12.35px] leading-[1.3] font-medium">
               {def.display}
               <span className="relative inline-flex group/tip">
                 <HelpCircle className="h-3.5 w-3.5 text-fg-3 hover:text-fg-2 cursor-help shrink-0" />
-                <span className="invisible opacity-0 group-hover/tip:visible group-hover/tip:opacity-100 transition-opacity duration-150 absolute left-0 top-full mt-1 z-50 w-[260px] rounded-md bg-popover text-popover-foreground border border-border shadow-md px-3 py-2 text-xs leading-relaxed font-normal pointer-events-none">
+                <span className="invisible opacity-0 group-hover/tip:visible group-hover/tip:opacity-100 transition-opacity duration-150 absolute left-0 top-full mt-1 z-50 w-[260px] rounded-[4px] bg-popover text-popover-foreground border border-border shadow-md px-3 py-2 text-[12.35px] leading-[1.3] font-normal pointer-events-none">
                   {t(def.tooltipKey)}
                 </span>
               </span>
             </div>
-            <div className="text-xs text-fg-2 truncate">{t(def.descKey)}</div>
+            <div className="text-[12.35px] leading-[1.3] text-fg-2 truncate">
+              {t(def.descKey)}
+            </div>
           </div>
           {renderModelSelect(
             currentModel,
@@ -1015,7 +1017,7 @@ export function OmoFormFields({
             value={item.key}
             onCommit={(value) => updateCustom({ key: value })}
             placeholder={keyPlaceholder}
-            className="w-32 shrink-0 h-8 text-sm text-primary"
+            className="w-32 shrink-0 h-8 text-[12.35px] leading-[1.3] text-primary"
           />
           {renderModelSelect(item.model, (value) =>
             updateCustom({ model: value }),
@@ -1097,7 +1099,9 @@ export function OmoFormFields({
         ) : (
           <ChevronRight className="h-4 w-4 text-fg-2" />
         )}
-        <Label className="text-sm font-semibold cursor-pointer">{title}</Label>
+        <Label className="text-[12.35px] leading-[1.3] font-semibold cursor-pointer">
+          {title}
+        </Label>
         {typeof badge === "string" ? (
           <Badge variant="outline" className="text-[12.35px] leading-[1.3] h-5">
             {badge}
@@ -1127,7 +1131,7 @@ export function OmoFormFields({
     maxHeightClass?: string;
     children: React.ReactNode;
   }) => (
-    <div className="rounded-lg border border-border/60">
+    <div className="rounded-[8px] border border-border/60">
       <SectionHeader
         title={title}
         isOpen={isOpen}
@@ -1151,7 +1155,7 @@ export function OmoFormFields({
       type="button"
       variant="ghost"
       size="sm"
-      className="h-6 text-xs"
+      className="h-6 text-[12.35px] leading-[1.3]"
       onClick={onClick}
     >
       <Plus className="h-3.5 w-3.5 mr-1" />
@@ -1186,7 +1190,7 @@ export function OmoFormFields({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-semibold">
+        <Label className="text-[12.35px] leading-[1.3] font-semibold">
           {t("omo.modelConfiguration", { defaultValue: "Model Configuration" })}
         </Label>
         <div className="flex items-center gap-1.5">
@@ -1194,7 +1198,7 @@ export function OmoFormFields({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-xs"
+            className="h-7 text-[12.35px] leading-[1.3]"
             disabled={readLocalFile.isPending}
             onClick={handleImportFromLocal}
           >
@@ -1209,7 +1213,7 @@ export function OmoFormFields({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-xs"
+            className="h-7 text-[12.35px] leading-[1.3]"
             onClick={handleFillAllRecommended}
           >
             <Wand2 className="h-3.5 w-3.5 mr-1" />
@@ -1218,7 +1222,7 @@ export function OmoFormFields({
         </div>
       </div>
 
-      <div className="text-xs text-fg-2">
+      <div className="text-[12.35px] leading-[1.3] text-fg-2">
         {t("omo.configSummary", {
           agents: configuredAgentCount,
           categories: configuredCategoryCount,

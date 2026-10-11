@@ -111,7 +111,7 @@ function useMinuteTicker() {
 
 const menuContentClass =
   "min-w-[200px] max-w-[320px] rounded-[8px] border-border bg-card p-1 shadow-md";
-const menuItemClass = "h-[30px] gap-2 rounded-[4px] px-2 text-ui";
+const menuItemClass = "h-6 gap-2 rounded-[4px] px-2 text-ui";
 
 function MenuCheck({ checked }: { checked: boolean }) {
   return (
@@ -466,7 +466,7 @@ export function UsageDashboard({
   );
   const chipClass = (pressed: boolean) =>
     cn(
-      "relative inline-flex h-[26px] shrink-0 items-center gap-2 whitespace-nowrap rounded-[5px] px-2 text-ui transition-colors duration-150",
+      "relative inline-flex h-6 shrink-0 items-center gap-2 whitespace-nowrap rounded-[3px] px-2 text-[12.35px] leading-[1.3] transition-colors duration-150",
       pressed
         ? "font-semibold text-foreground"
         : "font-medium text-muted-foreground hover:text-foreground",
@@ -478,12 +478,12 @@ export function UsageDashboard({
         ref={appFilterIndicator.ref}
         role="group"
         aria-label={t("usage.appFilter.label")}
-        className="relative flex h-8 shrink-0 items-center gap-0.5 rounded-[8px] bg-subtle p-[3px]"
+        className="relative flex h-7 shrink-0 items-center gap-0.5 rounded-[4px] bg-subtle p-0.5"
       >
         <SegmentThumb
           rect={appFilterIndicator.rect}
           animate={appFilterIndicator.animate}
-          className="rounded-[5px]"
+          className="rounded-[3px]"
         />
         <button
           type="button"
@@ -502,7 +502,7 @@ export function UsageDashboard({
               aria-label={APP_DISPLAY_NAME[app]}
               className={cn(
                 chipClass(appType === app),
-                "w-[30px] justify-center px-0",
+                "w-7 justify-center px-0",
               )}
               onClick={() => changeAppType(app)}
             >

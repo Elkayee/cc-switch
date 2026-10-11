@@ -40,7 +40,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
         <label
           htmlFor={id}
           className={cn(
-            "block text-ui font-medium text-foreground",
+            "block text-[12.35px] leading-[1.3] font-medium text-foreground",
             required && REQUIRED_LABEL,
           )}
         >

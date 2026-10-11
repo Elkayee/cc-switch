@@ -123,7 +123,7 @@ export const SessionQuestion = memo(function SessionQuestion({
         ) : null}
       </div>
       <div
-        className="min-w-0 max-w-full rounded-[16px] rounded-se-[4px] px-3.5 py-2 text-fg-1"
+        className="min-w-0 max-w-full rounded-[16px] rounded-se-[4px] px-3 py-2 text-fg-1"
         style={{
           // Agent 主题色铺一层浅色：深浅两套下都和左侧无底色的 Agent 输出区分开
           background:

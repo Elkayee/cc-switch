@@ -87,7 +87,7 @@ export function CardChipBadge({ chip }: { chip: CardChip }) {
     <span
       title={chip.title}
       className={cn(
-        "inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-full px-2 text-ui",
+        "inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-full px-2 text-[12.35px] leading-[1.3]",
         CHIP_CLASS[chip.tone],
         chip.title && "cursor-help",
       )}
@@ -343,7 +343,7 @@ export function ProviderCard({
           <div className="flex min-w-0 items-center gap-1">
             <h3
               className={cn(
-                "m-0 min-w-0 truncate text-ui font-semibold",
+                "m-0 min-w-0 truncate text-[12.35px] font-semibold leading-[1.3]",
                 presentation.dim ? "text-muted-foreground" : "text-foreground",
               )}
               title={provider.name}

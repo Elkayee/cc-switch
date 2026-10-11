@@ -1446,7 +1446,7 @@ export function PiProviderForm({
           <div
             role="alert"
             aria-live="assertive"
-            className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-ui text-destructive"
+            className="rounded-[8px] border border-destructive/30 bg-destructive/10 px-4 py-3 text-ui text-destructive"
           >
             {formError}
           </div>
@@ -1455,7 +1455,7 @@ export function PiProviderForm({
         {hasConfigurationSelection && !isSettingsConfigValid && (
           <p
             role="status"
-            className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-ui text-amber-900 dark:text-amber-200"
+            className="rounded-[8px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-ui text-amber-900 dark:text-amber-200"
           >
             {t("pi.form.fixJsonFirst")}
           </p>
@@ -1882,7 +1882,7 @@ export function PiProviderForm({
 
                                 {thinkingMapIsExpanded &&
                                   editableThinkingLevelMap && (
-                                    <div className="overflow-hidden rounded-lg border border-border/70 bg-surface">
+                                    <div className="overflow-hidden rounded-[8px] border border-border/70 bg-surface">
                                       {PI_THINKING_LEVELS.map((level) => {
                                         const mode = thinkingLevelMode(
                                           editableThinkingLevelMap,
@@ -1947,7 +1947,7 @@ export function PiProviderForm({
                                                 </span>
                                                 <PopoverAnchor asChild>
                                                   <span
-                                                    className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-[color,background-color,transform] duration-200 ${
+                                                    className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] transition-[color,background-color,transform] duration-200 ${
                                                       popoverOpen
                                                         ? "translate-x-0.5 bg-primary/10 text-primary"
                                                         : "text-fg-3 group-hover:translate-x-0.5 group-hover:text-fg-2"

@@ -73,9 +73,10 @@ export function BasicFormFields({
           <button
             type="button"
             aria-label={t("providerIcon.change", { defaultValue: "更换图标" })}
-            className="group shrink-0 rounded-[8px]"
+            className="group shrink-0 rounded-[4px] text-[12.35px] leading-[1.3]"
           >
             <ProviderIconBox
+              size={24}
               icon={currentIcon}
               name={providerName}
               color={effectiveIconColor}
@@ -103,7 +104,7 @@ export function BasicFormFields({
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </DialogClose>
-              <p className="text-lg font-semibold leading-tight">
+              <p className="text-[12.35px] leading-[1.3] font-semibold">
                 {t("providerIcon.selectIcon", {
                   defaultValue: "选择图标",
                 })}

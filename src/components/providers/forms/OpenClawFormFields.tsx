@@ -329,7 +329,10 @@ export function OpenClawFormFields({
         </div>
 
         {models.length === 0 ? (
-          <p role="status" className="py-2 text-sm text-fg-2">
+          <p
+            role="status"
+            className="py-2 text-[12.35px] leading-[1.3] text-fg-2"
+          >
             {t("openclaw.noModels", {
               defaultValue: "暂无模型配置",
             })}

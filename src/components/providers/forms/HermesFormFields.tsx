@@ -286,7 +286,7 @@ export function HermesFormFields({
 
       <div className="space-y-3 border-l border-border pl-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-normal leading-5">
+          <h3 className="text-[12.35px] leading-[1.3] font-normal">
             {t("hermes.form.models", { defaultValue: "模型列表" })}
           </h3>
           <div className="flex gap-1">
@@ -311,7 +311,7 @@ export function HermesFormFields({
         </div>
 
         {models.length === 0 ? (
-          <p className="text-sm text-fg-2 py-2">
+          <p className="text-[12.35px] leading-[1.3] text-fg-2 py-2">
             {t("hermes.form.noModels", {
               defaultValue: "暂无模型配置。切换到此供应商时将无默认模型。",
             })}

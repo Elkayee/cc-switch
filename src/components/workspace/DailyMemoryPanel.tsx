@@ -355,7 +355,7 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
           <div className="flex items-center justify-between gap-2">
             <HoverTip content={t("workspace.openDirectory")}>
               <p
-                className="text-sm text-muted-foreground shrink-0 cursor-pointer hover:text-foreground transition-colors inline-flex items-center gap-1"
+                className="text-[12.35px] leading-[1.3] text-muted-foreground shrink-0 cursor-pointer hover:text-foreground transition-colors inline-flex items-center gap-1"
                 onClick={() => workspaceApi.openDirectory("memory")}
               >
                 ~/.openclaw/workspace/memory/
@@ -399,13 +399,13 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
               >
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                     <Input
                       ref={searchInputRef}
                       value={searchTerm}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       placeholder={t("workspace.dailyMemory.searchPlaceholder")}
-                      className="pl-8 pr-8 h-8 text-sm"
+                      className="pl-8 pr-8 h-8 text-[12.35px] leading-[1.3]"
                     />
                     {searchTerm && (
                       <Button
@@ -423,7 +423,7 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={closeSearch}
-                    className="text-xs text-muted-foreground h-8 px-2 shrink-0"
+                    className="text-[12.35px] leading-[1.3] text-muted-foreground h-8 px-2 shrink-0"
                   >
                     {t("workspace.dailyMemory.searchCloseHint")}
                   </Button>
@@ -440,9 +440,9 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
                 {t("workspace.dailyMemory.searching")}
               </div>
             ) : searchResults.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-48 text-muted-foreground gap-3 border-2 border-dashed border-border rounded-xl">
+              <div className="flex flex-col items-center justify-center h-48 text-muted-foreground gap-3 border-2 border-dashed border-border rounded-[8px]">
                 <Search className="w-10 h-10 opacity-40" />
-                <p className="text-sm">
+                <p className="text-[12.35px] leading-[1.3]">
                   {t("workspace.dailyMemory.noSearchResults")}
                 </p>
               </div>
@@ -461,10 +461,10 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-foreground">
+                        <span className="font-medium text-[12.35px] leading-[1.3] text-foreground">
                           {result.date}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[12.35px] leading-[1.3] text-muted-foreground">
                           {formatFileSize(result.sizeBytes)}
                         </span>
                         {result.matchCount > 0 && (
@@ -476,7 +476,7 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
                         )}
                       </div>
                       {result.snippet && (
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 whitespace-pre-line">
+                        <p className="text-[12.35px] leading-[1.3] text-muted-foreground mt-1 line-clamp-2 whitespace-pre-line">
                           {result.snippet}
                         </p>
                       )}
@@ -502,7 +502,9 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
           ) : files.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-muted-foreground gap-3">
               <Calendar className="w-10 h-10 opacity-40" />
-              <p className="text-sm">{t("workspace.dailyMemory.empty")}</p>
+              <p className="text-[12.35px] leading-[1.3]">
+                {t("workspace.dailyMemory.empty")}
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -519,15 +521,15 @@ const DailyMemoryPanel: React.FC<DailyMemoryPanelProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm text-foreground">
+                      <span className="font-medium text-[12.35px] leading-[1.3] text-foreground">
                         {file.date}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-[12.35px] leading-[1.3] text-muted-foreground">
                         {formatFileSize(file.sizeBytes)}
                       </span>
                     </div>
                     {file.preview && (
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      <p className="text-[12.35px] leading-[1.3] text-muted-foreground mt-1 line-clamp-2">
                         {file.preview}
                       </p>
                     )}

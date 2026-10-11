@@ -46,8 +46,8 @@ import { CHECKBOX_CLASS } from "@/components/mcp/formBits";
 import { countRepoSkills } from "./RepoManagerPanel";
 import { describeRepoFailures, repoFailureKey } from "./repoFailures";
 
-/** 发现列表每行高度（h-14），虚拟化按这个算 */
-const ROW_HEIGHT = 56;
+/** 发现列表每行高度（h-10），虚拟化按这个算 */
+const ROW_HEIGHT = 40;
 export type SkillsPageSource = "repos" | "skillssh";
 
 type InstallRunner = <T extends { id: string }>(
@@ -341,7 +341,7 @@ export function SkillsPage({
         ].some((value) => value?.toLowerCase().includes(normalizedQuery));
       });
 
-  // 列表虚拟化：几个仓库加起来上千行，只渲染可视区域和前后各几行（每行固定 56）
+  // 列表虚拟化：几个仓库加起来上千行，只渲染可视区域和前后各几行（每行固定 40）
   const listScrollRef = useRef<HTMLDivElement>(null);
   const rowVirtualizer = useVirtualizer({
     count: visibleRows.length,
@@ -728,7 +728,7 @@ export function SkillsPage({
                     aria-setsize={visibleRows.length}
                     aria-posinset={index + 1}
                     className={cn(
-                      "absolute inset-x-0 top-0 flex h-14 items-center gap-3 pe-3 ps-4",
+                      "absolute inset-x-0 top-0 flex h-10 items-center gap-2 px-2",
                       index > 0 && "border-t border-border",
                     )}
                     style={{ transform: `translateY(${item.start}px)` }}
@@ -840,7 +840,7 @@ export function SkillsPage({
                           aria-label={t("skillsPage.discover.installingAria", {
                             name: row.name,
                           })}
-                          className="cursor-not-allowed ps-2.5"
+                          className="cursor-not-allowed ps-2"
                         >
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                           {t("skillsPage.discover.installing")}
@@ -925,7 +925,7 @@ function InstallToPopover({
           variant="neutral"
           size="regular"
           title={fullLabel}
-          className="min-w-0 shrink pe-2.5"
+          className="min-w-0 shrink pe-2"
         >
           <span className="min-w-0 truncate">
             {t("skillsPage.installTo.prefix")}
@@ -939,7 +939,7 @@ function InstallToPopover({
           align="end"
           sideOffset={6}
           collisionPadding={8}
-          className={cn(POPOVER_CLASS, "flex w-[280px] flex-col gap-2.5 p-3")}
+          className={cn(POPOVER_CLASS, "flex w-[280px] flex-col gap-2 p-3")}
         >
           <div className="flex items-center gap-0.5">
             <h3 className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
@@ -1015,7 +1015,7 @@ function RepoPopover({
           type="button"
           variant="quiet"
           size="compact"
-          className="pe-1.5 ps-2.5 text-fg-2"
+          className="pe-1.5 ps-2 text-fg-2"
         >
           {label}
           <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
@@ -1080,7 +1080,7 @@ function RepoPopover({
               setOpen(false);
               onManage();
             }}
-            className="flex h-8 items-center rounded-[4px] px-2.5 text-left text-[12.35px] leading-[1.3] transition-colors hover:bg-subtle"
+            className="flex h-8 items-center rounded-[4px] px-2 text-left text-[12.35px] leading-[1.3] transition-colors hover:bg-subtle"
           >
             {t("skillsPage.repos.manage")}
           </button>

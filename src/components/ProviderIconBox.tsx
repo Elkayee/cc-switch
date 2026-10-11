@@ -38,7 +38,7 @@ export function ProviderIconBox({
       aria-hidden="true"
       style={{ width: size, height: size }}
       className={cn(
-        "relative flex shrink-0 items-center justify-center overflow-hidden",
+        "relative flex shrink-0 items-center justify-center overflow-hidden text-[12.35px] leading-[1.3]",
         size <= 24 ? "rounded-[4px]" : "rounded-[8px]",
         tile
           ? // 描边画在图片上层：白底图标放在白色卡片上也有轮廓

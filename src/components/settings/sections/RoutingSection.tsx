@@ -233,7 +233,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
             label={t("routingSettings.listen")}
             control={
               <div className="flex items-start gap-2">
-                <label className="space-y-1">
+                <label className="block space-y-1 text-[12.35px] leading-[1.3]">
                   <span className="block text-ui font-medium text-muted-foreground">
                     {t("routingSettings.address")}
                   </span>
@@ -245,7 +245,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                   />
                   <span
                     className={cn(
-                      "block text-ui",
+                      "block text-[12.35px] leading-[1.3]",
                       addressError
                         ? "text-danger-text"
                         : "text-muted-foreground",
@@ -254,7 +254,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                     {addressError ?? t("routingSettings.addressHint")}
                   </span>
                 </label>
-                <label className="space-y-1">
+                <label className="block space-y-1 text-[12.35px] leading-[1.3]">
                   <span className="block text-ui font-medium text-muted-foreground">
                     {t("routingSettings.port")}
                   </span>
@@ -267,7 +267,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                   />
                   <span
                     className={cn(
-                      "block text-ui",
+                      "block text-[12.35px] leading-[1.3]",
                       portError ? "text-danger-text" : "text-muted-foreground",
                     )}
                   >

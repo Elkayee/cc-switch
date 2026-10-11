@@ -100,7 +100,7 @@ function parseBlocks(
         level === 1
           ? "mt-3 mb-1 text-[13.5px] font-semibold leading-[1.3]"
           : level === 2
-            ? "mt-2.5 mb-1 text-[13px] font-semibold leading-[1.3]"
+            ? "mt-2 mb-1 text-[13px] font-semibold leading-[1.3]"
             : "mt-2 mb-0.5 text-[12.35px] font-semibold leading-[1.3]";
       const content = renderInline(heading[2]);
       blocks.push(

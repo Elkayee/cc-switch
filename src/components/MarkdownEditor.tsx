@@ -149,7 +149,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   return (
     <div
       ref={editorRef}
-      className={`border rounded-md overflow-hidden ${
+      className={`border rounded-[4px] overflow-hidden ${
         darkMode ? "border-border-strong" : "border-border"
       } ${className}`}
     />

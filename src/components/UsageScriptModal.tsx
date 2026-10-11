@@ -906,8 +906,8 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
       onClose={onClose}
       footer={footer}
     >
-      <div className="glass rounded-xl border border-white/10 px-6 py-4 flex items-center justify-between gap-4">
-        <p className="text-base font-medium leading-none text-fg-1">
+      <div className="glass rounded-[8px] border border-white/10 px-6 py-4 flex items-center justify-between gap-4">
+        <p className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
           {t("usageScript.enableUsageQuery")}
         </p>
         <Switch
@@ -920,8 +920,8 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
       {script.enabled && (
         <div className="space-y-6">
           {/* 预设模板选择 */}
-          <div className="space-y-4 glass rounded-xl border border-white/10 p-6">
-            <Label className="text-base font-medium">
+          <div className="space-y-4 glass rounded-[8px] border border-white/10 p-6">
+            <Label className="text-[12.35px] leading-[1.3] font-medium">
               {t("usageScript.presetTemplate")}
             </Label>
             <div className="flex gap-2 flex-wrap">
@@ -952,7 +952,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
                       variant={isSelected ? "default" : "outline"}
                       size="sm"
                       className={cn(
-                        "rounded-lg border",
+                        "rounded-[8px] border",
                         isSelected
                           ? "shadow-sm"
                           : "bg-surface text-fg-2 hover:bg-subtle hover:text-accent-foreground",
@@ -968,10 +968,10 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {/* 自定义模式：变量提示和具体值 */}
             {selectedTemplate === TEMPLATE_TYPES.CUSTOM && (
               <div className="space-y-2 border-t border-white/10 pt-3">
-                <h4 className="text-sm font-medium text-fg-1">
+                <h4 className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
                   {t("usageScript.supportedVariables")}
                 </h4>
-                <div className="space-y-1 text-xs">
+                <div className="space-y-1 text-[12.35px] leading-[1.3]">
                   {/* baseUrl */}
                   <div className="flex items-center gap-2 py-1">
                     <code className="text-success-text font-mono shrink-0">
@@ -1036,7 +1036,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {/* Copilot 模式：自动认证提示 */}
             {selectedTemplate === TEMPLATE_TYPES.GITHUB_COPILOT && (
               <div className="space-y-2 border-t border-white/10 pt-3">
-                <p className="text-sm text-fg-2">
+                <p className="text-[12.35px] leading-[1.3] text-fg-2">
                   {t("usageScript.copilotAutoAuth")}
                 </p>
               </div>
@@ -1045,7 +1045,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {/* 官方余额查询模式：自动提示 */}
             {selectedTemplate === TEMPLATE_TYPES.BALANCE && (
               <div className="space-y-3 border-t border-white/10 pt-3">
-                <p className="text-sm text-fg-2">
+                <p className="text-[12.35px] leading-[1.3] text-fg-2">
                   {t("usageScript.balanceHint")}
                 </p>
                 <div className="flex gap-2 flex-wrap">
@@ -1054,7 +1054,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
                   ).map((bp) => (
                     <span
                       key={bp.id}
-                      className="inline-flex items-center px-2.5 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium"
+                      className="inline-flex items-center px-2 py-1 rounded-[4px] bg-primary/10 text-primary text-[12.35px] leading-[1.3] font-medium"
                     >
                       {bp.label}
                     </span>
@@ -1066,7 +1066,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {/* 官方订阅额度模式：自动提示 */}
             {selectedTemplate === TEMPLATE_TYPES.OFFICIAL_SUBSCRIPTION && (
               <div className="space-y-2 border-t border-white/10 pt-3">
-                <p className="text-sm text-fg-2">
+                <p className="text-[12.35px] leading-[1.3] text-fg-2">
                   {t("usageScript.officialSubscriptionHint")}
                 </p>
               </div>
@@ -1075,7 +1075,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {/* Coding Plan 模式：供应商选择 */}
             {selectedTemplate === TEMPLATE_TYPES.TOKEN_PLAN && (
               <div className="space-y-3 border-t border-white/10 pt-3">
-                <p className="text-sm text-fg-2">
+                <p className="text-[12.35px] leading-[1.3] text-fg-2">
                   {t("usageScript.tokenPlanHint")}
                 </p>
                 <div className="flex gap-2 flex-wrap">
@@ -1090,7 +1090,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
                       }
                       size="sm"
                       className={cn(
-                        "rounded-lg border",
+                        "rounded-[8px] border",
                         script.codingPlanProvider === cp.id
                           ? "shadow-sm"
                           : "bg-surface text-fg-2 hover:bg-subtle hover:text-accent-foreground",
@@ -1113,10 +1113,10 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
             {shouldShowCredentialsConfig && (
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
-                  <h4 className="text-sm font-medium text-fg-1">
+                  <h4 className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
                     {t("usageScript.credentialsConfig")}
                   </h4>
-                  <p className="text-xs text-fg-2">
+                  <p className="text-[12.35px] leading-[1.3] text-fg-2">
                     {t("usageScript.credentialsHint")}
                   </p>
                 </div>
@@ -1127,7 +1127,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
                       <div className="space-y-2">
                         <Label htmlFor="usage-api-key">
                           API Key{""}
-                          <span className="text-xs text-fg-2 font-normal">
+                          <span className="text-[12.35px] leading-[1.3] text-fg-2 font-normal">
                             ({t("usageScript.optional")})
                           </span>
                         </Label>
@@ -1170,7 +1170,7 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
                         <Label htmlFor="usage-base-url">
                           {t("usageScript.baseUrl")}
                           {""}
-                          <span className="text-xs text-fg-2 font-normal">
+                          <span className="text-[12.35px] leading-[1.3] text-fg-2 font-normal">
                             ({t("usageScript.optional")})
                           </span>
                         </Label>
@@ -1343,13 +1343,13 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
               script.codingPlanProvider === "volcengine" && (
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-fg-1">
+                    <h4 className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
                       {t("usageScript.credentialsConfig")}
                     </h4>
-                    <p className="text-xs text-fg-2 mt-1 leading-relaxed">
+                    <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1">
                       {t("usageScript.volcengineAkSkHint")}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1.5">
+                    <p className="text-[12.35px] leading-[1.3] text-muted-foreground mt-1.5">
                       {t("usageScript.volcengineKeyConsoleLink")}{" "}
                       <Button
                         type="button"
@@ -1436,13 +1436,13 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
               script.codingPlanProvider === "zhipu_team" && (
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-medium text-fg-1">
+                    <h4 className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
                       {t("usageScript.credentialsConfig")}
                     </h4>
-                    <p className="text-xs text-fg-2 mt-1 leading-relaxed">
+                    <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1">
                       {t("usageScript.zhipuTeamHint")}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1.5">
+                    <p className="text-[12.35px] leading-[1.3] text-muted-foreground mt-1.5">
                       {t("usageScript.zhipuTeamConsoleLink")}{" "}
                       <Button
                         type="button"
@@ -1571,12 +1571,12 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
 
           {/* 提取器代码 - 专用模板不需要 */}
           {!NATIVE_USAGE_TEMPLATES.has(selectedTemplate || "") && (
-            <div className="space-y-4 glass rounded-xl border border-white/10 p-6">
+            <div className="space-y-4 glass rounded-[8px] border border-white/10 p-6">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">
+                <Label className="text-[12.35px] leading-[1.3] font-medium">
                   {t("usageScript.extractorCode")}
                 </Label>
-                <div className="text-xs text-fg-2">
+                <div className="text-[12.35px] leading-[1.3] text-fg-2">
                   {t("usageScript.extractorHint")}
                 </div>
               </div>
@@ -1596,11 +1596,11 @@ const UsageScriptModal: React.FC<UsageScriptModalProps> = ({
 
           {/* 帮助信息 - 专用模板不需要 */}
           {!NATIVE_USAGE_TEMPLATES.has(selectedTemplate || "") && (
-            <div className="glass rounded-xl border border-white/10 p-6 text-sm text-fg-1">
+            <div className="glass rounded-[8px] border border-white/10 p-6 text-[12.35px] leading-[1.3] text-fg-1">
               <h4 className="font-medium mb-2">
                 {t("usageScript.scriptHelp")}
               </h4>
-              <div className="space-y-3 text-xs">
+              <div className="space-y-3 text-[12.35px] leading-[1.3]">
                 <div>
                   <strong>{t("usageScript.configFormat")}</strong>
                   <pre className="mt-1 p-2 bg-black/20 text-fg-1 rounded border border-white/10 text-[12.35px] leading-[1.3] overflow-x-auto">

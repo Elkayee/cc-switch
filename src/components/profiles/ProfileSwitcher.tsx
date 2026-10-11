@@ -116,7 +116,7 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
             })}
             title={t(`profiles.switcherTooltip.${scope}`)}
             className={cn(
-              "h-8 min-w-0 px-2.5",
+              "h-8 min-w-0 px-2",
               currentProfile ? "text-foreground" : "text-muted-foreground",
             )}
           >
@@ -157,7 +157,7 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
                       />
                       <span className="truncate">{profile.name}</span>
                       {!hasScopeSnapshot(profile, scope) && (
-                        <span className="ml-auto shrink-0 pl-2 text-xs text-fg-2">
+                        <span className="ml-auto shrink-0 pl-2 text-[12.35px] leading-[1.3] text-fg-2">
                           {t("profiles.noSnapshotForScope")}
                         </span>
                       )}

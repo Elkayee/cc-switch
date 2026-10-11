@@ -224,7 +224,7 @@ function PiInstructionFileEditor({
                 size="regular"
                 onClick={() => onDelete(baseSnapshot)}
                 disabled={busy}
-                className="-ms-2.5 text-danger-text"
+                className="-ms-2 text-danger-text"
               >
                 {t("pi.prompts.deleteFile")}
               </Button>
@@ -257,7 +257,7 @@ function PiInstructionFileEditor({
         }
       >
         {file.kind === "system_override" ? (
-          <div className="flex shrink-0 items-start gap-2.5 rounded-[8px] bg-warning-soft px-3.5 py-2.5">
+          <div className="flex shrink-0 items-start gap-2 rounded-[8px] bg-warning-soft px-3 py-2">
             <AlertTriangle
               aria-hidden="true"
               strokeWidth={1.5}
@@ -289,7 +289,7 @@ function PiInstructionFileEditor({
             }
             className={cn(
               promptFieldClass,
-              "min-h-[180px] flex-1 resize-none px-3 py-2.5 font-mono text-[12.35px] leading-[1.3]",
+              "min-h-[180px] flex-1 resize-none px-3 py-2 font-mono text-[12.35px] leading-[1.3]",
             )}
           />
           <div className="flex items-start gap-3">
@@ -735,7 +735,7 @@ function PiPromptTemplateEditor({
           placeholder={t("pi.prompts.templateContentPlaceholder")}
           className={cn(
             promptFieldClass,
-            "min-h-[180px] flex-1 resize-none px-3 py-2.5 font-mono text-[12.35px] leading-[1.3]",
+            "min-h-[180px] flex-1 resize-none px-3 py-2 font-mono text-[12.35px] leading-[1.3]",
           )}
         />
         <span className="ms-auto whitespace-nowrap text-[12.35px] leading-[1.3] tabular-nums text-fg-2">

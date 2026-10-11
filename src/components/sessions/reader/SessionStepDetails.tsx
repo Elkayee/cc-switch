@@ -394,7 +394,7 @@ export const SessionStepDetails = memo(function SessionStepDetails({
       <div className="flex min-w-0 gap-1.5">
         <span
           aria-hidden
-          className="w-4 shrink-0 select-none pt-1.5 text-center font-mono text-[12.35px] leading-[1.3] leading-none text-fg-3"
+          className="w-4 shrink-0 select-none pt-1.5 text-center font-mono text-[12.35px] leading-[1.3] text-fg-3"
         >
           {style.resultConnector}
         </span>
@@ -413,7 +413,7 @@ export const SessionStepDetails = memo(function SessionStepDetails({
         "min-w-0 space-y-2 pb-2 pt-0.5",
         style.resultFrame === "box"
           ? cn(
-              "ms-6 rounded-[8px] border border-s-2 border-border p-2.5",
+              "ms-6 rounded-[8px] border border-s-2 border-border p-2",
               STATUS_BORDER_START[status],
             )
           : style.resultFrame === "none"

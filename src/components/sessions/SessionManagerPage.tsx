@@ -119,8 +119,8 @@ type SessionListRow =
     }
   | { kind: "session"; key: string; session: SessionMeta; bordered: boolean };
 
-/** 虚拟列表每种行的固定高度：时间分组标题 h-7、项目分组标题 h-9、会话行 h-14 */
-const LIST_ROW_HEIGHT = { time: 28, project: 36, session: 56 } as const;
+/** 虚拟列表每种行的固定高度：时间分组标题 h-7、项目分组标题 h-8、会话行 h-10 */
+const LIST_ROW_HEIGHT = { time: 28, project: 32, session: 40 } as const;
 
 const linkButton =
   "h-[22px] rounded-[4px] px-0.5 text-[12.35px] leading-[1.3] text-fg-1 underline decoration-border-strong underline-offset-[3px] hover:decoration-fg-2";
@@ -803,7 +803,7 @@ export function SessionManagerPage({
     return (
       <div
         className={cn(
-          "flex h-9 items-center gap-3 bg-subtle pe-3 ps-2.5",
+          "flex h-8 items-center gap-2 bg-subtle pe-2 ps-2",
           !first && "border-t border-border",
         )}
       >
@@ -813,7 +813,7 @@ export function SessionManagerPage({
             aria-expanded={open}
             onClick={() => toggleGroup(group.key)}
             title={group.projectDir ?? undefined}
-            className="flex h-7 min-w-0 max-w-full items-center gap-2.5 rounded-[4px] pe-2 ps-1.5 text-left font-semibold transition-colors hover:bg-selected"
+            className="flex h-6 min-w-0 max-w-full items-center gap-2 rounded-[4px] pe-2 ps-1.5 text-left font-semibold transition-colors hover:bg-selected"
           >
             <ChevronDown
               aria-hidden="true"
@@ -865,7 +865,7 @@ export function SessionManagerPage({
             {row.kind === "time" ? (
               <h3
                 className={cn(
-                  "m-0 flex h-7 items-end px-4 pb-0.5 text-[12.35px] leading-[1.3] font-semibold text-fg-2",
+                  "m-0 flex h-7 items-end px-2 pb-0.5 text-[12.35px] leading-[1.3] font-semibold text-fg-2",
                   !row.first && "border-t border-border",
                 )}
               >
@@ -959,7 +959,6 @@ export function SessionManagerPage({
                   <Button
                     variant="quiet"
                     size="icon-compact"
-                    className="h-8 w-8"
                     aria-label={t("sessionManager.moreActions", {
                       defaultValue: "会话的更多操作",
                     })}
@@ -1055,13 +1054,13 @@ export function SessionManagerPage({
             readerSession && "hidden",
           )}
         >
-          <div className="flex shrink-0 items-center gap-2 px-6 pt-3.5">
+          <div className="flex shrink-0 items-center gap-2 px-6 pt-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="neutral"
                   size="regular"
-                  className="shrink-0 gap-2 pe-2 ps-2.5"
+                  className="shrink-0 gap-2 pe-2 ps-2"
                 >
                   <span className="sr-only">
                     {t("sessionManager.appPrefix", { defaultValue: "应用：" })}
@@ -1177,7 +1176,7 @@ export function SessionManagerPage({
               })}
               value={groupMode}
               onValueChange={setGroupMode}
-              className="h-8 shrink-0 rounded-[8px] [&>button]:rounded-[5px] [&>button]:px-3"
+              className="h-7 shrink-0"
               items={[
                 {
                   value: "time",
@@ -1325,7 +1324,7 @@ export function SessionManagerPage({
           <div className="h-4 shrink-0" />
 
           {selectionMode && (
-            <div className="flex h-14 shrink-0 items-center gap-2 border-t border-border bg-surface pe-4 ps-6">
+            <div className="flex h-10 shrink-0 items-center gap-2 border-t border-border bg-surface px-2">
               <span
                 role="status"
                 className="min-w-0 flex-1 truncate text-[12.35px] leading-[1.3] text-fg-1"
@@ -1458,7 +1457,7 @@ function EmptyState({
       <Button
         variant="neutral"
         size="regular"
-        className="mt-2.5"
+        className="mt-2"
         onClick={onAction}
       >
         {action}

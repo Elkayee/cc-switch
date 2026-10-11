@@ -89,7 +89,7 @@ interface ManagedAccountsGroupProps {
 }
 
 const PILL =
-  "inline-flex h-[18px] shrink-0 items-center rounded-full px-2 text-ui";
+  "inline-flex h-[18px] shrink-0 items-center rounded-full px-2 text-[12.35px] leading-[1.3]";
 
 /**
  * 授权中心的一个服务（v7 Auth 画板）：标题行（图标、名字、「?」、添加账号、⋯ 删除全部），
@@ -263,7 +263,7 @@ export function ManagedAccountsGroup({
               <DropdownMenuItem
                 disabled={removing}
                 onSelect={onRemoveAll}
-                className="h-[30px] rounded-[4px] px-2 text-ui text-danger-text focus:text-danger-text"
+                className="h-6 rounded-[4px] px-2 text-ui text-danger-text focus:text-danger-text"
               >
                 {t("authCenter.removeAll", { defaultValue: "删除全部账号…" })}
               </DropdownMenuItem>
@@ -606,7 +606,7 @@ function AccountRow({
             <DropdownMenuItem
               disabled={settingDefault}
               onSelect={() => onSetDefault(account.id)}
-              className="h-[30px] rounded-[4px] px-2 text-ui"
+              className="h-6 rounded-[4px] px-2 text-ui"
             >
               {t("authCenter.setDefault", { defaultValue: "设为默认" })}
             </DropdownMenuItem>
@@ -615,7 +615,7 @@ function AccountRow({
             <DropdownMenuItem
               disabled={busy}
               onSelect={() => onReauth(account.id)}
-              className="min-h-[30px] flex-col items-start justify-center gap-0 rounded-[4px] px-2 text-ui data-[disabled]:opacity-100"
+              className="min-h-6 flex-col items-start justify-center gap-0 rounded-[4px] px-2 text-ui data-[disabled]:opacity-100"
             >
               <span className={cn(busy && "text-muted-foreground")}>
                 {t("authCenter.reauth", { defaultValue: "重新登录" })}
@@ -632,7 +632,7 @@ function AccountRow({
           <DropdownMenuItem
             disabled={removing}
             onSelect={() => onRemove(account.id, account.login)}
-            className="h-[30px] rounded-[4px] px-2 text-ui text-danger-text focus:text-danger-text"
+            className="h-6 rounded-[4px] px-2 text-ui text-danger-text focus:text-danger-text"
           >
             {t("authCenter.removeAccount", { defaultValue: "删除账号…" })}
           </DropdownMenuItem>

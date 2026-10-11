@@ -230,7 +230,7 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
           >
             <span
               className={cn(
-                "min-w-0 flex-1 truncate text-left text-ui font-medium tracking-tight",
+                "min-w-0 flex-1 truncate text-left text-[12.35px] leading-[1.3] font-medium tracking-tight",
                 isAccountSelectionPlaceholder &&
                   "font-normal tracking-normal text-muted-foreground",
               )}
@@ -330,7 +330,7 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
   const statusErrorBanner = isStatusError && (
     <div
       role="alert"
-      className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-ui text-destructive"
+      className="flex items-center gap-2 rounded-[4px] border border-destructive/40 bg-destructive/5 px-3 py-2 text-ui text-destructive"
     >
       <AlertTriangle className="h-4 w-4 shrink-0" />
       <span className="min-w-0 flex-1">
@@ -368,7 +368,7 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
 
         {/* 所选账号需重新登录的内联提示 */}
         {selectedAccountNeedsReauth && (
-          <div className="flex items-start gap-2 rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-ui text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100">
+          <div className="flex items-start gap-2 rounded-[4px] border border-amber-300/70 bg-amber-50 px-3 py-2 text-ui text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
             <div className="flex-1 leading-relaxed">
               {t(
@@ -390,7 +390,7 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
         )}
 
         {onFastModeChange && (
-          <div className="flex items-center justify-between rounded-md border bg-muted/30 p-3">
+          <div className="flex items-center justify-between rounded-[4px] border bg-muted/30 p-3">
             <div className="space-y-1 pr-4">
               <Label className="text-ui font-medium">
                 {t("codexOauth.fastMode", "FAST mode")}

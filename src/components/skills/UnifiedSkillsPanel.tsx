@@ -970,7 +970,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                 type="button"
                 variant="solid"
                 size="regular"
-                className="pe-2.5"
+                className="pe-2"
                 disabled={controlsDisabled}
               >
                 <Plus className="h-4 w-4" strokeWidth={2} />
@@ -987,7 +987,9 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => void handleOpenImport()}>
                 <span className="flex-1">{t("skillsPage.addMenu.import")}</span>
-                {nUnmanaged > 0 && <NeutralBadge>{nUnmanaged}</NeutralBadge>}
+                {nUnmanaged > 0 && (
+                  <NeutralBadge className="h-4">{nUnmanaged}</NeutralBadge>
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -998,7 +1000,6 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                   type="button"
                   variant="quiet"
                   size="icon-compact"
-                  className="h-8 w-8"
                   aria-label={t("skills.moreActions")}
                 >
                   <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
@@ -1046,7 +1047,6 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     <PageTabs<SkillsView>
       aria-label={t("skillsPage.viewAria")}
       idPrefix="skills-view"
-      className="h-11"
       value={view}
       onValueChange={(next) => {
         if (next === "discover" && navigationBlocked) return;
@@ -1089,7 +1089,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     }
     if (isError) {
       return (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2.5 px-10 pb-12 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
           <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
             {t("skillsPage.loadFailed")}
           </h2>
@@ -1113,7 +1113,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     }
     if (nInstalled === 0) {
       return (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-10 pb-12 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
           <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
             {t("skillsPage.emptyTitle")}
           </h2>
@@ -1158,7 +1158,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
       >
         <MatrixColumnHighlight>
           <div className="min-w-[600px]">
-            <div className="sticky top-0 z-10 flex h-11 items-center border-b border-border bg-subtle px-2">
+            <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-subtle px-2">
               <span className="flex w-6 shrink-0 justify-center">
                 <Checkbox
                   aria-label={t("skillsPage.selectAllAria")}
@@ -1186,7 +1186,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
               <div className="-ms-0.5 flex min-w-0 flex-1 items-center gap-0.5">
                 {selectionActive ? (
                   <>
-                    <span className="shrink-0 whitespace-nowrap pe-1.5 ps-2.5 text-[12.35px] leading-[1.3] font-medium tabular-nums">
+                    <span className="shrink-0 whitespace-nowrap pe-1 ps-2 text-[12.35px] leading-[1.3] font-medium tabular-nums">
                       {t("skillsPage.bulk.selected", { count: selected.size })}
                     </span>
                     <AppMenuButton
@@ -1860,7 +1860,7 @@ function InstalledRow({
       id={`sk-row-${skill.id}`}
       tabIndex={-1}
       className={cn(
-        "group relative flex h-14 items-center px-2 outline-none transition-colors duration-150 hover:bg-subtle",
+        "group relative flex min-h-10 items-center px-2 py-1 outline-none transition-colors duration-150 hover:bg-subtle",
         !first && "border-t border-border",
         highlighted && "bg-subtle",
       )}
@@ -1875,7 +1875,7 @@ function InstalledRow({
           onChange={(event) => onPick(event.target.checked)}
         />
       </span>
-      <div className="ms-2 flex min-w-0 flex-1 flex-col pe-3">
+      <div className="ms-2 flex min-w-0 flex-1 flex-col pe-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <span
             title={skill.name}
@@ -2042,7 +2042,7 @@ function FilterMenu({
           variant="quiet"
           size="compact"
           className={cn(
-            "shrink-0 pe-1.5 ps-2.5",
+            "shrink-0 pe-1 ps-2",
             active ? "text-fg-1" : "text-fg-2",
           )}
         >
