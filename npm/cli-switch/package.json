@@ -1,6 +1,6 @@
 {
   "name": "@spec-ade/cli-switch",
-  "version": "3.20.7",
+  "version": "4.0.9",
   "description": "Cli-Switch in your browser: manage providers, MCP servers, prompts and skills for Claude Code, Codex, Gemini CLI and more",
   "license": "MIT",
   "repository": "https://github.com/nullmastermind/cc-switch",
@@ -27,11 +27,11 @@
     "cli"
   ],
   "optionalDependencies": {
-    "@spec-ade/cli-switch-win32-x64": "3.20.7",
-    "@spec-ade/cli-switch-win32-arm64": "3.20.7",
-    "@spec-ade/cli-switch-darwin-x64": "3.20.7",
-    "@spec-ade/cli-switch-darwin-arm64": "3.20.7",
-    "@spec-ade/cli-switch-linux-x64": "3.20.7",
-    "@spec-ade/cli-switch-linux-arm64": "3.20.7"
+    "@spec-ade/cli-switch-win32-x64": "4.0.9",
+    "@spec-ade/cli-switch-win32-arm64": "4.0.9",
+    "@spec-ade/cli-switch-darwin-x64": "4.0.9",
+    "@spec-ade/cli-switch-darwin-arm64": "4.0.9",
+    "@spec-ade/cli-switch-linux-x64": "4.0.9",
+    "@spec-ade/cli-switch-linux-arm64": "4.0.9"
   }
 }

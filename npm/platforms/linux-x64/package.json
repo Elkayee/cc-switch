@@ -1,6 +1,6 @@
 {
   "name": "@spec-ade/cli-switch-linux-x64",
-  "version": "3.20.7",
+  "version": "4.0.9",
   "description": "Cli-Switch server binary for linux/x64",
   "license": "MIT",
   "repository": "https://github.com/nullmastermind/cc-switch",
