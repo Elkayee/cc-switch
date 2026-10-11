@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -166,10 +167,10 @@ export function StructuredOptionsEditor({
   return (
     <div
       id={id}
-      className={cn("space-y-2 border-l border-border-default pl-3", className)}
+      className={cn("space-y-2 border-l border-border pl-3", className)}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 max-w-3xl flex-1 space-y-1">
+        <div className="min-w-0 flex-1 space-y-1">
           <span className="block text-ui font-medium text-foreground">
             {title}
           </span>
@@ -187,7 +188,7 @@ export function StructuredOptionsEditor({
         </Button>
       </div>
 
-      <div className="max-w-3xl space-y-2">
+      <div className="space-y-2">
         {!hasRows ? (
           <p className="py-1 text-ui text-muted-foreground">{emptyLabel}</p>
         ) : (
@@ -213,16 +214,18 @@ export function StructuredOptionsEditor({
                   placeholder={valuePlaceholder}
                   className="min-w-0 flex-1 font-mono"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeOption(key)}
-                  aria-label={removeLabel}
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <HoverTip content={removeLabel}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeOption(key)}
+                    aria-label={removeLabel}
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </HoverTip>
               </div>
             ))}
 
@@ -271,16 +274,18 @@ export function StructuredOptionsEditor({
                   placeholder={valuePlaceholder}
                   className="min-w-0 flex-1 font-mono"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeDraft(draft.id)}
-                  aria-label={removeLabel}
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <HoverTip content={removeLabel}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeDraft(draft.id)}
+                    aria-label={removeLabel}
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </HoverTip>
               </div>
             ))}
           </div>

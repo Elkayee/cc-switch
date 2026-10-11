@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Link2, Zap } from "lucide-react";
+import { REQUIRED_LABEL } from "../BasicFormFields";
 
 interface EndpointFieldProps {
   id: string;
@@ -54,13 +55,13 @@ export function EndpointField({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <FormLabel htmlFor={id}>{label}</FormLabel>
+          <FormLabel htmlFor={id} className={REQUIRED_LABEL}>
+            {label}
+          </FormLabel>
           {showFullUrlToggle && onFullUrlChange ? (
             <div className="flex items-center gap-2 rounded-[8px] border border-border/70 bg-muted/30 px-2 py-1">
               <Link2
-                className={`h-3.5 w-3.5 ${
-                  isFullUrl ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`h-3.5 w-3.5 ${isFullUrl ? "text-primary" : "text-muted-foreground"}`}
               />
               <span
                 className={`text-ui font-medium ${
@@ -95,6 +96,7 @@ export function EndpointField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         autoComplete="off"
+        aria-required="true"
       />
       {effectiveHint ? (
         <div className="p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-[8px]">

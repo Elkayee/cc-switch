@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -195,6 +195,10 @@ export function GrokBuildProviderForm({
   });
   const { isSubmitting } = form.formState;
   const websiteUrl = form.watch("websiteUrl") ?? "";
+  // 「获取 API Key」优先用预设的 apiKeyUrl（带推广参数），与 useApiKeyLink 一致
+  const apiKeyLinkUrl =
+    grokPresetEntries.find((entry) => entry.id === selectedPresetId)?.preset
+      .apiKeyUrl || websiteUrl;
 
   useEffect(() => {
     onSubmittingChange?.(isSubmitting);
@@ -466,8 +470,8 @@ export function GrokBuildProviderForm({
                 syncStructuredConfig({ apiKey: value });
               }}
               category={category}
-              shouldShowApiKeyLink={Boolean(websiteUrl)}
-              websiteUrl={websiteUrl}
+              shouldShowApiKeyLink={Boolean(apiKeyLinkUrl)}
+              websiteUrl={apiKeyLinkUrl}
               isPartner={isPartner}
               shouldShowSpeedTest
               codexBaseUrl={baseUrl}

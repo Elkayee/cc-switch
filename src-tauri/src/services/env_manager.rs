@@ -42,7 +42,7 @@ pub fn delete_env_vars(conflicts: Vec<EnvConflict>) -> Result<BackupInfo, String
 /// Create backup file before deletion
 fn create_backup(conflicts: &[EnvConflict]) -> Result<BackupInfo, String> {
     // Get backup directory
-    let backup_dir = get_backup_dir()?;
+    let backup_dir = backup_dir()?;
     fs::create_dir_all(&backup_dir)
         .map_err(|e| format!("Failed to create back up directory: {e}"))?;
 
@@ -67,7 +67,7 @@ fn create_backup(conflicts: &[EnvConflict]) -> Result<BackupInfo, String> {
 }
 
 /// Get backup directory path
-fn get_backup_dir() -> Result<PathBuf, String> {
+pub(crate) fn backup_dir() -> Result<PathBuf, String> {
     let home = dirs::home_dir().ok_or("Cannot determine user home directory")?;
     Ok(home.join(".cc-switch").join("backups"))
 }
@@ -253,7 +253,7 @@ mod tests {
 
     #[test]
     fn test_backup_dir_creation() {
-        let backup_dir = get_backup_dir();
+        let backup_dir = backup_dir();
         assert!(backup_dir.is_ok());
     }
 }

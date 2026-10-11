@@ -4,6 +4,8 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
+import { WindowControlsContext } from "@/components/shell/AppPageHeader";
 import {
   isWindows,
   isLinux,
@@ -11,11 +13,18 @@ import {
   DRAG_REGION_STYLE,
 } from "@/lib/platform";
 import { isTextEditableTarget } from "@/utils/domUtils";
+import { useUnsavedChangesTracker } from "@/lib/unsavedChanges";
 import { cn } from "@/lib/utils";
 
 interface FullScreenPanelProps {
   isOpen: boolean;
   title: string;
+  /** 标题后的灰字（应用名） */
+  subtitle?: React.ReactNode;
+  /** 返回按钮的读屏文字，默认「返回」 */
+  backLabel?: string;
+  /** 页头右侧 */
+  actions?: React.ReactNode;
   onClose: () => void;
   children: React.ReactNode;
   footer?: React.ReactNode;
@@ -26,10 +35,18 @@ interface FullScreenPanelProps {
    * 通过 `cn`(twMerge) 合并，传入如 `pt-3` 只覆盖顶部内边距，其余保持默认。
    */
   contentClassName?: string;
+  /**
+   * 编辑表单：用户改过内容后，从侧栏、托盘、⌘, 离开当前页前会先确认。
+   * 只给编辑页打开；授权中心、测速这类页面不需要。
+   */
+  trackUnsavedChanges?: boolean;
 }
 
 const DRAG_BAR_HEIGHT = isWindows() || isLinux() ? 0 : 28; // px - match App.tsx
 const HEADER_HEIGHT = 48; // px - match App.tsx (UI.md toolbar)
+
+/** Shell content area (App's <main id="content-area">): when present, sub-pages cover only it */
+const CONTENT_AREA_ID = "content-area";
 
 let bodyScrollLockCount = 0;
 let bodyOverflowBeforeFirstLock: string | null = null;
@@ -58,13 +75,22 @@ const unlockBodyScroll = () => {
 export const FullScreenPanel: React.FC<FullScreenPanelProps> = ({
   isOpen,
   title,
+  subtitle,
+  backLabel,
+  actions,
   onClose,
   children,
   footer,
   contentClassName,
   motionPreset = "fade",
+  trackUnsavedChanges = false,
 }) => {
+  // 面板关掉后组件可能还挂着：只在打开时登记，关掉即撤销
+  const unsavedChangesHandlers = useUnsavedChangesTracker(
+    trackUnsavedChanges && isOpen,
+  );
   const { t } = useTranslation();
+  const windowControls = React.useContext(WindowControlsContext);
   const prefersReducedMotion = useReducedMotion();
   const shouldSlideFromRight =
     motionPreset === "slide-from-right" && !prefersReducedMotion;
@@ -109,6 +135,11 @@ export const FullScreenPanel: React.FC<FullScreenPanelProps> = ({
     };
   }, [isOpen]);
 
+  const host =
+    typeof document !== "undefined"
+      ? document.getElementById(CONTENT_AREA_ID)
+      : null;
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
@@ -127,11 +158,13 @@ export const FullScreenPanel: React.FC<FullScreenPanelProps> = ({
               ? { duration: 0.26, ease: [0.22, 1, 0.36, 1] }
               : { duration: prefersReducedMotion ? 0 : 0.2 }
           }
-          className="fixed inset-0 z-[60] flex flex-col"
-          style={{ backgroundColor: "hsl(var(--background))" }}
+          className={cn(
+            "inset-0 z-[60] flex flex-col bg-background",
+            host ? "absolute" : "fixed",
+          )}
         >
-          {/* Drag region - match App.tsx. Linux 上 DRAG_BAR_HEIGHT=0，
-              直接跳过整个元素；macOS 保留 28px 拖拽占位。 */}
+          {/* Drag region - match App.tsx. Linux/Windows: DRAG_BAR_HEIGHT=0, skipped;
+              macOS keeps the 28px drag placeholder. */}
           {DRAG_BAR_HEIGHT > 0 && (
             <div
               data-tauri-drag-region
@@ -161,31 +194,70 @@ export const FullScreenPanel: React.FC<FullScreenPanelProps> = ({
               {...DRAG_REGION_ATTR}
               style={{ ...DRAG_REGION_STYLE } as React.CSSProperties}
             >
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={onClose}
-                aria-label={t("common.back")}
-                className="rounded-[3px] select-none"
-                style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+              {/* Title area: takes the remaining width, drag region, truncates long titles */}
+              <div
+                {...DRAG_REGION_ATTR}
+                className="flex min-w-0 flex-1 items-center gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <h2 className="text-[12.35px] leading-[1.3] font-semibold text-foreground select-none">
-                {title}
-              </h2>
+                <HoverTip content={backLabel ?? t("common.back")}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={onClose}
+                    aria-label={backLabel ?? t("common.back")}
+                    className="rounded-[3px] select-none"
+                    style={
+                      { WebkitAppRegion: "no-drag" } as React.CSSProperties
+                    }
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                </HoverTip>
+                <h2
+                  {...DRAG_REGION_ATTR}
+                  className="min-w-0 truncate text-[12.35px] leading-[1.3] font-semibold text-foreground select-none"
+                >
+                  {title}
+                </h2>
+                {subtitle ? (
+                  <span
+                    {...DRAG_REGION_ATTR}
+                    className="whitespace-nowrap text-[12.35px] leading-[1.3] text-muted-foreground select-none"
+                  >
+                    {subtitle}
+                  </span>
+                ) : null}
+              </div>
+              {actions ? (
+                <div
+                  className="flex min-w-0 shrink items-center justify-end gap-2"
+                  style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+                >
+                  {actions}
+                </div>
+              ) : null}
+              {windowControls ? (
+                <div
+                  className="flex shrink-0 items-center gap-1"
+                  style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+                >
+                  {windowControls}
+                </div>
+              ) : null}
             </div>
           </div>
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto scroll-overlay">
-            <div className={cn("px-2 py-2 space-y-2 w-full", contentClassName)}>
+            <div
+              className={cn("px-2 py-2 space-y-2 w-full", contentClassName)}
+              {...unsavedChangesHandlers}
+            >
               {children}
             </div>
           </div>
 
-          {/* Footer */}
           {footer && (
             <div
               className="flex-shrink-0 py-2 border-t border-border-default"
@@ -199,6 +271,6 @@ export const FullScreenPanel: React.FC<FullScreenPanelProps> = ({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body,
+    host ?? document.body,
   );
 };

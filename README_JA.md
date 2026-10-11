@@ -94,6 +94,11 @@ Claude Code / Codex / Gemini 公式チャンネルが最安で元価格の 38% /
 </tr>
 
 <tr>
+<td width="180"><a href="https://88api.ai/sign-up?aff=HSGY"><img src="assets/partners/logos/88api-banner-en.jpg" alt="88API" width="150"></a></td>
+<td>88API Token アグリゲーションプラットフォームによる本プロジェクトへのご支援に感謝します！88API は香港企業が運営し、主に開発者・クリエイター・AI アプリユーザー向けに提供されているワンストップのマルチモデル API プラットフォームです。統一インターフェースからテキスト・画像・音声・動画モデルを利用でき、AI コーディング、スマート翻訳、コンテンツ制作、ナレーション、画像生成、動画生成などの一般的なワークフローをカバーします。CC Switch 上でそのままプロバイダーを追加して切り替えられます。主要な国際決済方法に対応し、請求書の発行も可能で、エンタープライズ級の安定したサービスを提供します。<a href="https://88api.ai/sign-up?aff=HSGY">こちらのリンク</a>から登録すると、専用の特典クレジットがもらえます！</td>
+</tr>
+
+<tr>
 <td width="180"><a href="https://apikey.fan/register?aff=CCSwitch"><img src="assets/partners/logos/apikey_banner.png" alt="APIKEY.FUN" width="150"></a></td>
 <td>APIKEY.FUN のご支援に感謝します！APIKEY.FUN は、企業および個人開発者向けに安定・高効率・低コストな AI モデル API 接続サービスを提供する、プロフェッショナルなエンタープライズ級 AI リレープラットフォームです。Claude、OpenAI、Gemini などの主要人気モデルに対応し、料金は公式価格の 7% から利用できます。本プロジェクトの<a href="https://apikey.fan/register?aff=CCSwitch">専用リンク</a>から登録すると、最大で<strong>チャージ永久 5% オフ</strong>の特別優待も受けられます。</td>
 </tr>
@@ -203,20 +208,32 @@ TeamoRouter は、集中請求、チーム管理、BYOK、スマートルーテ�
 
 Claude Code、Codex、Gemini CLI などの AI コーディングツールは、それぞれ設定形式が異なります。API プロバイダを変えるたびに JSON、TOML、YAML、`.env` ファイルを手作業で編集しなければならず、MCP、Skills、プロンプトもツールごとに個別に管理する必要があります。
 
-**CC Switch** は、こうした作業を 1 つのデスクトップアプリに集約します。プリセットを選んでキーを入力すれば、ワンクリックで切り替えられます。既存の設定が失われることもありません。
+**CC Switch** は、こうした作業を 1 つのデスクトップアプリに集約します。プリセットを選んでキーを入力すれば、ワンクリックで切り替えられます。切り替え時に置き換えるのはアドレス、キー、モデルといった接続情報だけで、自分で追加したプラグイン、フック、MCP、コメントはそのまま残ります。
 
 - **1 つのアプリで 10 のツール** — Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build、OpenCode、OpenClaw、Hermes、Pi、MiniMax Code
 - **手動編集は不要** — AWS Bedrock、NVIDIA NIM、コミュニティリレーなど 90 以上のプロバイダプリセットを内蔵
-- **Claude Code で GPT を、Codex で Claude を使う** — ローカルルーティングを内蔵し、Anthropic、OpenAI、Gemini の API 形式を自動で変換。自動フェイルオーバーにも対応
+- **直接接続・ルーティング・集約を用途に応じて選択** — 直接接続はツールがプロバイダへ直接つなぎます。ルーティングはローカルで転送し、API 形式の変換と自動フェイルオーバーにより、Claude Code で GPT を、Codex で Claude を使えるようにします。集約は複数のプロバイダのモデルを Claude Code や Codex の 1 つのモデル一覧にまとめ、選んだモデルに応じてそのプロバイダへリクエストを送ります
 - **MCP・Skills・プロンプトを一元管理** — MCP と Skills は一度追加すれば、ツールごとにチェックを入れて同期。プロンプトはツールごとに個別に管理
-- **使用量とクォータをひと目で確認** — ローカルルーティングを使わなくてもトークン使用量と費用を集計。サブスクリプションのクォータと残高をプロバイダカードとトレイに直接表示
+- **読みやすいセッション** — 各ツールのセッション記録を読みやすいページに整理。各ターンで何をしたか、どのファイルを変更したか、どのステップで失敗したかがひと目でわかります
+- **使用量とクォータをひと目で確認** — ローカルルーティングを使わなくてもトークン使用量と費用を集計。サブスクリプションのクォータ残量とアカウント残高をプロバイダカードとトレイに直接表示
 - **クロスプラットフォーム** — Tauri 2 で構築された Windows、macOS、Linux 対応のネイティブデスクトップアプリ
 
 ## スクリーンショット
 
-|                  メイン画面                   |                  プロバイダ追加                  |
-| :-------------------------------------------: | :----------------------------------------------: |
-| ![メイン画面](assets/screenshots/main-ja.png) | ![プロバイダ追加](assets/screenshots/add-ja.png) |
+<table>
+<tr>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/main-en.png" alt="メイン画面：サイドバー、直接接続 / ルーティング / 集約タブとプロバイダカード" width="400"><br>メイン画面</td>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/apps-en.png" alt="アプリページ：各 AI コーディングツールのバージョン、インストール、アップグレードを一元管理" width="400"><br>アプリページ</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-en.png" alt="集約モード：既定のプロバイダ 1 社に加え、複数のプロバイダを追加" width="400"><br>集約モード</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-codex-en.png" alt="Codex のモデル選択画面に複数のプロバイダのモデルが並ぶ" width="400"><br>Codex の集約モデル一覧</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/session-en.png" alt="セッション閲覧ページ：実行過程の要約、ツール呼び出しの詳細、会話の目次" width="400"><br>セッション閲覧ページ</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/usage-en.png" alt="使用量：ヒートマップとリクエストログ" width="400"><br>使用量</td>
+</tr>
+</table>
 
 ## 特長
 
@@ -224,21 +241,22 @@ Claude Code、Codex、Gemini CLI などの AI コーディングツールは、�
 
 ### プロバイダ管理
 
-- **90 以上のプロバイダプリセット** — プリセットを選んでキーを入力するだけで追加。カスタム設定の作成も可能
-- **主要フィールドだけを変更** — 切り替え時に置き換えるのはリクエスト先アドレス、キー、モデルなどの接続情報だけ。プラグイン、フック、MCP、自分で追加した設定やコメントはそのまま残ります
-- **プロジェクト** — Claude Code または Codex の現在のプロバイダ、MCP、Skills、プロンプトファイルを 1 つのプロジェクトとして保存（Claude Desktop はプロバイダのみ保存）。以降はメインページ上部のプロジェクトスイッチャーやトレイから設定一式をワンクリックで切り替え。別のプロジェクトに切り替えると、現在の状態は自動的に元のプロジェクトへ保存
-- **OAuth 認証センター（Beta）** — 「設定 → 認証」で GitHub Copilot、ChatGPT、xAI（Grok）の複数アカウントにログインし、サブスクリプションをプロバイダとして Claude Code、Claude Desktop、Codex で利用（Codex の OpenAI Official 以外はすべてローカルルーティングの有効化が必要）。公式クライアント以外でサブスクリプションを使用すると、ベンダーの利用規約に違反する可能性があります。リスクはご自身で判断してください
+- **90 以上のプロバイダプリセット** — プリセットを選んでキーを入力するだけで追加。カスタム設定の作成も可能。追加パネルでは中国語名やドメインでも検索でき、同じプロバイダのプランや地域の違いは 1 行にまとめて表示
+- **主要フィールドだけを変更** — 切り替え時に置き換えるのはリクエスト先アドレス、キー、モデルなどの接続情報だけ。プラグイン、フック、MCP、自分で追加した設定やコメントはそのまま残ります。エディタの下部には切り替え後の設定ファイルの内容が表示され、CC Switch が設定ファイルを初めて書き換える前には元のファイルを自動でバックアップします
+- **プロジェクト** — Claude Code または Codex の現在のプロバイダ、MCP、Skills、プロンプトファイルを 1 つのプロジェクトとして保存（Claude Desktop はプロバイダのみ保存）。以降はページ上部のプロジェクトスイッチャーやトレイから設定一式をワンクリックで切り替え。別のプロジェクトに切り替えると、現在の状態は自動的に元のプロジェクトへ保存。プロジェクトスイッチャーはデフォルトで非表示のため、「設定 → 一般」で「プロジェクト切り替えを表示」をオンにしてください
+- **アカウント（Beta）** — サイドバーの「アカウント」で GitHub Copilot、ChatGPT、xAI（Grok）の複数アカウントにログインし、サブスクリプションをプロバイダとして Claude Code、Claude Desktop、Codex で利用（Codex の OpenAI Official 以外はすべてルーティングモードでの利用が必要）。公式クライアント以外でサブスクリプションを使用すると、ベンダーの利用規約に違反する可能性があります。リスクはご自身で判断してください
 - **Claude Desktop でサードパーティを利用** — Anthropic 互換エンドポイントに直接接続可能。Claude 以外のモデルは「モデルマッピング」を選び、ローカルルーティング経由で Sonnet、Opus、Haiku などのティアをプロバイダの実際のモデルにマッピング
 - **ユニバーサルプロバイダ** — 1 つの設定を Claude Code、Codex、Gemini CLI に同期
-- ワンクリック切り替え、システムトレイからのクイック切り替え（Claude Code、Codex、Gemini CLI、Grok Build）、ドラッグ＆ドロップ並び替え、インポート/エクスポート
+- ワンクリック切り替え、システムトレイからのクイック切り替え（Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build）、ドラッグ＆ドロップ並び替え、インポート/エクスポート
 
 ### プロキシ & フェイルオーバー
 
 - **API 形式の変換** — ローカルルーティングが Anthropic Messages、OpenAI Chat Completions、OpenAI Responses、Gemini Native の間でリクエスト形式を変換。Claude Code と Claude Desktop は OpenAI 形式や Gemini 形式のプロバイダを、Codex と Grok Build は Chat Completions 形式や Anthropic Messages 形式のプロバイダを利用可能
-- **ツールごとに有効化** — Claude Code、Codex、Gemini CLI、Grok Build でそれぞれ個別にローカルルーティングを有効化可能。有効化すると、プロバイダの切り替えが以降のリクエストに即座に反映（切り替えでモデルが変わる場合、Codex、Gemini CLI、Grok Build は再起動が必要になることがあります）
+- **ツールごとに有効化** — Claude Code、Codex、Gemini CLI、Grok Build はそれぞれ個別にルーティングモードに入れます。ページ上部の「ルーティング」タブで「ルーティングを開始」をクリックします。ルーティングモードでは、プロバイダの切り替えが以降のリクエストに即座に反映（切り替えでモデルが変わる場合、Codex、Gemini CLI、Grok Build は再起動が必要になることがあります）。CC Switch を終了するときは先に直接接続の設定を書き戻し、次回起動時に再接続します
 - **自動フェイルオーバー** — ツールごとにフェイルオーバーキューを設定し、リクエストが失敗するとキューの順に次のプロバイダへ自動で切り替え。サーキットブレーカーとプロバイダのヘルスモニタリングと連携
 - **整流器** — 一部の上流と互換性のないリクエストを自動で修正（Thinking 署名、画像非対応時のフォールバックなど）
 - 公式プロバイダ（Claude Official など）はローカルルーティングを経由できません（Codex の OpenAI Official を除く）
+- ルーティングサービスの状態、待ち受けアドレス、フェイルオーバーのパラメータは「設定 → ローカルルーティング」にまとまっています
 - 使い方ガイド：[Claude Code で GPT を使う](docs/guides/claude-codex-routing-guide-ja.md) · [Codex で Claude を使う](docs/guides/codex-claude-routing-guide-ja.md)
 
 ### MCP、Prompts & Skills
@@ -284,6 +302,19 @@ Cli-Switch は **Claude Code**、**Claude Desktop**、**Codex**、**Gemini CLI**
 </details>
 
 <details>
+<summary><strong>Codex の集約モードで、/model に集約したモデルが表示されないのはなぜですか？</strong></summary>
+
+Codex はモデル一覧を起動時にしか読み込みません。集約モードに入る・抜ける、集約するプロバイダを追加・削除する、あるいはいずれかのプロバイダの集約モデルを変更した後は、Codex を完全に再起動しないと新しい一覧は表示されません：
+
+- **Codex CLI**：ターミナルを閉じて `codex` を開き直すだけでは不十分です。すべてのターミナルの `codex` は 1 つのバックグラウンドデーモンを共有しており、それを再起動しないと新しい一覧が読み込まれません。Codex がまだ古い一覧を使っていることを CC Switch が検出すると、Codex のページ上部にお知らせが表示されるので、その中の「Codex デーモンを再起動」をクリックしてください。再起動すると、デーモンで実行中のタスクは中断されます。
+- **Codex デスクトップ版**：完全に終了してから開き直してください（macOS では ⌘Q。ウィンドウを閉じるだけでは不十分です）。
+- **エディタ拡張**：エディタのウィンドウを開き直してください。
+
+Claude Code は影響を受けず、集約モデルの変更はすぐに反映されます。
+
+</details>
+
+<details>
 <summary><strong>プロバイダを切り替えると、プラグインやフックなどの設定も変わってしまいますか？</strong></summary>
 
 変わりません。Claude Code、Codex、Gemini CLI、Grok Build でプロバイダを切り替えるとき、Cli-Switch が置き換えるのは設定ファイルの**主要フィールド**だけです。対象はリクエスト先アドレス、キー、モデル名、API プロトコル（Codex は推論レベル、Gemini CLI は認証方式も含む）と、プロバイダに合わせて切り替わる一部の互換オプション（Claude Code の「Artifact ツールを無効化」やコンテキストウィンドウなど）です。プラグイン、フック、権限、MCP、自分で追加した環境変数、コメント、書式はそのまま残り、すべてのプロバイダに適用されます。
@@ -304,7 +335,7 @@ Cli-Switch は **Claude Code**、**Claude Desktop**、**Codex**、**Gemini CLI**
 </details>
 
 <details>
-<summary><strong>現在アクティブなプロバイダを削除できないのはなぜですか？</strong></summary>
+<summary><strong>使用中のプロバイダを削除できないのはなぜですか？</strong></summary>
 
 Cli-Switch は「最小限の介入」という設計原則に従っています。アプリをアンインストールしても、CLI ツールは正常に動作し続けます。すべての設定を削除すると対応する CLI ツールが使用できなくなるため、システムは常にアクティブな設定を 1 つ保持します。特定の CLI ツールをあまり使用しない場合は、設定で非表示にできます。公式ログインに戻す方法は、次の質問をご覧ください。
 
@@ -317,16 +348,16 @@ Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build のプロバイ�
 
 Codex では、Cli-Switch 内の「ChatGPT でログイン」から複数の ChatGPT アカウントにログインし、**OpenAI Official** カードごとに「使用するアカウント」を選べるため、複数の Plus、Pro、Team アカウントをワンクリックで切り替えられます。「Codex のログインに追従」を選んだカードは、Codex CLI 自身のログインをそのまま使用します。
 
-注意：ローカルルーティングを有効にしている間は、公式プロバイダに切り替えられません（Codex の OpenAI Official カードを除く）。
+注意：公式サブスクリプションはツール自身のログインを使い、ローカルルーティングを経由しません。ルーティングモードでは公式プロバイダに切り替えられないので（Codex の OpenAI Official カードを除く）、先に直接接続に戻してください。
 
 </details>
 
 <details>
-<summary><strong>ローカルルーティングを有効にすると、設定ファイルのアドレスが 127.0.0.1 に変わるのはなぜですか？</strong></summary>
+<summary><strong>ルーティングを開始すると、設定ファイルのアドレスが 127.0.0.1 に変わるのはなぜですか？</strong></summary>
 
 ローカルルーティングを有効にすると、ツールのリクエストはまず Cli-Switch のローカルルーティング（デフォルトは `http://127.0.0.1:15721`）に送られ、そこから Cli-Switch が選択中のプロバイダへ転送します。そのため、ツールの設定ファイルにはローカルアドレスとプレースホルダーのキー `PROXY_MANAGED` だけが書き込まれます。Claude Code のモデル名も `claude-sonnet-5` のような固定のエイリアスになります（`/model` メニューには実際のモデル名が表示されます）。実際のプロバイダのアドレス、キー、モデルはすべて Cli-Switch に保存されています。
 
-「設定 → 利用統計 → リクエストログ」では、各リクエストの「リクエストモデル → 実際のモデル」を確認できます。
+サイドバーの「使用量」のリクエストログでは、各リクエストの「リクエストモデル → 実際のモデル」を確認できます。
 
 ローカルルーティングを有効にしている間に切り替わるのは、ローカルルーティングが使うプロバイダです。有効にする前に使っていたプロバイダは変わらず、カードに「直接接続」と表示されます。ローカルルーティングを無効にすると、設定ファイルはこの直接接続のプロバイダの設定に書き戻されます。Cli-Switch を終了するときも先に直接接続のプロバイダを書き戻し、次回起動時にローカルルーティングへ接続し直します。
 
@@ -335,16 +366,16 @@ Codex では、Cli-Switch 内の「ChatGPT でログイン」から複数の Cha
 <details>
 <summary><strong>Claude Code で OpenAI 互換 API、Gemini、ローカルモデルを使えますか？</strong></summary>
 
-使えますが、ローカルルーティングを有効にする必要があります。プロバイダを編集する際に、「高級オプション」の「上流フォーマット」でプロバイダに合った API 形式を選んでください。Chat Completions API のみを提供するサービス（多くのローカルモデルサービスがこれに当たります）は「OpenAI Chat Completions」、Responses API を提供するサービスは「OpenAI Responses API」、Gemini は「Gemini Native generateContent」を選びます。その後、[クイックスタート](#クイックスタート)の手順 5 に従って Claude Code のローカルルーティングを有効にしてください。形式の選択を誤ったり、ローカルルーティングを有効にしていなかったりすると、通常は 404 または 405 エラーになります。
+使えますが、ルーティングを使う必要があります。プロバイダを編集する際に、「高級オプション」の「上流フォーマット」でプロバイダに合った API 形式を選んでください。Chat Completions API のみを提供するサービス（多くのローカルモデルサービスがこれに当たります）は「OpenAI Chat Completions」、Responses API を提供するサービスは「OpenAI Responses API」、Gemini は「Gemini Native generateContent」を選びます。その後、Claude Code のページの「ルーティング」タブで「ルーティングを開始」をクリックしてください。形式の選択を誤ったり、ルーティングを開始していなかったりすると、通常は 404 または 405 エラーになります。
 
-逆に、Codex や Grok Build の「上流フォーマット」で「Anthropic Messages」を選ぶと、Claude 形式のプロバイダを使えます。この場合もローカルルーティングの有効化が必要です。詳しくは [Claude Code で GPT を使う](docs/guides/claude-codex-routing-guide-ja.md) と [Codex で Claude を使う](docs/guides/codex-claude-routing-guide-ja.md) をご覧ください。
+逆に、Codex や Grok Build の「上流フォーマット」で「Anthropic Messages」を選ぶと、Claude 形式のプロバイダを使えます。この場合もルーティングが必要です。詳しくは [Claude Code で GPT を使う](docs/guides/claude-codex-routing-guide-ja.md) と [Codex で Claude を使う](docs/guides/codex-claude-routing-guide-ja.md) をご覧ください。
 
 </details>
 
 <details>
 <summary><strong>「接続チェック」は成功したのに、リクエストが失敗するのはなぜですか？</strong></summary>
 
-プロバイダカードの「接続チェック」は、プロバイダのアドレスに接続できるかどうかだけを確認し、実際のモデルリクエストは送信しません。そのため、API キーやモデル名が正しいかどうかは検証できません。リクエストが失敗する場合は、キー、モデル名、上流フォーマットを確認してください。ローカルルーティングを有効にしている場合は、「設定 → 利用統計 → リクエストログ」で具体的なエラー内容も確認できます。
+プロバイダカードの「接続チェック」は、プロバイダのアドレスに接続できるかどうかだけを確認し、実際のモデルリクエストは送信しません。そのため、API キーやモデル名が正しいかどうかは検証できません。リクエストが失敗する場合は、キー、モデル名、上流フォーマットを確認してください。ルーティングを経由したリクエストは、サイドバーの「使用量」のリクエストログで具体的なエラー内容も確認できます。
 
 </details>
 
@@ -357,7 +388,7 @@ Codex では、Cli-Switch 内の「ChatGPT でログイン」から複数の Cha
 
 - **データベース**: `cc-switch.db`（SQLite — プロバイダ、MCP、プロンプト、Skills、プロジェクト、使用量記録など）
 - **ローカル設定**: `settings.json`（デバイスレベルの設定。各ツールの設定ディレクトリ、バックアップポリシー、クラウド同期の接続情報など）
-- **バックアップ**: `backups/`（デフォルトでは 24 時間ごとに自動バックアップし、最新 10 件を保持。「設定 → 詳細 → バックアップと復元」で変更可能）
+- **バックアップ**: `backups/`（デフォルトでは 24 時間ごとに自動バックアップし、最新 10 件を保持。「設定 → データ → バックアップと復元」で変更可能。その下の「その他のバックアップ」には、それ以外のバックアップの場所とサイズが一覧表示され、種類ごとに削除できます）
 - **Skills**: `skills/`（設定で `~/.agents/skills` に変更可能）。デフォルトではシンボリックリンクで各ツールに同期し、失敗した場合はコピーに切り替え
 - **Skill バックアップ**: `skill-backups/`（スキルのアンインストールまたは更新の前に自動作成、最新 20 件を保持）
 - **OAuth ログイン認証情報**: `copilot_auth.json`、`codex_oauth_auth.json`、`xai_oauth_auth.json`
@@ -374,7 +405,7 @@ Codex では、Cli-Switch 内の「ChatGPT でログイン」から複数の Cha
 
 Cli-Switch は WSL を自動では認識しません。「設定 → 詳細 → 設定ディレクトリ → 設定ディレクトリの上書き（詳細）」で、対象ツールのディレクトリを WSL 内のパス（例：`\\wsl.localhost\Ubuntu\home\<ユーザー名>\.claude`）に変更して保存すると、Cli-Switch は WSL 内の設定を読み書きするようになります（Claude Code、Codex、Gemini CLI、Grok Build、OpenCode、OpenClaw、Hermes、Pi で設定可能）。設定後は、「バージョン情報」ページでも対応する WSL ディストリビューション内でそのツールを検出・アップグレードします。
 
-注意：ローカルルーティングが設定に書き込むアドレスは `127.0.0.1` です。WSL2 のデフォルトである NAT ネットワークモードでは、WSL 内の `127.0.0.1` から Windows 上のローカルルーティングに接続できないため、WSL の mirrored ネットワークモードに切り替える必要があります。
+注意：ルーティングと集約が設定に書き込むアドレスは `127.0.0.1` です。WSL2 のデフォルトである NAT ネットワークモードでは、WSL 内の `127.0.0.1` から Windows 上のローカルルーティングに接続できないため、WSL の mirrored ネットワークモードに切り替える必要があります。
 
 </details>
 

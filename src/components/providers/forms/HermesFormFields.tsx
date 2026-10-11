@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ImeSafeInput } from "@/components/ui/ime-safe-input";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Download, Plus, Trash2, ChevronRight, Loader2 } from "lucide-react";
 import { ApiKeySection, ModelDropdown } from "./shared";
 import {
@@ -283,7 +284,7 @@ export function HermesFormFields({
         isPartner={isPartner}
       />
 
-      <div className="space-y-3 border-l border-border-default pl-3">
+      <div className="space-y-3 border-l border-border pl-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-normal leading-5">
             {t("hermes.form.models", { defaultValue: "模型列表" })}
@@ -310,7 +311,7 @@ export function HermesFormFields({
         </div>
 
         {models.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-2">
+          <p className="text-sm text-fg-2 py-2">
             {t("hermes.form.noModels", {
               defaultValue: "暂无模型配置。切换到此供应商时将无默认模型。",
             })}
@@ -388,18 +389,24 @@ export function HermesFormFields({
                       })}
                       className="min-w-0 flex-1"
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveModel(index)}
-                      aria-label={t("hermes.form.removeModel", {
+                    <HoverTip
+                      content={t("hermes.form.removeModel", {
                         defaultValue: "移除模型",
                       })}
-                      className="shrink-0 text-muted-foreground hover:text-destructive"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveModel(index)}
+                        aria-label={t("hermes.form.removeModel", {
+                          defaultValue: "移除模型",
+                        })}
+                        className="shrink-0 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </HoverTip>
                   </div>
 
                   {isExpanded && (
@@ -449,7 +456,7 @@ export function HermesFormFields({
         </p>
       </div>
 
-      <div className="space-y-2 border-l border-border-default pl-3">
+      <div className="space-y-2 border-l border-border pl-3">
         <Label htmlFor="hermes-rate-limit-delay">
           {t("hermes.form.rateLimitDelay", {
             defaultValue: "请求间隔（秒）",

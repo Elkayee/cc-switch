@@ -32,7 +32,7 @@ pub const BRIDGED_EVENTS: &[&str] = &[
     "usage-log-recorded",
     "webdav-sync-status-updated",
     "s3-sync-status-updated",
-    "update-download-progress",
+    "tray-navigate",
     "deeplink-import",
     "deeplink-error",
     "skill-auto-update-status",

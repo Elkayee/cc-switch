@@ -161,7 +161,7 @@ describe("HermesFormFields", () => {
     renderHermesForm();
 
     expect(screen.getByText("模型列表").closest("div.border-l")).toHaveClass(
-      "border-border-default",
+      "border-border",
       "pl-3",
     );
     expect(screen.queryByText("默认模型")).not.toBeInTheDocument();
@@ -239,10 +239,7 @@ describe("HermesFormFields", () => {
       "leading-[1.3]",
       "font-medium",
     );
-    expect(input.closest("div.border-l")).toHaveClass(
-      "border-border-default",
-      "pl-3",
-    );
+    expect(input.closest("div.border-l")).toHaveClass("border-border", "pl-3");
     expect(
       screen.queryByRole("button", { name: "供应商高级选项" }),
     ).not.toBeInTheDocument();

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Edit2, Trash2, RefreshCw, Globe, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { ProviderIcon } from "@/components/ProviderIcon";
 import type { UniversalProvider } from "@/types";
 
@@ -48,39 +49,57 @@ export function UniversalProviderCard({
 
         {/* 操作按钮 */}
         <div className="flex items-center gap-1 opacity-30 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onSync(provider.id)}
-            title={t("universalProvider.sync", { defaultValue: "同步到应用" })}
+          <HoverTip
+            content={t("universalProvider.sync", {
+              defaultValue: "同步到应用",
+            })}
           >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDuplicate(provider)}
-            title={t("universalProvider.duplicate", { defaultValue: "复制" })}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onSync(provider.id)}
+              aria-label={t("universalProvider.sync", {
+                defaultValue: "同步到应用",
+              })}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </HoverTip>
+          <HoverTip
+            content={t("universalProvider.duplicate", { defaultValue: "复制" })}
           >
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(provider)}
-            title={t("common.edit", { defaultValue: "编辑" })}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive hover:text-destructive"
-            onClick={() => onDelete(provider.id)}
-            title={t("common.delete", { defaultValue: "删除" })}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDuplicate(provider)}
+              aria-label={t("universalProvider.duplicate", {
+                defaultValue: "复制",
+              })}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </HoverTip>
+          <HoverTip content={t("common.edit", { defaultValue: "编辑" })}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(provider)}
+              aria-label={t("common.edit", { defaultValue: "编辑" })}
+            >
+              <Edit2 className="h-4 w-4" />
+            </Button>
+          </HoverTip>
+          <HoverTip content={t("common.delete", { defaultValue: "删除" })}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              onClick={() => onDelete(provider.id)}
+              aria-label={t("common.delete", { defaultValue: "删除" })}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </HoverTip>
         </div>
       </div>
 

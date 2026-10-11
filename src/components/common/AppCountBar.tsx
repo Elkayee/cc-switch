@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { AppId } from "@/lib/api/types";
 import { APP_IDS, APP_ICON_MAP } from "@/config/appConfig";
 import { cn } from "@/lib/utils";
+import { HoverTip } from "@/components/ui/hover-tip";
 
 interface AppCountBarProps {
   totalLabel: string;
@@ -71,39 +72,39 @@ export const AppCountBar: React.FC<AppCountBarProps> = ({
             }
 
             return (
-              <Button
-                key={app}
-                type="button"
-                variant="secondary"
-                role="checkbox"
-                aria-checked={partiallyEnabled ? "mixed" : allEnabled}
-                aria-busy={pending}
-                aria-label={actionLabel}
-                title={actionLabel}
-                data-selection-state={
-                  pending
-                    ? "pending"
-                    : allEnabled
-                      ? "all"
-                      : partiallyEnabled
-                        ? "partial"
-                        : "none"
-                }
-                disabled={
-                  disabled || bulkTotalCount === 0 || hasPendingBulkToggle
-                }
-                onClick={() => void onToggleAll?.(app, !allEnabled)}
-                className={cn(
-                  badgeVariants({ variant: "secondary" }),
-                  APP_ICON_MAP[app].badgeClass,
-                  "h-6 min-w-0 shrink-0 select-none focus:ring-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0",
-                  pending && "cursor-wait",
-                )}
-              >
-                <span className="sr-only">{APP_ICON_MAP[app].label}:</span>
-                {APP_ICON_MAP[app].icon}
-                <span className="ml-1 font-bold">{count}</span>
-              </Button>
+              <HoverTip key={app} content={actionLabel}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  role="checkbox"
+                  aria-checked={partiallyEnabled ? "mixed" : allEnabled}
+                  aria-busy={pending}
+                  aria-label={actionLabel}
+                  data-selection-state={
+                    pending
+                      ? "pending"
+                      : allEnabled
+                        ? "all"
+                        : partiallyEnabled
+                          ? "partial"
+                          : "none"
+                  }
+                  disabled={
+                    disabled || bulkTotalCount === 0 || hasPendingBulkToggle
+                  }
+                  onClick={() => void onToggleAll?.(app, !allEnabled)}
+                  className={cn(
+                    badgeVariants({ variant: "secondary" }),
+                    APP_ICON_MAP[app].badgeClass,
+                    "h-6 min-w-0 shrink-0 select-none focus:ring-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0",
+                    pending && "cursor-wait",
+                  )}
+                >
+                  <span className="sr-only">{APP_ICON_MAP[app].label}:</span>
+                  {APP_ICON_MAP[app].icon}
+                  <span className="ml-1 font-bold">{count}</span>
+                </Button>
+              </HoverTip>
             );
           })}
         </div>

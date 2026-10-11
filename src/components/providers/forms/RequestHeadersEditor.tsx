@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { ImeSafeInput } from "@/components/ui/ime-safe-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,11 +108,9 @@ export function RequestHeadersEditor({
   };
 
   return (
-    <div
-      className={cn("space-y-2 border-l border-border-default pl-3", className)}
-    >
+    <div className={cn("space-y-2 border-l border-border pl-3", className)}>
       <div className="flex items-start justify-between gap-3">
-        <div className="max-w-3xl space-y-1">
+        <div className="space-y-1">
           <Label>{t("opencode.headers", { defaultValue: "Headers" })}</Label>
           <p className="text-ui text-muted-foreground">
             {t("opencode.headersHint", {
@@ -134,7 +133,7 @@ export function RequestHeadersEditor({
         </Button>
       </div>
 
-      <div className="max-w-3xl" aria-live="polite">
+      <div aria-live="polite">
         {Object.keys(headers).length === 0 ? (
           <p className="py-1 text-ui text-muted-foreground">
             {t("opencode.noHeaders", {
@@ -175,18 +174,24 @@ export function RequestHeadersEditor({
                   })}
                   className="min-w-0 flex-1"
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeHeader(key)}
-                  aria-label={t("opencode.removeHeader", {
+                <HoverTip
+                  content={t("opencode.removeHeader", {
                     defaultValue: "Remove header",
                   })}
-                  className="shrink-0 text-muted-foreground hover:text-destructive"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeHeader(key)}
+                    aria-label={t("opencode.removeHeader", {
+                      defaultValue: "Remove header",
+                    })}
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </HoverTip>
               </div>
             ))}
           </div>

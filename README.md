@@ -94,6 +94,11 @@ Register now via <a href="https://pateway.ai/?ch=etzpm8&aff=WB6M6F67#/">this lin
 </tr>
 
 <tr>
+<td width="180"><a href="https://88api.ai/sign-up?aff=HSGY"><img src="assets/partners/logos/88api-banner-en.jpg" alt="88API" width="150"></a></td>
+<td>Thanks to 88API Token Aggregation Platform for sponsoring this project! 88API is a one-stop multi-model API platform operated by a Hong Kong company, built mainly for developers, creators and AI application users. A unified interface gives access to text, image, speech and video models, covering common workflows such as AI coding, smart translation, content creation, voice-over, image generation and video generation. You can add it as a provider and switch to it right inside CC Switch. 88API supports major international payment methods, can issue invoices, and provides enterprise-grade stable service. Register via <a href="https://88api.ai/sign-up?aff=HSGY">this link</a> to receive exclusive bonus credits!</td>
+</tr>
+
+<tr>
 <td width="180"><a href="https://apikey.fan/register?aff=CCSwitch"><img src="assets/partners/logos/apikey_banner.png" alt="APIKEY.FUN" width="150"></a></td>
 <td>Thanks to APIKEY.FUN for sponsoring this project! APIKEY.FUN is a professional enterprise-grade AI relay platform dedicated to providing stable, efficient, and low-cost AI model API access for enterprises and individual developers. The platform supports popular mainstream models such as Claude, OpenAI, and Gemini, with prices as low as 7% of official rates. Register through this project's <a href="https://apikey.fan/register?aff=CCSwitch">exclusive link</a> to enjoy an exclusive offer of up to <strong>permanent 5% off top-ups</strong>.</td>
 </tr>
@@ -203,21 +208,33 @@ TeamoRouter also offers enterprise features including centralized billing, team 
 
 AI coding tools like Claude Code, Codex, and Gemini CLI each have their own configuration format. Switching API providers means hand-editing JSON, TOML, YAML, or `.env` files, and MCP, Skills, and prompts have to be maintained separately in every tool.
 
-**CC Switch** brings all of this into a single desktop app: pick a preset, enter your key, and switch in one click, without losing your existing configuration.
+**CC Switch** brings all of this into a single desktop app: pick a preset, enter your key, and switch in one click. Switching replaces only the connection details — endpoint, key, and model — so plugins, hooks, MCP, and comments you added yourself stay as they are.
 
 - **One App, Ten Tools** — Claude Code, Claude Desktop, Codex, Gemini CLI, Grok Build, OpenCode, OpenClaw, Hermes, Pi, and MiniMax Code
 - **No More Manual Editing** — 90+ provider presets including AWS Bedrock, NVIDIA NIM, and community relays
-- **Use GPT in Claude Code, Claude in Codex** — Built-in local routing automatically converts between Anthropic, OpenAI, and Gemini API formats, with automatic failover
+- **Direct, Routing, or Aggregation — Your Choice** — Direct connects the tool straight to the provider; Routing forwards requests through your machine, converting API formats and failing over automatically, so you can use GPT in Claude Code and Claude in Codex; Aggregation puts models from several providers into one model list in Claude Code or Codex, and each request goes to the provider of the model you pick
 - **Centralized MCP, Skills & Prompts** — Add MCP servers and Skills once, then choose which tools to sync them to; prompts are maintained separately for each tool
-- **Usage & Quotas at a Glance** — Track token usage and spending even without local routing; subscription quotas and balances show right on provider cards and in the tray
+- **Sessions You Can Read** — Turns each tool's session logs into a reading view: what each turn did, which files changed, and which step failed, all at a glance
+- **Usage & Quotas at a Glance** — Track token usage and spending even without local routing; remaining subscription quota and account balances show right on provider cards and in the tray
 - **Cross-Platform** — Native desktop app for Windows, macOS, and Linux, built with Tauri 2
 - **Built-in Utilities** — Includes various utilities for first-launch login confirmation, signature bypass, plugin extension sync, and more
 
 ## Screenshots
 
-|                  Main Interface                   |                  Add Provider                  |
-| :-----------------------------------------------: | :--------------------------------------------: |
-| ![Main Interface](assets/screenshots/main-en.png) | ![Add Provider](assets/screenshots/add-en.png) |
+<table>
+<tr>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/main-en.png" alt="Main interface: sidebar, Direct / Routing / Aggregation tabs, and provider cards" width="400"><br>Main Interface</td>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/apps-en.png" alt="Apps page: versions, installation, and upgrades for every AI coding tool in one place" width="400"><br>Apps Page</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-en.png" alt="Aggregation mode: one default provider plus several added providers" width="400"><br>Aggregation Mode</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-codex-en.png" alt="Codex's model picker listing models from several providers" width="400"><br>Aggregated Model List in Codex</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/session-en.png" alt="Session reading view: step summaries, tool call details, and conversation outline" width="400"><br>Session Reading View</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/usage-en.png" alt="Usage: heatmap and request logs" width="400"><br>Usage</td>
+</tr>
+</table>
 
 ## Features
 
@@ -225,10 +242,10 @@ AI coding tools like Claude Code, Codex, and Gemini CLI each have their own conf
 
 ### Provider Management
 
-- **90+ provider presets** — Pick a preset and enter your key to add a provider, or create a custom configuration
-- **Key fields only** — Switching replaces only the connection details such as the endpoint, key, and model; plugins, hooks, MCP, settings you added yourself, and comments stay as they are
-- **Projects** — Save Claude Code's or Codex's current provider, MCP, Skills, and prompt files as a project (for Claude Desktop, only the provider is saved), then switch the whole setup in one click from the project switcher at the top of the main page or from the tray; when you switch to another project, the current state is automatically saved back to the previous project
-- **OAuth Authentication Center (Beta)** — Sign in to multiple GitHub Copilot, ChatGPT, and xAI (Grok) accounts in "Settings → Auth" and use those subscriptions as providers in Claude Code, Claude Desktop, and Codex (everything except Codex's OpenAI Official requires local routing). Using a subscription outside the official client may violate the vendor's terms of service; assess the risk yourself
+- **90+ provider presets** — Pick a preset and enter your key to add a provider, or create a custom configuration. The add panel lets you search by name (including Chinese names) and domain, and a vendor's different plans and regions are merged into one row
+- **Key fields only** — Switching replaces only the connection details such as the endpoint, key, and model; plugins, hooks, MCP, settings you added yourself, and comments stay as they are. The editor shows what the config file will look like after switching, and CC Switch automatically backs up each config file before rewriting it for the first time
+- **Projects** — Save Claude Code's or Codex's current provider, MCP, Skills, and prompt files as a project (for Claude Desktop, only the provider is saved), then switch the whole setup in one click from the project switcher at the top of the page or from the tray; when you switch to another project, the current state is automatically saved back to the previous project. The project switcher is hidden by default; turn on "Show project switcher" in "Settings → General"
+- **Accounts (Beta)** — Sign in to multiple GitHub Copilot, ChatGPT, and xAI (Grok) accounts under "Accounts" in the sidebar and use those subscriptions as providers in Claude Code, Claude Desktop, and Codex (everything except Codex's OpenAI Official has to be used in Routing mode). Using a subscription outside the official client may violate the vendor's terms of service; assess the risk yourself
 - **Third-party providers for Claude Desktop** — Connect directly to Anthropic-compatible endpoints; for non-Claude models, choose "Model Mapping" to map tiers like Sonnet, Opus, and Haiku to the provider's actual models through local routing
 - **Universal providers** — One config syncs to Claude Code, Codex, and Gemini CLI
 - One-click switching, system tray quick access, drag-and-drop sorting, import/export
@@ -240,7 +257,16 @@ AI coding tools like Claude Code, Codex, and Gemini CLI each have their own conf
 - **Auto-failover** — Configure a failover queue for each tool; when a request fails, Cli-Switch automatically moves on to the next provider in the queue, backed by a circuit breaker and provider health monitoring
 - **Rectifier** — Automatically fixes certain requests that some upstreams can't handle (e.g. Thinking signatures, or falling back when images aren't supported)
 - Official providers (e.g. Claude Official) can't go through local routing (except Codex's OpenAI Official)
+- The routing service's status, listen address, and failover settings are all in "Settings → Local routing"
 - Guides: [Using GPT in Claude Code](docs/guides/claude-codex-routing-guide-en.md) · [Using Claude in Codex](docs/guides/codex-claude-routing-guide-en.md)
+
+### Aggregation Mode
+
+- **One model list, many providers** — On the Claude Code or Codex page, switch to "Aggregation" and add a few providers; their models all appear in the client's model picker. Each request goes to the provider of the model you pick, with no need to switch in CC Switch
+- **Add and remove anytime** — Click "Add" or "Remove" on a provider card, then pick one provider as the default; requests that don't name an aggregated model go to it. Codex's OpenAI Official can only be the default provider; Claude official subscriptions are currently unsupported in Aggregation
+- **Notes** — Aggregation doesn't provide failover; Claude Code requires version 2.1.243 or later; Codex needs a restart after the aggregated list changes, while Claude Code doesn't. When you switch models within a session, the new model has to rebuild its prompt cache, so the first turn costs a bit more
+- Much of Aggregation mode's design draws on [opencodex](https://github.com/lidge-jun/opencodex) — thanks to its author and contributors
+- Documentation: [Aggregation mode manual](docs/user-manual/en/4-proxy/4.6-aggregation.md) · [Illustrated guide (Chinese)](docs/guides/aggregation-mode-guide-zh.md)
 
 ### MCP, Prompts & Skills
 
@@ -285,6 +311,19 @@ It depends on the tool:
 </details>
 
 <details>
+<summary><strong>In Aggregation mode, why don't the aggregated models show up in Codex's /model?</strong></summary>
+
+Codex reads its model list only at startup. After entering or leaving Aggregation mode, adding or removing an aggregated provider, or changing a provider's aggregated models, fully restart Codex to see the new list:
+
+- **Codex CLI**: Closing the terminal and running `codex` again isn't enough. Every `codex` in every terminal shares one background daemon, and it has to be restarted to pick up the new list. When CC Switch detects that Codex is still using the old list, it shows a notice at the top of the Codex page; click "Restart Codex daemon" in the notice. Restarting interrupts any tasks running in the daemon.
+- **Codex desktop app**: Quit it completely and reopen it (press ⌘Q on macOS; closing the window isn't enough).
+- **Editor extensions**: Reopen the editor window.
+
+Claude Code isn't affected: changes to aggregated models take effect immediately.
+
+</details>
+
+<details>
 <summary><strong>Will switching providers change my plugins, hooks, or other settings?</strong></summary>
 
 No. When you switch providers for Claude Code, Codex, Gemini CLI, or Grok Build, Cli-Switch replaces only the **key fields** in the config file: the endpoint, key, model name, and API protocol (plus the reasoning effort for Codex and the auth method for Gemini CLI), along with a few compatibility options that belong to the provider (such as Claude Code's "Disable Artifact Tool" and the context window). Plugins, hooks, permissions, MCP, environment variables you added yourself, comments, and formatting all stay as they are and apply to every provider.
@@ -305,7 +344,7 @@ Older versions saved the whole config file back to the provider when you switche
 </details>
 
 <details>
-<summary><strong>Why can't I delete the currently active provider?</strong></summary>
+<summary><strong>Why can't I delete the provider currently in use?</strong></summary>
 
 Cli-Switch follows a "minimal intrusion" design principle — even if you uninstall the app, your CLI tools will continue to work normally. The system always keeps one active configuration, because deleting all configurations would make the corresponding CLI tool unusable. If you rarely use a specific CLI tool, you can hide it in Settings. To switch back to official login, see the next question.
 
@@ -318,16 +357,16 @@ In Cli-Switch, the provider lists for Claude Code, Claude Desktop, Codex, Gemini
 
 For Codex, you can also sign in to multiple ChatGPT accounts inside Cli-Switch via "Sign in with ChatGPT" and choose an "Account to use" for each **OpenAI Official** card, so switching between multiple Plus, Pro, or Team accounts takes one click; cards set to "Follow Codex login" keep using the Codex CLI's own login.
 
-Note: official providers can't be selected while local routing is on — Codex's OpenAI Official cards are the exception.
+Note: official subscriptions use the tool's own login and don't go through local routing. Official providers can't be selected in Routing mode (Codex's OpenAI Official cards are the exception); switch back to Direct first.
 
 </details>
 
 <details>
-<summary><strong>With local routing on, why does my config file point to 127.0.0.1?</strong></summary>
+<summary><strong>After I start routing, why does my config file point to 127.0.0.1?</strong></summary>
 
 With local routing on, the tool's requests first go to Cli-Switch's local routing (`http://127.0.0.1:15721` by default), and Cli-Switch then forwards them to the provider you selected. That's why the tool's config file only contains the local address and the placeholder key `PROXY_MANAGED`; for Claude Code, the model name is also written as a fixed alias such as `claude-sonnet-5` (the `/model` menu still shows the real model name). The real provider address, key, and model are all stored in Cli-Switch.
 
-In "Settings → Usage Statistics → Request Logs" you can see "requested model → actual model" for each request.
+In the request logs under "Usage" in the sidebar, you can see "requested model → actual model" for each request.
 
 While local routing is on, switching changes the provider that local routing uses; the provider you were using before you turned it on stays the same and is labeled "Direct" on its card. When you turn local routing off, the config file is written back to this direct provider's configuration. Quitting Cli-Switch also writes back the direct provider first, and local routing is reconnected the next time Cli-Switch starts.
 
@@ -336,16 +375,16 @@ While local routing is on, switching changes the provider that local routing use
 <details>
 <summary><strong>Can I use OpenAI-compatible APIs, Gemini, or local models in Claude Code?</strong></summary>
 
-Yes, but you need to turn on local routing. When editing the provider, set "Upstream Format" under "Advanced Options" to match the provider's API: choose "OpenAI Chat Completions" for services that only offer a Chat Completions endpoint (as many local model servers do), "OpenAI Responses API" for services that offer a Responses endpoint, and "Gemini Native generateContent" for Gemini. Then turn on local routing for Claude Code as described in step 5 of [Quick Start](#quick-start). Choosing the wrong format or not turning on local routing usually results in a 404 or 405 error.
+Yes, but you need to use Routing. When editing the provider, set "Upstream Format" under "Advanced Options" to match the provider's API: choose "OpenAI Chat Completions" for services that only offer a Chat Completions endpoint (as many local model servers do), "OpenAI Responses API" for services that offer a Responses endpoint, and "Gemini Native generateContent" for Gemini. Then click "Start routing" on the "Routing" tab of the Claude Code page. Choosing the wrong format or not starting routing usually results in a 404 or 405 error.
 
-Conversely, choosing "Anthropic Messages" as the "Upstream Format" in Codex or Grok Build lets you use Claude-format providers; this also requires local routing. See [Using GPT in Claude Code](docs/guides/claude-codex-routing-guide-en.md) and [Using Claude in Codex](docs/guides/codex-claude-routing-guide-en.md) for details.
+Conversely, choosing "Anthropic Messages" as the "Upstream Format" in Codex or Grok Build lets you use Claude-format providers; this also requires Routing. See [Using GPT in Claude Code](docs/guides/claude-codex-routing-guide-en.md) and [Using Claude in Codex](docs/guides/codex-claude-routing-guide-en.md) for details.
 
 </details>
 
 <details>
 <summary><strong>"Connectivity check" passed, so why do requests still fail?</strong></summary>
 
-The "Connectivity check" on a provider card only checks whether the provider address is reachable; it doesn't send a real model request, so it can't verify whether the API key and model name are correct. When requests fail, check the key, model name, and upstream format; with local routing on, you can also see the exact error in "Settings → Usage Statistics → Request Logs".
+The "Connectivity check" on a provider card only checks whether the provider address is reachable; it doesn't send a real model request, so it can't verify whether the API key and model name are correct. When requests fail, check the key, model name, and upstream format; for requests that go through Routing, you can also see the exact error in the request logs under "Usage" in the sidebar.
 
 </details>
 
@@ -358,7 +397,7 @@ folder there too.
 
 - **Database**: `cc-switch.db` (SQLite — providers, MCP, prompts, Skills, projects, usage records, etc.)
 - **Local settings**: `settings.json` (device-level settings such as each tool's config directory, backup policy, and cloud sync connection details)
-- **Backups**: `backups/` (backed up automatically every 24 hours by default, keeping the 10 most recent; adjustable in "Settings → Advanced → Backup & Restore")
+- **Backups**: `backups/` (backed up automatically every 24 hours by default, keeping the 10 most recent; adjustable in "Settings → Data → Backup & Restore"; "Other Backups" below it lists the location and size of every other backup, which you can clean up by category)
 - **Skills**: `skills/` (can be changed to `~/.agents/skills` in Settings), synced to each tool via symlinks by default, falling back to copying if that fails
 - **Skill Backups**: `skill-backups/` (created automatically before uninstalling or updating a skill, keeping the 20 most recent)
 - **OAuth login credentials**: `copilot_auth.json`, `codex_oauth_auth.json`, `xai_oauth_auth.json`
@@ -375,7 +414,7 @@ After you change "Cli-Switch Configuration Directory" in "Settings → Advanced 
 
 Cli-Switch doesn't detect WSL automatically. In "Settings → Advanced → Configuration Directory → Configuration Directory Override (Advanced)", change the directory for the corresponding tool to a path inside WSL, e.g. `\\wsl.localhost\Ubuntu\home\<user>\.claude`; after you save, Cli-Switch reads and writes the config inside WSL (supported for Claude Code, Codex, Gemini CLI, Grok Build, OpenCode, OpenClaw, Hermes, and Pi). Once this is set, the "About" page also detects and upgrades that tool in the corresponding WSL distribution.
 
-Note: local routing writes `127.0.0.1` as the address into the config. In WSL2's default NAT networking mode, `127.0.0.1` inside WSL can't reach local routing on Windows; switch WSL to mirrored networking mode instead.
+Note: Routing and Aggregation write `127.0.0.1` as the address into the config. In WSL2's default NAT networking mode, `127.0.0.1` inside WSL can't reach local routing on Windows; switch WSL to mirrored networking mode instead.
 
 </details>
 

@@ -4,6 +4,7 @@ import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ImeSafeInput } from "@/components/ui/ime-safe-input";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import {
   Select,
   SelectContent,
@@ -11,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Download, Plus, Trash2, ChevronRight, Loader2 } from "lucide-react";
 import { ApiKeySection, ModelDropdown } from "./shared";
 import {
@@ -27,6 +28,10 @@ import {
   OPENCODE_EXTRA_OPTION_DRAFT_PREFIX,
 } from "./helpers/opencodeFormUtils";
 import { RequestHeadersEditor } from "./RequestHeadersEditor";
+import {
+  findRequestHeaderValue,
+  normalizeRequestHeaders,
+} from "./helpers/requestHeaders";
 import { FetchedModelPicker } from "./FetchedModelPicker";
 import type { ProviderCategory, OpenCodeModel } from "@/types";
 import { useCommittableRef } from "@/hooks/useLatestRef";
@@ -227,20 +232,36 @@ export function OpenCodeFormFields({
       // Ignore responses for a previous endpoint/key or an unmounted form.
       modelFetchGeneration.current += 1;
     };
-  }, [baseUrl, apiKey]);
+  }, [baseUrl, apiKey, headers]);
 
   const handleFetchModels = useCallback(() => {
-    if (!baseUrl || !apiKey) {
+    const requestHeaders = normalizeRequestHeaders(headers);
+    const hasCredentials =
+      Boolean(apiKey) || Object.keys(requestHeaders).length > 0;
+    if (!baseUrl || !hasCredentials) {
       showFetchModelsError(null, t, {
-        hasApiKey: !!apiKey,
-        hasBaseUrl: !!baseUrl,
+        hasApiKey: hasCredentials,
+        hasBaseUrl: Boolean(baseUrl),
       });
       return;
     }
+
+    const customUserAgent = findRequestHeaderValue(
+      requestHeaders,
+      "user-agent",
+    );
+
     const generation = ++modelFetchGeneration.current;
     setFetchedModels([]);
     setIsFetchingModels(true);
-    fetchModelsForConfig(baseUrl, apiKey)
+    fetchModelsForConfig(
+      baseUrl,
+      apiKey,
+      undefined,
+      undefined,
+      customUserAgent,
+      { requestHeaders },
+    )
       .then((result) => {
         if (generation !== modelFetchGeneration.current) return;
         const models = [
@@ -265,7 +286,7 @@ export function OpenCodeFormFields({
           setIsFetchingModels(false);
         }
       });
-  }, [baseUrl, apiKey, t]);
+  }, [baseUrl, apiKey, headers, t]);
 
   // Track which models have expanded options panel
   const [expandedModels, setExpandedModels] = useState<Set<string>>(new Set());
@@ -532,10 +553,22 @@ export function OpenCodeFormFields({
 
   const handleExtraOptionKeyChange = (oldKey: string, newKey: string) => {
     if (oldKey === newKey) return;
+    const trimmed = newKey.trim();
+    // Renaming onto an existing key collapses two rows into one string map,
+    // which can no longer tell "the target row was replaced" from "it was
+    // untouched", so the merge would silently keep the target's stale value
+    // type. Reject like the model extra-field editor does.
+    if (
+      trimmed &&
+      trimmed !== oldKey &&
+      Object.prototype.hasOwnProperty.call(extraOptions, trimmed)
+    ) {
+      return false;
+    }
     const newOptions: Record<string, string> = {};
     for (const [k, v] of Object.entries(extraOptions)) {
       if (k === oldKey) {
-        newOptions[newKey.trim() || oldKey] = v;
+        newOptions[trimmed || oldKey] = v;
       } else {
         newOptions[k] = v;
       }
@@ -622,9 +655,9 @@ export function OpenCodeFormFields({
       />
 
       {/* Extra Options Editor */}
-      <div className="space-y-2 border-l border-border-default pl-3">
+      <div className="space-y-2 border-l border-border pl-3">
         <div className="flex items-start justify-between gap-3">
-          <div className="max-w-3xl space-y-1">
+          <div className="space-y-1">
             <FormLabel>
               {t("opencode.extraOptions", {
                 defaultValue: "Extra SDK Options",
@@ -647,7 +680,7 @@ export function OpenCodeFormFields({
           </Button>
         </div>
 
-        <div className="max-w-3xl">
+        <div>
           {Object.keys(extraOptions).length === 0 ? (
             <p className="text-ui text-muted-foreground py-1">
               {t("opencode.noExtraOptions", {
@@ -686,15 +719,18 @@ export function OpenCodeFormFields({
                     })}
                     className="flex-1"
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveExtraOption(key)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <HoverTip content={t("common.delete")}>
+                    <Button
+                      aria-label={t("common.delete")}
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveExtraOption(key)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </HoverTip>
                 </div>
               ))}
             </div>
@@ -703,7 +739,7 @@ export function OpenCodeFormFields({
       </div>
 
       {/* Models Editor */}
-      <div className="space-y-3 border-l border-border-default pl-3">
+      <div className="space-y-3 border-l border-border pl-3">
         <div className="flex items-center justify-between">
           <FormLabel>
             {t("opencode.models", { defaultValue: "Models" })}
@@ -724,7 +760,7 @@ export function OpenCodeFormFields({
             </Button>
             <Button type="button" variant="outline" onClick={handleAddModel}>
               <Plus className="h-4 w-4" />
-              {t("opencode.addModel", { defaultValue: "Add" })}
+              {t("opencode.addModel", { defaultValue: "Add manually" })}
             </Button>
           </div>
         </div>
@@ -802,15 +838,18 @@ export function OpenCodeFormFields({
                     })}
                     className="flex-1"
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleRemoveModel(key)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <HoverTip content={t("common.delete")}>
+                    <Button
+                      aria-label={t("common.delete")}
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveModel(key)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </HoverTip>
                 </div>
 
                 {/* Expanded model details */}
@@ -939,17 +978,20 @@ export function OpenCodeFormFields({
                                 )}
                                 className="flex-1"
                               />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() =>
-                                  handleRemoveModelExtraField(key, fKey)
-                                }
-                                className="text-muted-foreground hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <HoverTip content={t("common.delete")}>
+                                <Button
+                                  aria-label={t("common.delete")}
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleRemoveModelExtraField(key, fKey)
+                                  }
+                                  className="text-muted-foreground hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </HoverTip>
                             </div>
                           ),
                         )
@@ -1024,17 +1066,20 @@ export function OpenCodeFormFields({
                                 )}
                                 className="flex-1"
                               />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() =>
-                                  handleRemoveModelOption(key, optKey)
-                                }
-                                className="text-muted-foreground hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              <HoverTip content={t("common.delete")}>
+                                <Button
+                                  aria-label={t("common.delete")}
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleRemoveModelOption(key, optKey)
+                                  }
+                                  className="text-muted-foreground hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </HoverTip>
                             </div>
                           ),
                         )

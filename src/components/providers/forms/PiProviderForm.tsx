@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import {
   Form,
   FormField,
@@ -1582,7 +1583,7 @@ export function PiProviderForm({
             <div
               id="pi-models-section"
               tabIndex={-1}
-              className="space-y-3 border-l border-border-default pl-3 outline-none"
+              className="space-y-3 border-l border-border pl-3 outline-none"
             >
               <div className="flex items-center justify-between gap-3">
                 <FormLabel>
@@ -1711,16 +1712,18 @@ export function PiProviderForm({
                             required={!isEdit || model.hasName}
                             className="min-w-0 flex-1"
                           />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeModel(model.key)}
-                            aria-label={t("pi.form.removeModel")}
-                            className="shrink-0 text-muted-foreground hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <HoverTip content={t("pi.form.removeModel")}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeModel(model.key)}
+                              aria-label={t("pi.form.removeModel")}
+                              className="shrink-0 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </HoverTip>
                         </div>
 
                         {isExpanded && (
@@ -1879,7 +1882,7 @@ export function PiProviderForm({
 
                                 {thinkingMapIsExpanded &&
                                   editableThinkingLevelMap && (
-                                    <div className="overflow-hidden rounded-lg border border-border/70 bg-background/30">
+                                    <div className="overflow-hidden rounded-lg border border-border/70 bg-surface">
                                       {PI_THINKING_LEVELS.map((level) => {
                                         const mode = thinkingLevelMode(
                                           editableThinkingLevelMap,
@@ -1947,7 +1950,7 @@ export function PiProviderForm({
                                                     className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-[color,background-color,transform] duration-200 ${
                                                       popoverOpen
                                                         ? "translate-x-0.5 bg-primary/10 text-primary"
-                                                        : "text-muted-foreground/50 group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                                                        : "text-fg-3 group-hover:translate-x-0.5 group-hover:text-fg-2"
                                                     }`}
                                                   >
                                                     <ChevronRight className="h-3.5 w-3.5" />
@@ -1980,7 +1983,7 @@ export function PiProviderForm({
                                                       "default",
                                                     )
                                                   }
-                                                  className="h-4 w-4 accent-primary"
+                                                  className="ui-radio"
                                                 />
                                                 {t(
                                                   "pi.form.thinkingLevelFollowDefault",
@@ -2002,7 +2005,7 @@ export function PiProviderForm({
                                                       "value",
                                                     )
                                                   }
-                                                  className="h-4 w-4 accent-primary"
+                                                  className="ui-radio"
                                                 />
                                                 <label
                                                   htmlFor={`pi-thinking-level-value-${model.key}-${level}`}
@@ -2062,7 +2065,7 @@ export function PiProviderForm({
                                                       "unsupported",
                                                     )
                                                   }
-                                                  className="h-4 w-4 accent-primary"
+                                                  className="ui-radio"
                                                 />
                                                 {t(
                                                   "pi.form.thinkingLevelMarkUnavailable",

@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -43,6 +43,7 @@ import {
   fetchCodexOauthModels,
   fetchXaiOauthModels,
   fetchModelsForConfig,
+  modelFetchRequestHeaders,
   showFetchModelsError,
   type FetchedModel,
 } from "@/lib/api/model-fetch";
@@ -321,7 +322,16 @@ export function ClaudeFormFields({
     const modelsUrl = matchedPreset?.modelsUrl;
 
     setIsFetchingModels(true);
-    fetchModelsForConfig(baseUrl, apiKey, isFullUrl, modelsUrl, customUserAgent)
+    fetchModelsForConfig(
+      baseUrl,
+      apiKey,
+      isFullUrl,
+      modelsUrl,
+      customUserAgent,
+      {
+        requestHeaders: modelFetchRequestHeaders(localProxyHeadersOverride),
+      },
+    )
       .then((models) => {
         setFetchedModels(models);
         showModelFetchResult(models.length);
@@ -331,7 +341,15 @@ export function ClaudeFormFields({
         showFetchModelsError(err, t);
       })
       .finally(() => setIsFetchingModels(false));
-  }, [baseUrl, apiKey, isFullUrl, customUserAgent, showModelFetchResult, t]);
+  }, [
+    baseUrl,
+    apiKey,
+    isFullUrl,
+    customUserAgent,
+    localProxyHeadersOverride,
+    showModelFetchResult,
+    t,
+  ]);
 
   const handleFetchCopilotModels = useCallback(() => {
     if (!isCopilotAuthenticated) {
@@ -714,6 +732,7 @@ export function ClaudeFormFields({
           value={apiKey}
           onChange={onApiKeyChange}
           category={category}
+          required
           shouldShowLink={shouldShowApiKeyLink}
           websiteUrl={websiteUrl}
           isPartner={isPartner}

@@ -4,8 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Download, Loader2, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -911,6 +912,7 @@ export function ClaudeDesktopProviderForm({
                 value={apiKey}
                 onChange={setApiKey}
                 category={apiKeyLinkCategory}
+                required
                 shouldShowLink={shouldShowApiKeyLink}
                 websiteUrl={apiKeyLinkWebsiteUrl}
                 isPartner={apiKeyLinkIsPartner}
@@ -955,7 +957,7 @@ export function ClaudeDesktopProviderForm({
                         })}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-2 border-l border-border-default pl-4">
+                <div className="flex shrink-0 items-center gap-2 border-l border-border pl-4">
                   <Label
                     htmlFor="claude-desktop-model-mode"
                     className="text-[12.35px] leading-[1.3] font-normal text-muted-foreground"
@@ -1043,7 +1045,7 @@ export function ClaudeDesktopProviderForm({
                   )}
 
                   <div className="space-y-3">
-                    <div className="space-y-1 border-t border-border-default pt-4">
+                    <div className="space-y-1 border-t border-border pt-4">
                       <div className="flex items-center justify-between">
                         <Label>
                           {t("claudeDesktop.routeMapTitle", {
@@ -1186,7 +1188,7 @@ export function ClaudeDesktopProviderForm({
               )}
 
               {!needsModelMapping && (
-                <div className="space-y-3 border-t border-border-default pt-4">
+                <div className="space-y-3 border-t border-border pt-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <Label>
                       {t("claudeDesktop.directModelListTitle", {
@@ -1257,18 +1259,21 @@ export function ClaudeDesktopProviderForm({
                               defaultValue: "1M",
                             })}
                           </label>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() =>
-                              setRoutes((current) =>
-                                current.filter((_, i) => i !== index),
-                              )
-                            }
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <HoverTip content={t("common.delete")}>
+                            <Button
+                              aria-label={t("common.delete")}
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                setRoutes((current) =>
+                                  current.filter((_, i) => i !== index),
+                                )
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </HoverTip>
                         </div>
                       ))}
                     </div>

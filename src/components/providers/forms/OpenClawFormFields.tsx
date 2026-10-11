@@ -4,6 +4,7 @@ import { FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ImeSafeInput } from "@/components/ui/ime-safe-input";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Download, Plus, Trash2, ChevronRight, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ApiKeySection, ModelDropdown } from "./shared";
@@ -286,7 +287,7 @@ export function OpenClawFormFields({
       />
 
       {/* User-Agent */}
-      <div className="flex items-center justify-between border-l border-border-default pl-3">
+      <div className="flex items-center justify-between border-l border-border pl-3">
         <div className="space-y-0.5">
           <FormLabel>
             {t("openclaw.userAgent", { defaultValue: "发送 User-Agent" })}
@@ -301,7 +302,7 @@ export function OpenClawFormFields({
       </div>
 
       {/* Models Editor */}
-      <div className="space-y-3 border-l border-border-default pl-3">
+      <div className="space-y-3 border-l border-border pl-3">
         <div className="flex items-center justify-between gap-3">
           <FormLabel>
             {t("openclaw.models", { defaultValue: "模型配置" })}
@@ -328,7 +329,7 @@ export function OpenClawFormFields({
         </div>
 
         {models.length === 0 ? (
-          <p role="status" className="py-2 text-sm text-muted-foreground">
+          <p role="status" className="py-2 text-sm text-fg-2">
             {t("openclaw.noModels", {
               defaultValue: "暂无模型配置",
             })}
@@ -402,18 +403,24 @@ export function OpenClawFormFields({
                       })}
                       className="min-w-0 flex-1"
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveModel(index)}
-                      aria-label={t("openclaw.removeModel", {
+                    <HoverTip
+                      content={t("openclaw.removeModel", {
                         defaultValue: "移除模型",
                       })}
-                      className="shrink-0 text-muted-foreground hover:text-destructive"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveModel(index)}
+                        aria-label={t("openclaw.removeModel", {
+                          defaultValue: "移除模型",
+                        })}
+                        className="shrink-0 text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </HoverTip>
                   </div>
 
                   {isExpanded && (

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Download, Loader2, Plus, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormLabel } from "@/components/ui/form";
 import { ImeSafeInput } from "@/components/ui/ime-safe-input";
@@ -160,14 +161,14 @@ export function ClaudeStackModelsField({
               className="gap-2"
             >
               <Plus className="h-4 w-4" />
-              {t("providerForm.addStackModel", { defaultValue: "添加模型" })}
+              {t("providerForm.addStackModel", { defaultValue: "手动添加" })}
             </Button>
           </div>
         </div>
         <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("providerForm.stackModelsHint", {
             defaultValue:
-              "这些模型会出现在 Claude Code 的 /model 里，选中后请求直达这家。第一个（★）是这家的默认模型：这家被设为默认时，Claude Code 启动和后台任务都用它。修改后需要重启 Claude Code。",
+              "这些模型会出现在 Claude Code 的 /model 里，选中后请求直达这家。第一个（★）是这家的默认模型：这家被设为默认时，Claude Code 启动和后台任务都用它。",
           })}
         </p>
       </div>
@@ -186,7 +187,7 @@ export function ClaudeStackModelsField({
         <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("providerForm.stackModelsEmpty", {
             defaultValue:
-              "未配置模型：叠加这家后，模型选择器里不会多出它的模型",
+              "未配置模型：把这家加入聚合后，模型选择器里不会多出它的模型",
           })}
         </p>
       ) : (
@@ -223,25 +224,26 @@ export function ClaudeStackModelsField({
                 key={row.rowId}
                 className="grid grid-cols-1 gap-2 md:grid-cols-[24px_1fr_minmax(0,1fr)_64px_24px]"
               >
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => makeDefault(row.rowId)}
-                  disabled={isDefault}
-                  aria-label={defaultLabel}
-                  aria-pressed={isDefault}
-                  title={defaultLabel}
-                  className="text-muted-foreground hover:text-amber-500 disabled:opacity-100"
-                >
-                  <Star
-                    className={
-                      isDefault
-                        ? "h-4 w-4 fill-amber-400 text-amber-500"
-                        : "h-4 w-4"
-                    }
-                  />
-                </Button>
+                <HoverTip content={defaultLabel}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => makeDefault(row.rowId)}
+                    disabled={isDefault}
+                    aria-label={defaultLabel}
+                    aria-pressed={isDefault}
+                    className="text-muted-foreground hover:text-amber-500 disabled:opacity-100"
+                  >
+                    <Star
+                      className={
+                        isDefault
+                          ? "h-4 w-4 fill-amber-400 text-amber-500"
+                          : "h-4 w-4"
+                      }
+                    />
+                  </Button>
+                </HoverTip>
                 <ImeSafeInput
                   value={row.displayName ?? ""}
                   onValueChange={(value) =>
@@ -294,20 +296,22 @@ export function ClaudeStackModelsField({
                   />
                   {t("providerForm.modelOneMLabel", { defaultValue: "1M" })}
                 </label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() =>
-                    onRowsChange(
-                      rows.filter((other) => other.rowId !== row.rowId),
-                    )
-                  }
-                  aria-label={t("common.delete")}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <HoverTip content={t("common.delete")}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      onRowsChange(
+                        rows.filter((other) => other.rowId !== row.rowId),
+                      )
+                    }
+                    aria-label={t("common.delete")}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </HoverTip>
               </div>
             );
           })}

@@ -21,6 +21,7 @@ import { workspaceApi } from "@/lib/api/workspace";
 import WorkspaceFileEditor from "./WorkspaceFileEditor";
 import DailyMemoryPanel from "./DailyMemoryPanel";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 
 interface WorkspaceFile {
   filename: string;
@@ -85,14 +86,15 @@ const WorkspaceFilesPanel: React.FC = () => {
 
   return (
     <div className="px-6 pt-4 pb-8">
-      <p
-        className="text-sm text-muted-foreground mb-6 cursor-pointer hover:text-foreground transition-colors inline-flex items-center gap-1"
-        onClick={() => workspaceApi.openDirectory("workspace")}
-        title={t("workspace.openDirectory")}
-      >
-        ~/.openclaw/workspace/
-        <FolderOpen className="w-3.5 h-3.5" />
-      </p>
+      <HoverTip content={t("workspace.openDirectory")}>
+        <p
+          className="text-sm text-muted-foreground mb-6 cursor-pointer hover:text-foreground transition-colors inline-flex items-center gap-1"
+          onClick={() => workspaceApi.openDirectory("workspace")}
+        >
+          ~/.openclaw/workspace/
+          <FolderOpen className="w-3.5 h-3.5" />
+        </p>
+      </HoverTip>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {WORKSPACE_FILES.map((file) => {

@@ -1,4 +1,4 @@
-import { Download, Users } from "lucide-react";
+import { Download, Plus, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import type { AppId } from "@/lib/api/types";
@@ -9,6 +9,10 @@ interface ProviderEmptyStateProps {
   onImport?: () => void;
 }
 
+/**
+ * 供应商页空状态（v7 PANELS_BRIEF 空状态规则）：列表区居中，标题 15/600 +
+ * 一段 13px --text-2 + 按钮。页头已经有实心的「添加供应商」，这里一律描边。
+ */
 export function ProviderEmptyState({
   appId,
   onCreate,
@@ -40,28 +44,29 @@ export function ProviderEmptyState({
           ? t(`${emptyCopyNs}.empty.description`)
           : t("provider.noProvidersDescription")}
       </p>
+      {(onImport || onCreate) && (
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+          {onImport && (
+            <Button variant="neutral" onClick={onImport}>
+              <Download className="h-4 w-4" />
+              {appId === "claude-desktop"
+                ? t("provider.importFromClaude")
+                : t("provider.importCurrent")}
+            </Button>
+          )}
+          {onCreate && (
+            <Button variant="neutral" onClick={onCreate}>
+              <Plus className="h-4 w-4" />
+              {t("provider.addProvider")}
+            </Button>
+          )}
+        </div>
+      )}
       {showKeyFieldsHint && (
-        <p className="mt-1 max-w-lg text-ui text-muted-foreground">
+        <p className="mt-2 max-w-lg text-ui text-muted-foreground">
           {t("provider.noProvidersDescriptionKeyFields")}
         </p>
       )}
-      <div className="mt-6 flex flex-col gap-2">
-        {onImport && (
-          <Button onClick={onImport}>
-            <Download className="mr-2 h-4 w-4" />
-            {appId === "claude-desktop"
-              ? t("provider.importFromClaude", {
-                  defaultValue: "将 Claude Code 中已有的供应商导入",
-                })
-              : t("provider.importCurrent")}
-          </Button>
-        )}
-        {onCreate && (
-          <Button variant={onImport ? "outline" : "default"} onClick={onCreate}>
-            {t("provider.addProvider")}
-          </Button>
-        )}
-      </div>
     </div>
   );
 }

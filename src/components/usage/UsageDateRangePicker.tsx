@@ -7,6 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HoverTip } from "@/components/ui/hover-tip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,7 +22,7 @@ import type { UsageRangePreset, UsageRangeSelection } from "@/types/usage";
 
 type DraftField = "start" | "end";
 
-const PRESETS: UsageRangePreset[] = ["today", "1d", "7d", "14d", "30d"];
+const PRESETS: UsageRangePreset[] = ["today", "1d", "7d", "14d", "30d", "all"];
 
 interface UsageDateRangePickerProps {
   selection: UsageRangeSelection;
@@ -104,6 +105,12 @@ function getCalendarDays(month: Date): Date[] {
 
 /* ── component ── */
 
+function resolveCalendarRange(selection: UsageRangeSelection) {
+  const r = resolveUsageRange(selection);
+  if (selection.preset !== "all") return r;
+  return { startDate: r.endDate - 30 * 24 * 60 * 60, endDate: r.endDate };
+}
+
 export function UsageDateRangePicker({
   selection,
   onApply,
@@ -111,9 +118,12 @@ export function UsageDateRangePicker({
 }: UsageDateRangePickerProps) {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
+  const prevMonthLabel = t("usage.prevMonth", { defaultValue: "上个月" });
+  const nextMonthLabel = t("usage.nextMonth", { defaultValue: "下个月" });
   const [activeField, setActiveField] = useState<DraftField>("start");
+  // 「全部」的起点是 0，日历草稿改从结束日往前 30 天开始，避免跳到 1970 年
   const resolvedRange = useMemo(
-    () => resolveUsageRange(selection),
+    () => resolveCalendarRange(selection),
     [selection],
   );
   const [draftStart, setDraftStart] = useState(resolvedRange.startDate);
@@ -137,7 +147,7 @@ export function UsageDateRangePicker({
   // Reset draft when popover opens
   useEffect(() => {
     if (!open) return;
-    const r = resolveUsageRange(selection);
+    const r = resolveCalendarRange(selection);
     setDraftStart(r.startDate);
     setDraftEnd(r.endDate);
     setDraftLiveEnd(
@@ -260,23 +270,23 @@ export function UsageDateRangePicker({
         className={cn(
           "rounded-[8px] border px-2 py-2 transition-all",
           isEndLive
-            ? "border-border/30 bg-muted/30 cursor-not-allowed opacity-50"
+            ? "border-border bg-subtle cursor-not-allowed opacity-50"
             : isActive
-              ? "border-primary ring-1 ring-primary/30 bg-primary/5 cursor-pointer"
-              : "border-border/50 hover:border-border cursor-pointer",
+              ? "border-ring ring-1 ring-ring bg-card cursor-pointer"
+              : "border-border hover:border-border cursor-pointer",
         )}
         onClick={() => {
           if (!isEndLive) setActiveField(field);
         }}
       >
-        <div className="mb-2 text-[12.35px] leading-[1.3] font-medium uppercase tracking-wider text-muted-foreground">
+        <div className="mb-2 text-ui font-medium uppercase tracking-wider text-muted-foreground">
           {label}
         </div>
         <div className="flex items-center gap-2">
           <Input
             type="date"
             className={cn(
-              "flex-1 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0",
+              "h-7 flex-1 border-0 bg-transparent p-0 text-ui shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtDate(ts)}
@@ -297,7 +307,7 @@ export function UsageDateRangePicker({
             type="time"
             step={60}
             className={cn(
-              "w-[90px] flex-none border-0 bg-transparent p-0 shadow-none focus-visible:ring-0",
+              "h-7 w-[90px] flex-none border-0 bg-transparent p-0 text-ui shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtTime(ts)}
@@ -321,26 +331,36 @@ export function UsageDateRangePicker({
       <PopoverTrigger asChild>
         <Button
           type="button"
-          variant={selection.preset === "custom" ? "default" : "outline"}
-          className="w-[100px] min-w-0 justify-start gap-2 overflow-hidden whitespace-normal text-left"
-          title={triggerLabel}
+          variant="neutral"
+          size="regular"
+          className="max-w-[220px] shrink-0 gap-1 pe-2 ps-2"
+          title={`${t("usage.timeRange")}: ${triggerLabel}`}
         >
-          <CalendarDays className="h-4 w-4 shrink-0" />
-          <span className="truncate flex-1">{triggerLabel}</span>
-          <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+          {selection.preset === "custom" && (
+            <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
+          )}
+          <span className="min-w-0 truncate">{triggerLabel}</span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="usage-range-popover w-[620px] max-w-[calc(100vw-2rem)] rounded-[8px] p-2"
+        className="usage-range-popover w-[620px] max-w-[calc(100vw-2rem)] rounded-[8px] border-border bg-card p-2 shadow-md"
         align="end"
       >
         {/* Preset shortcuts */}
-        <div className="flex flex-wrap gap-2 pb-2 border-b border-border/40">
+        <div className="flex flex-wrap gap-2 pb-2 border-b border-border">
           {PRESETS.map((preset) => (
             <Button
               key={preset}
               type="button"
-              variant={selection.preset === preset ? "default" : "outline"}
+              size="compact"
+              variant="neutral"
+              aria-pressed={selection.preset === preset}
+              className={cn(
+                "px-2",
+                selection.preset === preset &&
+                  "border-fg-1 bg-selected font-semibold",
+              )}
               onClick={() => {
                 onApply({ preset });
                 setOpen(false);
@@ -351,16 +371,16 @@ export function UsageDateRangePicker({
           ))}
         </div>
 
-        <div className="usage-range-layout flex flex-col gap-2">
+        <div className="usage-range-layout mt-2 flex flex-col gap-2">
           {/* Left: date fields */}
           <div className="usage-range-fields space-y-2">
-            <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
+            <p className="text-ui text-muted-foreground">
               {t("usage.customRangeHint", "支持日期与时间，最长 30 天")}
             </p>
             {renderField("start")}
             {renderField("end")}
 
-            <label className="flex items-center gap-2 cursor-pointer select-none text-[12.35px] leading-[1.3]">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
               <Checkbox
                 checked={draftLiveEnd}
                 onCheckedChange={(checked) => {
@@ -372,84 +392,96 @@ export function UsageDateRangePicker({
                   }
                 }}
               />
-              <span className="text-[12.35px] leading-[1.3] text-muted-foreground">
+              <span className="text-ui text-muted-foreground">
                 {t("usage.liveEndTime", "结束时间跟随当前时刻")}
               </span>
             </label>
 
-            {error && (
-              <p className="text-[12.35px] leading-[1.3] text-destructive">
-                {error}
-              </p>
-            )}
+            {error && <p className="text-ui text-danger-text">{error}</p>}
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <Button
                 type="button"
-                variant="ghost"
+                variant="quiet"
+                size="compact"
                 className="flex-1"
                 onClick={() => setOpen(false)}
               >
                 {t("common.cancel")}
               </Button>
-              <Button type="button" className="flex-1" onClick={handleApply}>
+              <Button
+                type="button"
+                variant="solid"
+                size="compact"
+                className="flex-1"
+                onClick={handleApply}
+              >
                 {t("common.confirm")}
               </Button>
             </div>
           </div>
 
           {/* Right: calendar */}
-          <div className="usage-range-calendar rounded-[8px] border border-border/50 bg-muted/30 p-2">
+          <div className="usage-range-calendar rounded-[8px] border border-border bg-subtle p-2">
             {/* Month navigation */}
             <div className="flex items-center justify-between mb-2">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() =>
-                  setDisplayMonth(
-                    new Date(
-                      displayMonth.getFullYear(),
-                      displayMonth.getMonth() - 1,
-                      1,
-                    ),
-                  )
-                }
+              <HoverTip content={prevMonthLabel}>
+                <Button
+                  type="button"
+                  size="icon-compact"
+                  variant="quiet"
+                  aria-label={prevMonthLabel}
+                  onClick={() =>
+                    setDisplayMonth(
+                      new Date(
+                        displayMonth.getFullYear(),
+                        displayMonth.getMonth() - 1,
+                        1,
+                      ),
+                    )
+                  }
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </HoverTip>
+              {/* 点月份标题跳回本月：动作不在字面上，用 HoverTip 说明 */}
+              <HoverTip
+                content={t("usage.presetToday", { defaultValue: "当天" })}
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="min-w-0 px-2"
-                onClick={goToToday}
-                title={t("usage.presetToday", { defaultValue: "当天" })}
-              >
-                {displayMonth.toLocaleDateString(locale, {
-                  year: "numeric",
-                  month: "long",
-                })}
-              </Button>
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={() =>
-                  setDisplayMonth(
-                    new Date(
-                      displayMonth.getFullYear(),
-                      displayMonth.getMonth() + 1,
-                      1,
-                    ),
-                  )
-                }
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                <button
+                  type="button"
+                  className="text-ui font-medium text-foreground transition-colors hover:text-muted-foreground"
+                  onClick={goToToday}
+                >
+                  {displayMonth.toLocaleDateString(locale, {
+                    year: "numeric",
+                    month: "long",
+                  })}
+                </button>
+              </HoverTip>
+              <HoverTip content={nextMonthLabel}>
+                <Button
+                  type="button"
+                  size="icon-compact"
+                  variant="quiet"
+                  aria-label={nextMonthLabel}
+                  onClick={() =>
+                    setDisplayMonth(
+                      new Date(
+                        displayMonth.getFullYear(),
+                        displayMonth.getMonth() + 1,
+                        1,
+                      ),
+                    )
+                  }
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </HoverTip>
             </div>
 
             {/* Weekday headers */}
-            <div className="grid grid-cols-7 text-center text-[12.35px] leading-[1.3] text-muted-foreground mb-2">
+            <div className="grid grid-cols-7 text-center text-ui text-muted-foreground mb-0.5">
               {weekdayLabels.map((label, i) => (
                 <div key={i} className="py-0.5">
                   {label}
@@ -472,26 +504,24 @@ export function UsageDateRangePicker({
                 const isEndpoint = isStart || isEnd;
 
                 return (
-                  <Button
+                  <button
                     key={day.toISOString()}
                     type="button"
-                    variant="ghost"
                     aria-label={day.toLocaleDateString(locale)}
                     aria-current={isToday ? "date" : undefined}
                     aria-pressed={isEndpoint}
                     className={cn(
-                      "relative h-6 min-w-0 rounded-[4px]",
-                      !isCurrentMonth && "text-muted-foreground/30",
-                      isCurrentMonth && !inRange && "hover:bg-muted",
-                      inRange && !isEndpoint && "bg-primary/10 text-primary",
-                      isEndpoint &&
-                        "bg-primary text-primary-foreground font-medium",
-                      isToday && !isEndpoint && "ring-1 ring-primary/40",
+                      "relative h-7 rounded text-ui transition-colors",
+                      !isCurrentMonth && "text-muted-foreground",
+                      isCurrentMonth && !inRange && "hover:bg-subtle",
+                      inRange && !isEndpoint && "bg-selected text-foreground",
+                      isEndpoint && "bg-action text-action-fg font-medium",
+                      isToday && !isEndpoint && "ring-1 ring-border-strong",
                     )}
                     onClick={() => handleDatePick(day)}
                   >
                     {day.getDate()}
-                  </Button>
+                  </button>
                 );
               })}
             </div>

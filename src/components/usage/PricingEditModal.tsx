@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Save, Plus, Globe } from "lucide-react";
 import { FullScreenPanel } from "@/components/common/FullScreenPanel";
 import { Button } from "@/components/ui/button";
@@ -88,6 +88,7 @@ export function PricingEditModal({
   return (
     <FullScreenPanel
       isOpen={open}
+      trackUnsavedChanges
       title={
         isNew
           ? t("usage.addPricing", "新增定价")
@@ -98,6 +99,8 @@ export function PricingEditModal({
         <Button
           type="submit"
           form="pricing-form"
+          variant="solid"
+          size="regular"
           disabled={updatePricing.isPending}
         >
           {isNew ? <Plus className="h-4 w-4" /> : <Save className="h-4 w-4" />}
@@ -110,8 +113,8 @@ export function PricingEditModal({
       }
     >
       {isNew && (
-        <div className="mb-2 flex items-center justify-between gap-2 rounded-[8px] border border-border/50 bg-muted/20 px-2 py-2">
-          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
+        <div className="mb-2 flex items-center justify-between gap-2 rounded-[8px] border border-border bg-subtle px-2 py-2">
+          <p className="text-ui text-muted-foreground">
             {t(
               "usage.modelsDevHint",
               "无需手动填写，可从 models.dev 选择模型定价",
@@ -119,7 +122,8 @@ export function PricingEditModal({
           </p>
           <Button
             type="button"
-            variant="outline"
+            variant="neutral"
+            size="compact"
             onClick={() => setIsPickerOpen(true)}
             className="shrink-0"
           >

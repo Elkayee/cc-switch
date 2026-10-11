@@ -110,7 +110,7 @@ export function AppSwitcher({
   const [moreOpen, setMoreOpen] = useState(false);
 
   const handleSwitch = (app: AppId) => {
-    if (app === activeApp) return;
+    // Re-clicking the active app is allowed: from a non-provider page it returns to the provider list
     localStorage.setItem(STORAGE_KEY, app);
     onSwitch(app);
   };

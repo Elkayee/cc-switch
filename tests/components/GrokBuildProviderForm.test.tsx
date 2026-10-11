@@ -36,9 +36,7 @@ describe("GrokBuildProviderForm", () => {
     expect(screen.queryByRole("button", { name: /BytePlus/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /Kimi/ })).toBeNull();
 
-    await user.click(
-      screen.getByRole("button", { name: /Toggle unofficial provider presets/ }),
-    );
+    await user.click(screen.getByRole("button", { name: /unofficial/i }));
     await user.click(screen.getByRole("button", { name: /PatewayAI/ }));
 
     const baseUrlInput =
@@ -47,6 +45,29 @@ describe("GrokBuildProviderForm", () => {
       container.querySelector<HTMLInputElement>('input[name="name"]');
     expect(baseUrlInput?.value).toBe("https://api.pateway.ai/v1");
     expect(nameInput?.value).toBe("PatewayAI");
+  });
+
+  it("points the get-API-key link at the preset's apiKeyUrl", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <GrokBuildProviderForm
+        submitLabel="Save"
+        onSubmit={() => {}}
+        onCancel={() => {}}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /unofficial/i }));
+    await user.click(screen.getByRole("button", { name: /88API/ }));
+
+    const websiteInput = container.querySelector<HTMLInputElement>(
+      'input[name="websiteUrl"]',
+    );
+    expect(websiteInput?.value).toBe("https://88api.ai");
+    expect(screen.getByRole("link", { name: /API Key/ })).toHaveAttribute(
+      "href",
+      "https://88api.ai/sign-up?aff=HSGY",
+    );
   });
 
   it("submits a complete config.toml payload with Grok defaults", async () => {

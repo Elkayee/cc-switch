@@ -2,9 +2,26 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { HelpTip } from "@/components/ui/help-tip";
 import JsonEditor from "@/components/JsonEditor";
 import type { ProviderEditorInactiveField } from "@/lib/api/providers";
+import { CLAUDE_AUTO_MODE_SERVER_ENV } from "@/utils/claudeEditorOverlay";
 import { InactiveFieldsPanel } from "./InactiveFieldsPanel";
+
+/** 编辑框上方的快捷开关，顺序即显示顺序；文案在 `claudeConfig.<key>` 和 `claudeConfig.<key>Help`。 */
+const QUICK_TOGGLES = [
+  "hideAttribution",
+  "enableToolSearch",
+  "disableAutoUpgrade",
+  "disableArtifact",
+  "disableAutoModeServer",
+  "enableTodoTools",
+] as const;
+
+/** 没有 `claudeConfig.<key>Help` 文案的开关，不画「?」按钮。 */
+const TOGGLES_WITHOUT_HELP = new Set<(typeof QUICK_TOGGLES)[number]>([
+  "enableTodoTools",
+]);
 
 interface CommonConfigEditorProps {
   value: string;
@@ -82,13 +99,9 @@ export function CommonConfigEditor({
           config?.attribution?.commit === "" &&
           config?.attribution?.pr === "" &&
           config?.attribution?.sessionUrl === false,
-        teammates:
-          config?.env?.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS === "1" ||
-          config?.env?.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS === 1,
         enableToolSearch:
           config?.env?.ENABLE_TOOL_SEARCH === "true" ||
           config?.env?.ENABLE_TOOL_SEARCH === "1",
-        effortMax: config?.env?.CLAUDE_CODE_EFFORT_LEVEL === "max",
         disableAutoUpgrade:
           config?.env?.DISABLE_AUTOUPDATER === "1" ||
           config?.env?.DISABLE_AUTOUPDATER === 1,
@@ -98,22 +111,24 @@ export function CommonConfigEditor({
         enableTodoTools:
           config?.env?.CLAUDE_CODE_ENABLE_TODO_TOOLS === "1" ||
           config?.env?.CLAUDE_CODE_ENABLE_TODO_TOOLS === 1,
+        disableAutoModeServer:
+          config?.env?.[CLAUDE_AUTO_MODE_SERVER_ENV] === "0" ||
+          config?.env?.[CLAUDE_AUTO_MODE_SERVER_ENV] === 0,
       };
     } catch {
       return {
         hideAttribution: false,
-        teammates: false,
         enableToolSearch: false,
-        effortMax: false,
         disableAutoUpgrade: false,
         disableArtifact: false,
         enableTodoTools: false,
+        disableAutoModeServer: false,
       };
     }
   }, [localValue]);
 
   const handleToggle = useCallback(
-    (toggleKey: string, checked: boolean) => {
+    (toggleKey: (typeof QUICK_TOGGLES)[number], checked: boolean) => {
       try {
         const config = JSON.parse(localValue || "{}");
 
@@ -125,30 +140,12 @@ export function CommonConfigEditor({
               delete config.attribution;
             }
             break;
-          case "teammates":
-            if (!config.env) config.env = {};
-            if (checked) {
-              config.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
-            } else {
-              delete config.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS;
-              if (Object.keys(config.env).length === 0) delete config.env;
-            }
-            break;
           case "enableToolSearch":
             if (!config.env) config.env = {};
             if (checked) {
               config.env.ENABLE_TOOL_SEARCH = "true";
             } else {
               delete config.env.ENABLE_TOOL_SEARCH;
-              if (Object.keys(config.env).length === 0) delete config.env;
-            }
-            break;
-          case "effortMax":
-            if (!config.env) config.env = {};
-            if (checked) {
-              config.env.CLAUDE_CODE_EFFORT_LEVEL = "max";
-            } else {
-              delete config.env.CLAUDE_CODE_EFFORT_LEVEL;
               if (Object.keys(config.env).length === 0) delete config.env;
             }
             break;
@@ -181,6 +178,15 @@ export function CommonConfigEditor({
               config.env.CLAUDE_CODE_ENABLE_TODO_TOOLS = "1";
             } else {
               delete config.env.CLAUDE_CODE_ENABLE_TODO_TOOLS;
+              if (Object.keys(config.env).length === 0) delete config.env;
+            }
+            break;
+          case "disableAutoModeServer":
+            if (!config.env) config.env = {};
+            if (checked) {
+              config.env[CLAUDE_AUTO_MODE_SERVER_ENV] = "0";
+            } else {
+              delete config.env[CLAUDE_AUTO_MODE_SERVER_ENV];
               if (Object.keys(config.env).length === 0) delete config.env;
             }
             break;
@@ -230,27 +236,21 @@ export function CommonConfigEditor({
         })}
       </p>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        {(
-          [
-            ["hideAttribution", "hideAttribution"],
-            ["teammates", "enableTeammates"],
-            ["enableToolSearch", "enableToolSearch"],
-            ["effortMax", "effortMax"],
-            ["disableAutoUpgrade", "disableAutoUpgrade"],
-            ["disableArtifact", "disableArtifact"],
-            ["enableTodoTools", "enableTodoTools"],
-          ] as const
-        ).map(([key, label]) => (
-          <label
-            key={key}
-            className="inline-flex items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground cursor-pointer"
-          >
-            <Checkbox
-              checked={toggleStates[key]}
-              onCheckedChange={(checked) => handleToggle(key, checked)}
-            />
-            <span>{t(`claudeConfig.${label}`)}</span>
-          </label>
+        {QUICK_TOGGLES.map((key) => (
+          <span key={key} className="inline-flex items-center gap-1">
+            <label className="inline-flex items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground cursor-pointer">
+              <Checkbox
+                checked={toggleStates[key]}
+                onCheckedChange={(checked) => handleToggle(key, checked)}
+              />
+              <span>{t(`claudeConfig.${key}`)}</span>
+            </label>
+            {!TOGGLES_WITHOUT_HELP.has(key) && (
+              <HelpTip title={t(`claudeConfig.${key}`)}>
+                {t(`claudeConfig.${key}Help`)}
+              </HelpTip>
+            )}
+          </span>
         ))}
       </div>
       <JsonEditor

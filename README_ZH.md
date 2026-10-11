@@ -94,6 +94,11 @@ Claude Code / Codex / Gemini 官方渠道低至 3.8 / 0.2 / 0.9 折，充值更�
 </tr>
 
 <tr>
+<td width="180"><a href="https://88api.ai/sign-up?aff=HSGY"><img src="assets/partners/logos/88api-banner.jpg" alt="88API" width="150"></a></td>
+<td>感谢 88API Token聚合平台赞助了本项目！88API 是一家由香港企业运营并且主要面向开发者、创作者与 AI 应用用户的一站式多模型 API 平台，通过统一接口接入文本、图片、语音和视频模型，覆盖 AI 编程、智能翻译、内容创作、配音、图像生成、视频生成等常见工作流。可以直接在 CC Switch 中完成 Provider 添加并切换，支持国际主流付款方式，可提供发票，提供企业级稳定服务。通过<a href="https://88api.ai/sign-up?aff=HSGY">此链接</a>注册可以获取专属赠送额度！</td>
+</tr>
+
+<tr>
 <td width="180"><a href="https://apikey.fan/register?aff=CCSwitch"><img src="assets/partners/logos/apikey_banner.png" alt="APIKEY.FUN" width="150"></a></td>
 <td>感谢 APIKEY.FUN 赞助本项目！APIKEY.FUN 是一家专业的企业级 AI 中转站，致力于为企业和个人开发者提供稳定、高效、低成本的 AI 模型 API 接入服务。平台支持 Claude、OpenAI、Gemini 等主流热门模型，价格低至官方原价的 7%。通过本项目<a href="https://apikey.fan/register?aff=CCSwitch">专属链接</a>注册，还可享受最高 <strong>充值永久 95 折</strong> 专属优惠。</td>
 </tr>
@@ -204,21 +209,33 @@ TeamoRouter 还提供企业级功能，包括集中账单、团队管理、BYOK�
 
 Claude Code、Codex、Gemini CLI 等 AI 编程工具各有各的配置格式。换一个 API 供应商，就得手动改 JSON、TOML、YAML 或 `.env` 文件；MCP、Skills 和提示词也要在每个工具里分别维护。
 
-**CC Switch** 把这些工作集中到一个桌面应用里：选一个预设、填入 Key，一键即可切换，原有配置不会丢失。
+**CC Switch** 把这些工作集中到一个桌面应用里：选一个预设、填入 Key，一键即可切换。切换时只替换地址、Key、模型这几项连接信息，你自己加的插件、Hook、MCP 和注释都原样保留。
 
 - **一个应用，十个工具** — Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build、OpenCode、OpenClaw、Hermes、Pi、MiniMax Code
 - **告别手动编辑** — 90+ 供应商预设，包括 AWS Bedrock、NVIDIA NIM 和社区中转服务
-- **在 Claude Code 里用 GPT，在 Codex 里用 Claude** — 内置本地路由，自动转换 Anthropic、OpenAI、Gemini 的接口格式，并支持自动故障转移
+- **直连、路由、聚合，按需选择** — 直连是工具直接连供应商；路由经本机转发，能转换接口格式、自动故障转移，让 Claude Code 用 GPT、Codex 用 Claude；聚合把多家供应商的模型放进 Claude Code 或 Codex 的同一个模型列表，选哪个模型，请求就发给哪一家
 - **MCP、Skills 与提示词集中管理** — MCP 和 Skills 添加一次，按工具勾选同步；提示词按工具分别维护
-- **用量与额度一目了然** — 不开本地路由也能统计 Token 用量和花费，供应商卡片和托盘上直接显示订阅额度与余额
+- **会话读得懂** — 把各工具的会话记录整理成阅读页：每一轮做了什么、改了哪些文件、哪一步失败了，一目了然
+- **用量与额度一目了然** — 不开本地路由也能统计 Token 用量和花费；供应商卡片和托盘上直接显示订阅额度剩余量与账户余额
 - **跨平台** — 基于 Tauri 2 构建的原生桌面应用，支持 Windows、macOS 和 Linux
 - **小工具** - 内置了多种小工具来解决首次安装登录确认、禁止签名、插件拓展同步等多种功能
 
 ## 界面预览
 
-|                  主界面                   |                  添加供应商                  |
-| :---------------------------------------: | :------------------------------------------: |
-| ![主界面](assets/screenshots/main-zh.png) | ![添加供应商](assets/screenshots/add-zh.png) |
+<table>
+<tr>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/main-zh.png" alt="主界面：侧边栏、直连 / 路由 / 聚合标签和供应商卡片" width="400"><br>主界面</td>
+<td align="center" width="50%"><img src="assets/release-notes/v4.0.0/apps-zh.png" alt="应用页：集中管理各个 AI 编程工具的版本、安装与升级" width="400"><br>应用页</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-zh.png" alt="聚合模式：一家默认供应商，另外添加了多家" width="400"><br>聚合模式</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/agg-codex-zh.png" alt="Codex 的模型选择器里同时列出多家供应商的模型" width="400"><br>Codex 里的聚合模型列表</td>
+</tr>
+<tr>
+<td align="center"><img src="assets/release-notes/v4.0.0/session-zh.png" alt="会话阅读页：执行过程摘要、工具调用详情和对话目录" width="400"><br>会话阅读页</td>
+<td align="center"><img src="assets/release-notes/v4.0.0/usage-zh.png" alt="用量统计：热力图与请求日志" width="400"><br>用量统计</td>
+</tr>
+</table>
 
 ## 功能特性
 
@@ -226,10 +243,10 @@ Claude Code、Codex、Gemini CLI 等 AI 编程工具各有各的配置格式。�
 
 ### 供应商管理
 
-- **90+ 供应商预设** — 选择预设、填入 Key 即可添加，也可以创建自定义配置
-- **只改关键字段** — 切换时只替换请求地址、Key、模型等连接信息，插件、Hook、MCP、你自己加的设置和注释都原样保留
-- **项目** — 把 Claude Code 或 Codex 当前的供应商、MCP、Skills 和提示词文件保存为一个项目（Claude Desktop 只保存供应商），之后在主页顶部的项目切换器或托盘里一键整套切换；切到其他项目时，当前状态会自动存回原项目
-- **OAuth 认证中心（Beta）** — 在「设置 → 认证」里登录多个 GitHub Copilot、ChatGPT、xAI（Grok）账号，把订阅当作供应商用在 Claude Code、Claude Desktop 和 Codex 中（除 Codex 的 OpenAI Official 外，都需要开启本地路由）。在官方客户端以外使用订阅可能违反厂商的服务条款，请自行评估风险
+- **90+ 供应商预设** — 选择预设、填入 Key 即可添加，也可以创建自定义配置。添加面板支持按中文名和域名搜索，同一家的不同套餐和地区合并成一行
+- **只改关键字段** — 切换时只替换请求地址、Key、模型等连接信息，插件、Hook、MCP、你自己加的设置和注释都原样保留；编辑器底部显示切换后配置文件的样子，CC Switch 第一次改写配置文件前会自动备份原文件
+- **项目** — 把 Claude Code 或 Codex 当前的供应商、MCP、Skills 和提示词文件保存为一个项目（Claude Desktop 只保存供应商），之后在页面顶部的项目切换器或托盘里一键整套切换；切到其他项目时，当前状态会自动存回原项目。项目切换器默认隐藏，在「设置 → 通用」里打开“显示项目切换”
+- **授权中心（Beta）** — 在侧栏的「授权中心」里登录多个 GitHub Copilot、ChatGPT、xAI（Grok）账号，把订阅当作供应商用在 Claude Code、Claude Desktop 和 Codex 中（除 Codex 的 OpenAI Official 外，都需要在路由模式下使用）。在官方客户端以外使用订阅可能违反厂商的服务条款，请自行评估风险
 - **Claude Desktop 接入第三方** — 可以直连 Anthropic 兼容端点；非 Claude 模型选“模型映射”，经本地路由把 Sonnet、Opus、Haiku 等档位映射到供应商的实际模型
 - **通用供应商** — 一份配置同步到 Claude Code、Codex 和 Gemini CLI
 - 一键切换、系统托盘快速访问、拖拽排序、导入导出
@@ -237,10 +254,11 @@ Claude Code、Codex、Gemini CLI 等 AI 编程工具各有各的配置格式。�
 ### 代理与故障转移
 
 - **接口格式转换** — 本地路由在 Anthropic Messages、OpenAI Chat Completions、OpenAI Responses 和 Gemini Native 之间转换请求格式：Claude Code 和 Claude Desktop 可以使用 OpenAI 或 Gemini 格式的供应商，Codex 和 Grok Build 可以使用 Chat Completions 或 Anthropic Messages 格式的供应商
-- **按工具开启** — Claude Code、Codex、Gemini CLI、Grok Build 可以分别开启本地路由；开启后，切换供应商会立即作用于后续请求（如果切换改变了模型，Codex、Gemini CLI 和 Grok Build 仍可能需要重启）
+- **按工具开启** — Claude Code、Codex、Gemini CLI、Grok Build 可以分别进入路由模式：在页面顶部的「路由」标签里点“开始路由”。路由模式下，切换供应商会立即作用于后续请求（如果切换改变了模型，Codex、Gemini CLI 和 Grok Build 仍可能需要重启）。退出 CC Switch 时会先写回直连配置，下次启动再接上
 - **自动故障转移** — 为每个工具配置故障转移队列，请求失败时按队列顺序自动改用下一个供应商，配合熔断器和供应商健康监控
 - **整流器** — 自动修正部分上游不兼容的请求（如 Thinking 签名、不支持图片时降级）
 - 官方供应商（如 Claude Official）不能走本地路由（Codex 的 OpenAI Official 除外）
+- 路由服务的状态、监听地址和故障转移参数集中在「设置 → 本地路由」
 - 使用攻略：[在 Claude Code 中使用 GPT](docs/guides/claude-codex-routing-guide-zh.md) · [在 Codex 中使用 Claude](docs/guides/codex-claude-routing-guide-zh.md)
 
 ### MCP、Prompts 与 Skills
@@ -286,6 +304,19 @@ Cli-Switch 支持九个工具：**Claude Code**、**Claude Desktop**、**Codex**
 </details>
 
 <details>
+<summary><strong>Codex 聚合模式下，/model 里看不到聚合的模型？</strong></summary>
+
+Codex 只在启动时读取模型列表。进入或退出聚合模式、添加或移除聚合的供应商、改动某家的聚合模型之后，都要彻底重启 Codex 才能看到新的列表：
+
+- **Codex CLI**：只关掉终端重开 `codex` 不够。所有终端里的 `codex` 共用一个后台守护进程，要重启它才会读到新列表。CC Switch 检测到 Codex 还在用旧列表时，会在 Codex 页面顶部提示，点提示里的“重启 Codex 守护进程”即可。重启会中断守护进程里正在运行的任务。
+- **Codex 桌面版**：要彻底退出后重新打开（macOS 上按 ⌘Q，只关窗口不行）。
+- **编辑器插件**：重开编辑器窗口。
+
+Claude Code 不受影响，聚合模型改动立即生效。
+
+</details>
+
+<details>
 <summary><strong>切换供应商会改掉我的插件、Hook 等设置吗？</strong></summary>
 
 不会。Claude Code、Codex、Gemini CLI、Grok Build 切换供应商时，Cli-Switch 只替换配置文件里的**关键字段**：请求地址、Key、模型名和接口协议（Codex 还包括推理档位，Gemini CLI 还包括认证方式），以及少数跟着供应商走的兼容选项（如 Claude Code 的“禁用 Artifact 工具”、上下文窗口）。插件、Hook、权限、MCP、你自己加的环境变量、注释和排版都原样保留，对所有供应商生效。
@@ -306,7 +337,7 @@ Cli-Switch 支持九个工具：**Claude Code**、**Claude Desktop**、**Codex**
 </details>
 
 <details>
-<summary><strong>为什么总有一个正在激活中的供应商无法删除？</strong></summary>
+<summary><strong>为什么总有一个正在使用的供应商无法删除？</strong></summary>
 
 本软件的设计原则是“最小侵入性”，即使卸载本软件，也不会影响应用的正常使用。
 
@@ -321,16 +352,16 @@ Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build 的供应商列�
 
 Codex 还可以在 Cli-Switch 里用“使用 ChatGPT 登录”登录多个 ChatGPT 账号，再为每张 **OpenAI Official** 卡片选择“使用的账号”，多个 Plus、Pro 或 Team 账号之间一键切换；选择“跟随 Codex 登录”的卡片则沿用 Codex CLI 自己的登录。
 
-注意：开启本地路由时不能切换到官方供应商，Codex 的 OpenAI Official 卡片除外。
+注意：官方订阅用的是工具自己的登录，不经过本地路由。路由模式下不能切换到官方供应商（Codex 的 OpenAI Official 卡片除外），先回到直连即可。
 
 </details>
 
 <details>
-<summary><strong>开启本地路由后，配置文件里的地址为什么变成了 127.0.0.1？</strong></summary>
+<summary><strong>开始路由后，配置文件里的地址为什么变成了 127.0.0.1？</strong></summary>
 
 开启本地路由后，工具的请求会先发到 Cli-Switch 的本地路由（默认 `http://127.0.0.1:15721`），再由 Cli-Switch 转发给你选中的供应商。所以工具的配置文件里只有本地地址和占位密钥 `PROXY_MANAGED`；Claude Code 的模型名还会写成 `claude-sonnet-5` 之类的固定别名（`/model` 菜单里仍显示真实模型名）。真实的供应商地址、密钥和模型都保存在 Cli-Switch 里。
 
-在「设置 → 使用统计 → 请求日志」里可以看到每条请求的“请求模型 → 实际模型”。
+在侧栏「用量统计」的请求日志里可以看到每条请求的“请求模型 → 实际模型”。
 
 开启本地路由期间，切换的是本地路由使用的供应商，开启前在用的供应商保持不变，卡片上标“直连”。关闭本地路由后，配置文件会写回这个直连供应商的配置。退出 Cli-Switch 时也会先写回直连供应商，下次启动再重新接上本地路由。
 
@@ -339,16 +370,16 @@ Codex 还可以在 Cli-Switch 里用“使用 ChatGPT 登录”登录多个 Chat
 <details>
 <summary><strong>能在 Claude Code 里使用 OpenAI 兼容接口、Gemini 或本地模型吗？</strong></summary>
 
-可以，但需要开启本地路由。编辑供应商时，在“高级选项”的“上游格式”里选择和供应商一致的接口格式：只提供 Chat Completions 接口的服务（很多本地模型服务都是这样）选“OpenAI Chat Completions”，提供 Responses 接口的选“OpenAI Responses API”，Gemini 选“Gemini Native generateContent”。然后按[快速开始](#快速开始)第 5 步为 Claude Code 开启本地路由。格式选错或没有开启本地路由，通常会报 404 或 405 错误。
+可以，但需要使用路由。编辑供应商时，在“高级选项”的“上游格式”里选择和供应商一致的接口格式：只提供 Chat Completions 接口的服务（很多本地模型服务都是这样）选“OpenAI Chat Completions”，提供 Responses 接口的选“OpenAI Responses API”，Gemini 选“Gemini Native generateContent”。然后在 Claude Code 页面的「路由」标签里点“开始路由”。格式选错或没有开始路由，通常会报 404 或 405 错误。
 
-反过来，在 Codex 或 Grok Build 的“上游格式”里选“Anthropic Messages”，就能使用 Claude 格式的供应商，同样需要开启本地路由。详见[在 Claude Code 中使用 GPT](docs/guides/claude-codex-routing-guide-zh.md) 和 [在 Codex 中使用 Claude](docs/guides/codex-claude-routing-guide-zh.md)。
+反过来，在 Codex 或 Grok Build 的“上游格式”里选“Anthropic Messages”，就能使用 Claude 格式的供应商，同样需要路由。详见[在 Claude Code 中使用 GPT](docs/guides/claude-codex-routing-guide-zh.md) 和 [在 Codex 中使用 Claude](docs/guides/codex-claude-routing-guide-zh.md)。
 
 </details>
 
 <details>
 <summary><strong>“检测连通”通过了，为什么请求还是失败？</strong></summary>
 
-供应商卡片上的“检测连通”只检查供应商地址能不能连上，不会发送真实的模型请求，所以验证不了 API Key 和模型名是否正确。请求失败时，请检查 Key、模型名和上游格式；开启本地路由时，还可以在「设置 → 使用统计 → 请求日志」里查看具体报错。
+供应商卡片上的“检测连通”只检查供应商地址能不能连上，不会发送真实的模型请求，所以验证不了 API Key 和模型名是否正确。请求失败时，请检查 Key、模型名和上游格式；经过路由的请求，还可以在侧栏「用量统计」的请求日志里查看具体报错。
 
 </details>
 
@@ -360,7 +391,7 @@ Codex 还可以在 Cli-Switch 里用“使用 ChatGPT 登录”登录多个 Chat
 
 - **数据库**：`cc-switch.db`（SQLite — 供应商、MCP、提示词、Skills、项目、用量记录等）
 - **本地设置**：`settings.json`（设备级设置，如各工具的配置目录、备份策略、云同步连接信息）
-- **备份**：`backups/`（默认每 24 小时自动备份一次、保留最近 10 个，可在「设置 → 高级 → 备份与恢复」中调整）
+- **备份**：`backups/`（默认每 24 小时自动备份一次、保留最近 10 个，可在「设置 → 数据 → 备份与恢复」中调整；下方的“其他备份”列出其余备份的位置和大小，可以按类别清理）
 - **Skills**：`skills/`（可在设置中改为 `~/.agents/skills`），默认通过软链接同步到各工具，失败时改为复制
 - **技能备份**：`skill-backups/`（卸载或更新技能前自动创建，保留最近 20 个）
 - **OAuth 登录凭据**：`copilot_auth.json`、`codex_oauth_auth.json`、`xai_oauth_auth.json`
@@ -377,7 +408,7 @@ Codex 还可以在 Cli-Switch 里用“使用 ChatGPT 登录”登录多个 Chat
 
 Cli-Switch 不会自动识别 WSL。请在「设置 → 高级 → 配置文件目录 → 配置目录覆盖（高级）」里，把对应工具的目录改成 WSL 里的路径，例如 `\\wsl.localhost\Ubuntu\home\<用户名>\.claude`，保存后 Cli-Switch 就会读写 WSL 里的配置（Claude Code、Codex、Gemini CLI、Grok Build、OpenCode、OpenClaw、Hermes、Pi 支持设置）。设置之后，「关于」页也会在对应的 WSL 发行版里检测和升级该工具。
 
-注意：本地路由写入配置的地址是 `127.0.0.1`。WSL2 默认的 NAT 网络模式下，WSL 里的 `127.0.0.1` 连不到 Windows 上的本地路由，需要改用 WSL 的 mirrored 网络模式。
+注意：路由和聚合写入配置的地址是 `127.0.0.1`。WSL2 默认的 NAT 网络模式下，WSL 里的 `127.0.0.1` 连不到 Windows 上的本地路由，需要改用 WSL 的 mirrored 网络模式。
 
 </details>
 

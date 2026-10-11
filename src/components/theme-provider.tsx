@@ -34,9 +34,32 @@ export function applyAdeTheme(theme: AdeTheme) {
   if (typeof document === "undefined") return;
 
   const root = document.documentElement;
+  const adeClass = theme === "light" ? "ade-theme-light" : "ade-theme-dark";
+  if (
+    root.classList.contains(theme) &&
+    root.classList.contains(adeClass) &&
+    !root.classList.contains(theme === "light" ? "dark" : "light")
+  ) {
+    return;
+  }
+
+  // 切换期间暂停所有过渡（`.theme-switching`），否则各处的 transition-colors
+  // 会让颜色一块块慢慢变过去。
+  root.classList.add("theme-switching");
   root.classList.remove("light", "dark", "ade-theme-dark", "ade-theme-light");
   root.classList.add(theme);
-  root.classList.add(theme === "light" ? "ade-theme-light" : "ade-theme-dark");
+  root.classList.add(adeClass);
+  // 强制重排一次，让不带过渡的新颜色先落定，再在第二帧恢复过渡。
+  void document.body?.offsetHeight;
+  if (typeof window !== "undefined" && window.requestAnimationFrame) {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        root.classList.remove("theme-switching");
+      });
+    });
+  } else {
+    root.classList.remove("theme-switching");
+  }
 }
 
 function resolveSystemTheme(): AdeTheme {
