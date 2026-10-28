@@ -125,7 +125,7 @@ pub struct WebDavSyncStatus {
 }
 
 fn default_remote_root() -> String {
-    "cc-switch-sync".to_string()
+    "cli-switch-sync".to_string()
 }
 fn default_profile() -> String {
     "default".to_string()
@@ -173,14 +173,14 @@ impl WebDavSyncSettings {
         if self.base_url.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "webdav.base_url.required",
-                "WebDAV 地址不能为空",
+                "WebDAV URL is required.",
                 "WebDAV URL is required.",
             ));
         }
         if self.username.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "webdav.username.required",
-                "WebDAV 用户名不能为空",
+                "WebDAV username is required.",
                 "WebDAV username is required.",
             ));
         }
@@ -254,28 +254,28 @@ impl S3SyncSettings {
         if self.bucket.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "s3.bucket.required",
-                "S3 存储桶不能为空",
+                "S3 bucket is required.",
                 "S3 bucket is required.",
             ));
         }
         if self.region.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "s3.region.required",
-                "S3 区域不能为空",
+                "S3 region is required.",
                 "S3 region is required.",
             ));
         }
         if self.access_key_id.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "s3.access_key_id.required",
-                "S3 Access Key ID 不能为空",
+                "S3 Access Key ID is required.",
                 "S3 Access Key ID is required.",
             ));
         }
         if self.secret_access_key.trim().is_empty() {
             return Err(crate::error::AppError::localized(
                 "s3.secret_access_key.required",
-                "S3 Secret Access Key 不能为空",
+                "S3 Secret Access Key is required.",
                 "S3 Secret Access Key is required.",
             ));
         }
@@ -456,10 +456,10 @@ pub struct AppSettings {
     #[serde(default = "default_session_auto_sync_enabled")]
     pub session_auto_sync_enabled: bool,
     /// Whether to show the failover toggle independently on the main page
-    #[serde(default)]
+    #[serde(default = "default_enable_failover_toggle")]
     pub enable_failover_toggle: bool,
     /// Whether to show the project profile switcher on the main page header
-    #[serde(default)]
+    #[serde(default = "default_show_profile_switcher")]
     pub show_profile_switcher: bool,
     /// Show the provider search button in the provider page header (on by default;
     /// Cmd/Ctrl+F still opens the search when it is hidden)
@@ -524,6 +524,9 @@ pub struct AppSettings {
     pub common_config_confirmed: Option<bool>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
+    /// User has confirmed the language picker (shown once per install/update).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language_picker_confirmed: Option<bool>,
     /// 按档的额度百分比写「剩余」还是「已用」（`"left"` / `"used"`，缺省为剩余）。卡片、
     /// 授权中心和托盘一起变；余额、Credits、重置次数不受影响（#8024）
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -641,6 +644,14 @@ fn default_minimize_to_tray_on_close() -> bool {
     true
 }
 
+fn default_show_profile_switcher() -> bool {
+    true
+}
+
+fn default_enable_failover_toggle() -> bool {
+    true
+}
+
 fn default_session_auto_sync_enabled() -> bool {
     true
 }
@@ -663,8 +674,8 @@ impl Default for AppSettings {
             usage_dashboard_refresh_interval_ms: None,
             usage_display: None,
             session_auto_sync_enabled: true,
-            enable_failover_toggle: false,
-            show_profile_switcher: false,
+            enable_failover_toggle: true,
+            show_profile_switcher: true,
             show_provider_search: true,
             check_tool_updates_on_startup: false,
             native_tray_menu: false,
@@ -681,6 +692,7 @@ impl Default for AppSettings {
             whats_new_seen_version: None,
             common_config_confirmed: None,
             language: None,
+            language_picker_confirmed: None,
             quota_display: None,
             visible_apps: None,
             app_order: None,
@@ -724,11 +736,7 @@ impl AppSettings {
 
     fn settings_path() -> Option<PathBuf> {
         // settings.json 保留用于旧版本迁移和无数据库场景
-        Some(
-            crate::config::get_home_dir()
-                .join(".cc-switch")
-                .join("settings.json"),
-        )
+        Some(crate::config::device_dir().join("settings.json"))
     }
 
     fn normalize_paths(&mut self) {
@@ -799,7 +807,7 @@ impl AppSettings {
             .language
             .as_ref()
             .map(|s| s.trim())
-            .filter(|s| matches!(*s, "en" | "zh" | "zh-TW" | "ja" | "tr"))
+            .filter(|s| matches!(*s, "en" | "zh" | "zh-TW" | "ja" | "tr" | "vi"))
             .map(|s| s.to_string());
 
         self.quota_display = self
@@ -965,7 +973,9 @@ fn backup_settings_file(path: &Path) -> std::io::Result<PathBuf> {
 
 fn save_settings_file(settings: &AppSettings) -> Result<(), AppError> {
     let Some(path) = AppSettings::settings_path() else {
-        return Err(AppError::Config("无法获取用户主目录".to_string()));
+        return Err(AppError::Config(
+            "Cannot determine user home directory".to_string(),
+        ));
     };
     write_settings_to_path(&path, settings, &SETTINGS_BACKUP_PENDING)
 }

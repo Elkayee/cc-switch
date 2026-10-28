@@ -2,9 +2,9 @@
 
 ## Supported Versions / 支持的版本
 
-Only the latest release of CC Switch receives security updates.
+Only the latest release of Cli-Switch receives security updates.
 
-仅最新版本的 CC Switch 会收到安全更新。
+仅最新版本的 Cli-Switch 会收到安全更新。
 
 | Version / 版本 | Supported / 是否支持 |
 |----------------|---------------------|
@@ -13,9 +13,9 @@ Only the latest release of CC Switch receives security updates.
 
 ## Threat Model / 威胁模型
 
-CC Switch is a local desktop application. It manages configuration files for AI coding CLIs on the user's own machine. There is no project-operated cloud backend, no multi-user model, and no privilege separation from the user who runs it.
+Cli-Switch is a local desktop application. It manages configuration files for AI coding CLIs on the user's own machine. There is no project-operated cloud backend, no multi-user model, and no privilege separation from the user who runs it.
 
-CC Switch 是一个本地桌面应用，用于管理本机上各 AI 编程 CLI 的配置文件。本项目不运营任何云端后端，没有多用户模型，也不与运行它的用户之间存在权限隔离。
+Cli-Switch 是一个本地桌面应用，用于管理本机上各 AI 编程 CLI 的配置文件。本项目不运营任何云端后端，没有多用户模型，也不与运行它的用户之间存在权限隔离。
 
 It does, however, run a **local HTTP proxy** whose listen address and port are user-configurable and **may be bound to a non-loopback interface**. Requests arriving at that listener are untrusted input and are in scope — see Scope below.
 
@@ -104,9 +104,9 @@ Inputs that genuinely cross a trust boundary:
 
 **请不要通过公开的 GitHub Issue 报告安全漏洞。**
 
-Instead, please report them through [GitHub Security Advisories](https://github.com/farion1231/cc-switch/security/advisories/new).
+Instead, please report them through [GitHub Security Advisories](../../security/advisories/new).
 
-请通过 [GitHub 安全公告](https://github.com/farion1231/cc-switch/security/advisories/new) 进行报告。
+请通过 [GitHub 安全公告](../../security/advisories/new) 进行报告。
 
 When reporting, please include:
 
@@ -155,6 +155,6 @@ Severity is scored with CVSS (v3.1 or v4.0), and the vector will reflect any req
 
 ## Security Updates / 安全更新
 
-Security fixes are released as patch versions and announced via [GitHub Releases](https://github.com/farion1231/cc-switch/releases). We recommend always updating to the latest version.
+Security fixes are released as patch versions and announced via [GitHub Releases](../../releases). We recommend always updating to the latest version.
 
-安全修复通过补丁版本发布，并通过 [GitHub Releases](https://github.com/farion1231/cc-switch/releases) 通知。建议始终更新到最新版本。
+安全修复通过补丁版本发布，并通过 [GitHub Releases](../../releases) 通知。建议始终更新到最新版本。

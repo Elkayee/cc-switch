@@ -127,10 +127,7 @@ export interface ClaudeDesktopModelRoute {
 }
 
 export type CodexChatThinkingParam =
-  | "none"
-  | "thinking"
-  | "enable_thinking"
-  | "reasoning_split";
+  "none" | "thinking" | "enable_thinking" | "reasoning_split";
 
 export type CodexChatEffortParam =
   | "none"
@@ -196,10 +193,7 @@ export interface ProviderMeta {
   // - "openai_responses": OpenAI Responses API 格式，需要格式转换
   // - "gemini_native": Gemini Native generateContent API 格式，需要格式转换
   apiFormat?:
-    | "anthropic"
-    | "openai_chat"
-    | "openai_responses"
-    | "gemini_native";
+    "anthropic" | "openai_chat" | "openai_responses" | "gemini_native";
   // Managed Codex Copilot uses this instead of apiFormat. Missing/unknown means auto.
   // Keep the raw string so selections from newer versions survive an edit/save.
   codexCopilotApiFormat?: string;
@@ -264,10 +258,7 @@ export type SkillStorageLocation = "cc_switch" | "unified";
 // - "openai_responses": OpenAI Responses API 格式，需要格式转换
 // - "gemini_native": Gemini Native generateContent API 格式，需要格式转换
 export type ClaudeApiFormat =
-  | "anthropic"
-  | "openai_chat"
-  | "openai_responses"
-  | "gemini_native";
+  "anthropic" | "openai_chat" | "openai_responses" | "gemini_native";
 
 // Codex API 格式类型
 // - "openai_responses": OpenAI Responses API 格式，直接透传
@@ -405,7 +396,7 @@ export interface Settings {
   launchOnStartup?: boolean;
   // 静默启动（程序启动时不显示主窗口）
   silentStartup?: boolean;
-  // 是否启用主页面本地代理功能（默认关闭）
+  // 是否启用主页面本地代理功能（默认开启）
   enableLocalProxy?: boolean;
   // 是否在主页面显示 Stack 模式开关（默认关闭）。和 enableLocalProxy 二选一，只影响 Claude Code、Codex
   enableStackMode?: boolean;
@@ -418,7 +409,7 @@ export interface Settings {
   usageDisplay?: UsageDisplaySettings;
   // 会话用量自动扫描开关（默认开启=自动模式；关闭后仅手动同步时扫描会话日志，代理记账不受影响）
   sessionAutoSyncEnabled?: boolean;
-  // Whether to show the failover toggle independently on the main page
+  // Whether to show the failover toggle independently on the main page (default on)
   enableFailoverToggle?: boolean;
   // Whether to show the project profile switcher on the main page header
   showProfileSwitcher?: boolean;
@@ -458,7 +449,9 @@ export interface Settings {
   // User has confirmed the common config first-run notice
   commonConfigConfirmed?: boolean;
   // 首选语言（可选，默认中文）
-  language?: "en" | "zh" | "zh-TW" | "ja" | "tr";
+  language?: "en" | "zh" | "zh-TW" | "ja" | "tr" | "vi";
+  // User has confirmed the first-run / new-language picker
+  languagePickerConfirmed?: boolean;
   // 按档的额度百分比写剩余还是已用（默认剩余；余额、Credits 不受影响）
   quotaDisplay?: "left" | "used";
 
@@ -562,11 +555,7 @@ export type ToolKind =
   | "other";
 
 export type ToolStatus =
-  | "success"
-  | "error"
-  | "interrupted"
-  | "pending"
-  | "unknown";
+  "success" | "error" | "interrupted" | "pending" | "unknown";
 
 export type EventKind =
   | "aborted"

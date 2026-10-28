@@ -22,7 +22,7 @@ pub fn prompt_file_path(app: &AppType) -> Result<PathBuf, AppError> {
     if matches!(app, AppType::ClaudeDesktop) {
         return Err(AppError::localized(
             "app.prompts_unsupported",
-            "当前应用暂不支持 Prompts",
+            "This app does not support Prompts",
             "This app does not support Prompts",
         ));
     }
@@ -89,7 +89,7 @@ fn get_base_dir_with_fallback(
         .ok_or_else(|| {
             AppError::localized(
                 "home_dir_not_found",
-                format!("无法确定 {fallback_dir} 配置目录：用户主目录不存在"),
+                format!("Cannot determine {fallback_dir} config directory: user home directory not found"),
                 format!("Cannot determine {fallback_dir} config directory: user home not found"),
             )
         })

@@ -25,6 +25,7 @@ import {
   useRemoveSkillRepo,
   useSearchSkillsSh,
   useSkillRepos,
+  useUninstallSkill,
 } from "@/hooks/useSkills";
 import type { AppId } from "@/lib/api/types";
 import type {
@@ -45,8 +46,8 @@ import { CHECKBOX_CLASS } from "@/components/mcp/formBits";
 import { countRepoSkills } from "./RepoManagerPanel";
 import { describeRepoFailures, repoFailureKey } from "./repoFailures";
 
-/** 发现列表每行高度（h-14），虚拟化按这个算 */
-const ROW_HEIGHT = 56;
+/** 发现列表每行高度（h-10），虚拟化按这个算 */
+const ROW_HEIGHT = 40;
 export type SkillsPageSource = "repos" | "skillssh";
 
 type InstallRunner = <T extends { id: string }>(
@@ -59,7 +60,7 @@ type InstallRunner = <T extends { id: string }>(
 
 const SKILLSSH_PAGE_SIZE = 20;
 const POPOVER_CLASS =
-  "z-[110] rounded-panel border border-border bg-surface p-1 text-fg-1 shadow-v7-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2";
+  "z-[110] rounded-[8px] border border-border bg-surface p-1 text-fg-1 shadow-sm outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2";
 
 /** 仓库的增删和停用（发现段的「仓库」弹层和仓库管理抽屉共用） */
 export function useSkillRepoActions() {
@@ -166,7 +167,8 @@ export function SkillsPage({
   initialQuery = "",
 }: SkillsPageProps) {
   const { t, i18n } = useTranslation();
-  const [source, setSource] = useState<SkillsPageSource>("repos");
+  // fork：默认进 skills.sh（空查询 = 热门榜）
+  const [source, setSource] = useState<SkillsPageSource>("skillssh");
   const [query, setQuery] = useState(initialQuery);
   const [statusFilter, setStatusFilter] = useState<"all" | "uninstalled">(
     "all",
@@ -203,6 +205,7 @@ export function SkillsPage({
     refetch: refetchSkillsSh,
   } = useSearchSkillsSh(skillsShQuery, SKILLSSH_PAGE_SIZE, skillsShOffset);
   const installMutation = useInstallSkill();
+  const uninstallMutation = useUninstallSkill();
   const { setRepoEnabled } = useSkillRepoActions();
 
   useEffect(() => {
@@ -338,7 +341,7 @@ export function SkillsPage({
         ].some((value) => value?.toLowerCase().includes(normalizedQuery));
       });
 
-  // 列表虚拟化：几个仓库加起来上千行，只渲染可视区域和前后各几行（每行固定 56）
+  // 列表虚拟化：几个仓库加起来上千行，只渲染可视区域和前后各几行（每行固定 40）
   const listScrollRef = useRef<HTMLDivElement>(null);
   const rowVirtualizer = useVirtualizer({
     count: visibleRows.length,
@@ -400,6 +403,29 @@ export function SkillsPage({
     }
   };
 
+  // 目录名被别的 Skill 占着：先卸掉占用者再装
+  const handleReplace = async (row: DiscoverRow) => {
+    if (installing.has(row.key)) return;
+    const status = statusOf(row);
+    if (status.kind !== "conflict") {
+      await handleInstall(row);
+      return;
+    }
+    try {
+      await uninstallMutation.mutateAsync(status.skill.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      const { title, description } = formatSkillError(
+        message,
+        t,
+        "skills.replaceFailed",
+      );
+      setFailed((prev) => ({ ...prev, [row.key]: description || title }));
+      return;
+    }
+    await handleInstall(row);
+  };
+
   const reload = () => {
     void refetchDiscoverable();
     void refetchRepos();
@@ -429,7 +455,13 @@ export function SkillsPage({
     let buttons: Array<{ label: string; onClick: () => void }> = [];
     if (isSkillsSh) {
       if (skillsShQuery.length < 2) {
-        body = t("skillsPage.discover.skillsShHint");
+        if (skillsShError) {
+          title = t("skills.skillssh.error");
+          buttons = [{ label: t("common.retry"), onClick: retrySkillsSh }];
+        } else {
+          title = t("skills.skillssh.noTrending");
+          body = t("skillsPage.discover.skillsShHint");
+        }
       } else if (skillsShError) {
         title = t("skills.skillssh.error");
         buttons = [{ label: t("common.retry"), onClick: retrySkillsSh }];
@@ -490,9 +522,15 @@ export function SkillsPage({
     }
     return (
       <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-        {title && <h2 className="m-0 text-section">{title}</h2>}
+        {title && (
+          <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
+            {title}
+          </h2>
+        )}
         {body && (
-          <p className="m-0 max-w-[460px] text-body text-fg-2">{body}</p>
+          <p className="m-0 max-w-[460px] text-[12.35px] leading-[1.3] text-fg-2">
+            {body}
+          </p>
         )}
         {buttons.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2 pt-1">
@@ -531,7 +569,15 @@ export function SkillsPage({
             className="w-[240px] min-w-[160px] shrink"
             inputId="sk-discover-search"
             value={query}
-            onValueChange={setQuery}
+            onValueChange={(value) => {
+              setQuery(value);
+              // 清空搜索词 = 回到热门榜
+              if (isSkillsSh && value.trim() === "" && skillsShQuery !== "") {
+                setSkillsShOffset(0);
+                setAccumulated([]);
+                setSkillsShQuery("");
+              }
+            }}
             onEnter={isSkillsSh ? submitSkillsSh : undefined}
             placeholder={
               isSkillsSh
@@ -561,14 +607,14 @@ export function SkillsPage({
           onValueChange={setSource}
           items={[
             {
+              value: "skillssh",
+              label: "skills.sh",
+            },
+            {
               value: "repos",
               label: t("skillsPage.discover.sourceRepos", {
                 count: enabledRepos.length,
               }),
-            },
-            {
-              value: "skillssh",
-              label: "skills.sh",
             },
           ]}
         />
@@ -581,7 +627,7 @@ export function SkillsPage({
               onToggle={setRepoEnabled}
               onManage={onOpenRepoManager}
             />
-            <label className="flex h-7 shrink-0 cursor-pointer items-center gap-2 rounded-control px-2 text-body text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1">
+            <label className="flex h-7 shrink-0 cursor-pointer items-center gap-2 rounded-[4px] px-2 text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1">
               <input
                 type="checkbox"
                 className={CHECKBOX_CLASS}
@@ -642,12 +688,17 @@ export function SkillsPage({
       )}
 
       <div className="flex min-h-0 flex-1 flex-col px-6 pb-5">
+        {isSkillsSh && skillsShQuery.length < 2 && accumulated.length > 0 && (
+          <p className="m-0 mb-2 text-[12.35px] leading-[1.3] font-medium text-fg-2">
+            {t("skills.skillssh.trending")}
+          </p>
+        )}
         <div
           ref={listScrollRef}
-          className="min-h-0 overflow-auto scroll-stable rounded-panel border border-border bg-surface"
+          className="min-h-0 overflow-auto scroll-stable rounded-[8px] border border-border bg-surface"
         >
           {loadingList ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-body text-fg-2">
+            <div className="flex items-center justify-center gap-2 py-16 text-[12.35px] leading-[1.3] text-fg-2">
               <Loader2 className="h-4 w-4 animate-spin" />
               {isSkillsSh ? t("skills.skillssh.loading") : t("skills.loading")}
             </div>
@@ -677,20 +728,20 @@ export function SkillsPage({
                     aria-setsize={visibleRows.length}
                     aria-posinset={index + 1}
                     className={cn(
-                      "absolute inset-x-0 top-0 flex h-14 items-center gap-3 pe-3 ps-4",
+                      "absolute inset-x-0 top-0 flex h-10 items-center gap-2 px-2",
                       index > 0 && "border-t border-border",
                     )}
                     style={{ transform: `translateY(${item.start}px)` }}
                   >
                     <div className="flex min-w-0 flex-1 flex-col">
                       <div className="flex min-w-0 items-center gap-1.5">
-                        <span className="min-w-0 truncate text-body font-medium">
+                        <span className="min-w-0 truncate text-[12.35px] leading-[1.3] font-medium">
                           {row.name}
                         </span>
                         {showDir && (
                           <span
                             title={row.directory}
-                            className="min-w-0 shrink truncate font-mono text-caption text-fg-3"
+                            className="min-w-0 shrink truncate font-mono text-[12.35px] leading-[1.3] text-fg-3"
                           >
                             {row.directory}
                           </span>
@@ -700,7 +751,7 @@ export function SkillsPage({
                         )}
                         {typeof row.installs === "number" && (
                           <span
-                            className="inline-flex shrink-0 items-center gap-0.5 text-caption text-fg-2"
+                            className="inline-flex shrink-0 items-center gap-0.5 text-[12.35px] leading-[1.3] text-fg-2"
                             title={t("skills.skillssh.installs", {
                               count: row.installs,
                             })}
@@ -717,7 +768,7 @@ export function SkillsPage({
                       <span
                         id={line2Id}
                         className={cn(
-                          "truncate text-caption",
+                          "truncate text-[12.35px] leading-[1.3]",
                           failure ? "text-danger-text" : "text-fg-2",
                         )}
                         title={failure ?? row.description}
@@ -731,7 +782,7 @@ export function SkillsPage({
                             : row.description}
                       </span>
                     </div>
-                    <div className="flex w-[180px] shrink-0 justify-end">
+                    <div className="flex w-[240px] shrink-0 justify-end">
                       {status.kind === "installed" ? (
                         <button
                           type="button"
@@ -740,7 +791,7 @@ export function SkillsPage({
                             name: row.name,
                             count: enabledAppCount(status.skill),
                           })}
-                          className="inline-flex h-7 items-center gap-0.5 rounded-control px-2 text-body text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
+                          className="inline-flex h-7 items-center gap-0.5 rounded-[4px] px-2 text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
                         >
                           {t("skillsPage.discover.installed", {
                             count: enabledAppCount(status.skill),
@@ -751,22 +802,35 @@ export function SkillsPage({
                           />
                         </button>
                       ) : status.kind === "conflict" ? (
-                        <button
-                          type="button"
-                          onClick={() => onShowInstalled(status.skill.id)}
-                          className="inline-flex min-w-0 items-center gap-0.5 rounded-control px-1 text-right text-caption text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
-                        >
-                          <span className="min-w-0 truncate">
-                            {t("skillsPage.discover.dirTaken", {
-                              name: status.skill.name,
-                              source: sourceLabel(status.skill),
-                            })}
-                          </span>
-                          <ChevronRight
-                            className="h-3.5 w-3.5 shrink-0"
-                            strokeWidth={2}
-                          />
-                        </button>
+                        <div className="flex min-w-0 items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onShowInstalled(status.skill.id)}
+                            className="inline-flex min-w-0 items-center gap-0.5 rounded-[4px] px-1 text-right text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
+                          >
+                            <span className="min-w-0 truncate">
+                              {t("skillsPage.discover.dirTaken", {
+                                name: status.skill.name,
+                                source: sourceLabel(status.skill),
+                              })}
+                            </span>
+                            <ChevronRight
+                              className="h-3.5 w-3.5 shrink-0"
+                              strokeWidth={2}
+                            />
+                          </button>
+                          <Button
+                            type="button"
+                            variant="neutral"
+                            size="compact"
+                            className="shrink-0"
+                            disabled={!row.repoOwner}
+                            aria-label={t("skills.replace") + " " + row.name}
+                            onClick={() => void handleReplace(row)}
+                          >
+                            {t("skills.replace")}
+                          </Button>
+                        </div>
                       ) : isInstalling ? (
                         <Button
                           type="button"
@@ -776,7 +840,7 @@ export function SkillsPage({
                           aria-label={t("skillsPage.discover.installingAria", {
                             name: row.name,
                           })}
-                          className="cursor-not-allowed ps-2.5"
+                          className="cursor-not-allowed ps-2"
                         >
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                           {t("skillsPage.discover.installing")}
@@ -827,7 +891,7 @@ export function SkillsPage({
                 {t("skills.skillssh.loadMore")}
               </Button>
             )}
-            <span className="text-caption text-fg-3">
+            <span className="text-[12.35px] leading-[1.3] text-fg-3">
               {t("skills.skillssh.poweredBy")}
             </span>
           </div>
@@ -861,7 +925,7 @@ function InstallToPopover({
           variant="neutral"
           size="regular"
           title={fullLabel}
-          className="min-w-0 shrink pe-2.5"
+          className="min-w-0 shrink pe-2"
         >
           <span className="min-w-0 truncate">
             {t("skillsPage.installTo.prefix")}
@@ -875,10 +939,10 @@ function InstallToPopover({
           align="end"
           sideOffset={6}
           collisionPadding={8}
-          className={cn(POPOVER_CLASS, "flex w-[280px] flex-col gap-2.5 p-3")}
+          className={cn(POPOVER_CLASS, "flex w-[280px] flex-col gap-2 p-3")}
         >
           <div className="flex items-center gap-0.5">
-            <h3 className="m-0 text-caption font-semibold text-fg-2">
+            <h3 className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
               {t("skillsPage.installTo.title")}
             </h3>
             <HelpTip title={t("skillsPage.installTo.helpTitle")}>
@@ -891,7 +955,7 @@ function InstallToPopover({
               return (
                 <label
                   key={app}
-                  className="flex h-6 cursor-pointer items-center gap-2 text-body"
+                  className="flex h-6 cursor-pointer items-center gap-2 text-[12.35px] leading-[1.3]"
                 >
                   <input
                     type="checkbox"
@@ -951,7 +1015,7 @@ function RepoPopover({
           type="button"
           variant="quiet"
           size="compact"
-          className="pe-1.5 ps-2.5 text-fg-2"
+          className="pe-1.5 ps-2 text-fg-2"
         >
           {label}
           <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
@@ -974,7 +1038,7 @@ function RepoPopover({
               return (
                 <label
                   key={id}
-                  className="flex min-h-8 cursor-pointer items-center gap-2 rounded-control px-2 py-1 transition-colors hover:bg-subtle"
+                  className="flex min-h-8 cursor-pointer items-center gap-2 rounded-[4px] px-2 py-1 transition-colors hover:bg-subtle"
                 >
                   <input
                     type="checkbox"
@@ -985,21 +1049,21 @@ function RepoPopover({
                       void onToggle(repo, event.target.checked)
                     }
                   />
-                  <span className="min-w-0 flex-1 truncate font-mono text-caption">
+                  <span className="min-w-0 flex-1 truncate font-mono text-[12.35px] leading-[1.3]">
                     {id}
                   </span>
-                  <span className="shrink-0 text-caption text-fg-3">
+                  <span className="shrink-0 text-[12.35px] leading-[1.3] text-fg-3">
                     {repo.branch || "main"}
                   </span>
                   {failure ? (
                     <span
-                      className="shrink-0 text-right text-caption text-warning-text"
+                      className="shrink-0 text-right text-[12.35px] leading-[1.3] text-warning-text"
                       title={skillErrorReason(failure.error, t)}
                     >
                       {t("skillsPage.repos.readFailed")}
                     </span>
                   ) : (
-                    <span className="w-12 shrink-0 text-right text-caption tabular-nums text-fg-2">
+                    <span className="w-12 shrink-0 text-right text-[12.35px] leading-[1.3] tabular-nums text-fg-2">
                       {repo.enabled
                         ? countRepoSkills(discoverable, repo)
                         : t("skillsPage.repos.disabledShort")}
@@ -1016,7 +1080,7 @@ function RepoPopover({
               setOpen(false);
               onManage();
             }}
-            className="flex h-8 items-center rounded-control px-2.5 text-left text-body transition-colors hover:bg-subtle"
+            className="flex h-8 items-center rounded-[4px] px-2 text-left text-[12.35px] leading-[1.3] transition-colors hover:bg-subtle"
           >
             {t("skillsPage.repos.manage")}
           </button>

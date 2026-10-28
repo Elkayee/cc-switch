@@ -95,7 +95,7 @@ export const SessionOutline = memo(function SessionOutline({
       aria-label={rt("outlineTitle")}
       className="flex min-h-0 w-[260px] shrink-0 flex-col border-s border-border max-lg:hidden"
     >
-      <div className="flex h-9 shrink-0 items-center px-4 text-caption font-semibold text-fg-2">
+      <div className="flex h-8 shrink-0 items-center px-2 text-[12.35px] leading-[1.3] font-semibold text-fg-2">
         {rt("outlineTitle")}
         <span className="ms-1.5 font-normal tabular-nums text-fg-3">
           {entries.length}
@@ -112,7 +112,7 @@ export const SessionOutline = memo(function SessionOutline({
               key={entry.turn.key}
               data-outline-turn={entry.turn.index}
               className={cn(
-                "relative mb-1 flex flex-col gap-1 rounded-panel px-1.5 py-1.5 transition-colors",
+                "relative mb-1 flex flex-col gap-1 rounded-[8px] px-1.5 py-1.5 transition-colors",
                 active && "bg-subtle",
               )}
             >
@@ -128,7 +128,7 @@ export const SessionOutline = memo(function SessionOutline({
                   type="button"
                   onClick={() => onJumpQuestion(entry.turn)}
                   aria-current={active ? "true" : undefined}
-                  className="group/outline flex min-w-0 flex-col items-end gap-0.5 self-end rounded-control text-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="group/outline flex min-w-0 flex-col items-end gap-0.5 self-end rounded-[4px] text-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="text-[11px] tabular-nums text-fg-3">
                     {t("sessionManager.you", { defaultValue: "你" })}
@@ -138,7 +138,7 @@ export const SessionOutline = memo(function SessionOutline({
                   </span>
                   {/* 人的输入：靠右的小气泡，和正文提问同色 */}
                   <span
-                    className="line-clamp-2 max-w-[200px] break-words rounded-[10px] rounded-se-[3px] px-2 py-1 text-start text-caption text-fg-1 transition-[filter] group-hover/outline:brightness-110"
+                    className="line-clamp-2 max-w-[200px] break-words rounded-[10px] rounded-se-[3px] px-2 py-1 text-start text-[12.35px] leading-[1.3] text-fg-1 transition-[filter] group-hover/outline:brightness-110"
                     style={{
                       background:
                         "color-mix(in srgb, var(--reader-accent) 14%, var(--bg-subtle))",
@@ -152,7 +152,7 @@ export const SessionOutline = memo(function SessionOutline({
               <button
                 type="button"
                 onClick={() => onJumpReply(entry.turn)}
-                className="group/outline flex min-w-0 items-start gap-1.5 rounded-control text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="group/outline flex min-w-0 items-start gap-1.5 rounded-[4px] text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {/* AI 的输出：靠左，带 Agent 头像，正文不加底色 */}
                 <span className="mt-0.5 origin-top-left scale-[0.72]">
@@ -171,7 +171,7 @@ export const SessionOutline = memo(function SessionOutline({
                   </span>
                   <span
                     className={cn(
-                      "line-clamp-2 break-words text-caption transition-colors group-hover/outline:text-fg-1",
+                      "line-clamp-2 break-words text-[12.35px] leading-[1.3] transition-colors group-hover/outline:text-fg-1",
                       entry.reply ? "text-fg-2" : "italic text-fg-3",
                     )}
                   >

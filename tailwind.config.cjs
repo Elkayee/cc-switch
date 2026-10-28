@@ -4,6 +4,9 @@ module.exports = {
   darkMode: ["selector", ".dark"],
   theme: {
     extend: {
+      borderColor: {
+        DEFAULT: "hsl(var(--border))",
+      },
       // v7 禁用态统一 0.45（tokens.css 的 [aria-disabled] 规则）
       opacity: { 45: "0.45" },
       colors: {
@@ -190,32 +193,9 @@ module.exports = {
         metric: ["24px", { lineHeight: "32px", fontWeight: "600" }],
       },
       fontFamily: {
-        // 使用与之前版本保持一致的系统字体栈
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          '"SF Pro Text"',
-          '"PingFang SC"',
-          '"Hiragino Sans GB"',
-          '"Segoe UI Variable Text"',
-          '"Segoe UI"',
-          '"Microsoft YaHei UI"',
-          '"Microsoft YaHei"',
-          "Roboto",
-          '"Helvetica Neue"',
-          "Arial",
-          "system-ui",
-          "sans-serif",
-        ],
-        mono: [
-          "ui-monospace",
-          "SFMono-Regular",
-          '"SF Mono"',
-          "Consolas",
-          '"Liberation Mono"',
-          "Menlo",
-          "monospace",
-        ],
+        // ADE embed fonts (values live in src/styles/ade-bridge.css)
+        sans: ["var(--ade-font-sans)"],
+        mono: ["var(--ade-font-mono)"],
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out",

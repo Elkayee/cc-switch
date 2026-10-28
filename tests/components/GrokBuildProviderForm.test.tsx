@@ -36,6 +36,7 @@ describe("GrokBuildProviderForm", () => {
     expect(screen.queryByRole("button", { name: /BytePlus/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /Kimi/ })).toBeNull();
 
+    await user.click(screen.getByRole("button", { name: /unofficial/i }));
     await user.click(screen.getByRole("button", { name: /PatewayAI/ }));
 
     const baseUrlInput =
@@ -56,6 +57,7 @@ describe("GrokBuildProviderForm", () => {
       />,
     );
 
+    await user.click(screen.getByRole("button", { name: /unofficial/i }));
     await user.click(screen.getByRole("button", { name: /88API/ }));
 
     const websiteInput = container.querySelector<HTMLInputElement>(

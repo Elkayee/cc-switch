@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
+import { isTauri } from "@tauri-apps/api/core";
 import { toast } from "@/lib/toast";
 import type { Provider } from "@/types";
 import type { AppMode, StartupAttachFailure } from "@/types/proxy";
@@ -30,6 +31,7 @@ import {
   useSetAutoFailoverEnabled,
 } from "@/lib/query/failover";
 import { useModeActions } from "@/hooks/useModeActions";
+import { routeProxyUrl } from "@/lib/pinnedProxyUrl";
 import { getRoutingReason } from "@/utils/routingReason";
 import { CODEX_OFFICIAL_PROVIDER_ID } from "@/utils/providerCapabilities";
 import { routeSwitchNotification } from "@/utils/routeSwitchNotification";
@@ -67,6 +69,10 @@ type ListCallbacks = Pick<
   | "onCreate"
   | "searchOpen"
   | "onSearchOpenChange"
+  | "pinnedTakeoverOn"
+  | "isProxyRunning"
+  | "proxyListenAddress"
+  | "proxyListenPort"
 >;
 
 interface SwitchModePanelProps extends ListCallbacks {
@@ -310,6 +316,23 @@ export function SwitchModePanel({
             }),
           };
 
+  // Routing endpoint a client can point at: only while this app is actually routed
+  const endpoint =
+    view === "route" && active === "route"
+      ? (routeProxyUrl({
+          appId: app,
+          takeoverOn: listCallbacks.pinnedTakeoverOn ?? false,
+          proxyRunning: listCallbacks.isProxyRunning ?? false,
+          isTauri: isTauri(),
+          pageHostname:
+            typeof window === "undefined"
+              ? "localhost"
+              : window.location.hostname,
+          listenAddress: listCallbacks.proxyListenAddress ?? "",
+          port: listCallbacks.proxyListenPort ?? 0,
+        }) ?? undefined)
+      : undefined;
+
   const handleFailoverChange = (enabled: boolean) => {
     if (enabled && !settings?.failoverConfirmed) {
       setConfirmFailover(true);
@@ -521,7 +544,6 @@ export function SwitchModePanel({
         actions={
           <Button
             variant={view}
-            size="regular"
             disabled={modeActions.pending}
             onClick={() =>
               setDialog(
@@ -584,6 +606,7 @@ export function SwitchModePanel({
         active={active}
         view={view}
         onView={setView}
+        endpoint={endpoint}
         failover={
           hasFailover && view === "route" && active === "route"
             ? {
@@ -608,10 +631,10 @@ export function SwitchModePanel({
       <div
         ref={scrollRef}
         id="main-content"
-        className="min-h-0 flex-1 overflow-y-auto scroll-stable overflow-x-hidden px-6 pb-12 pt-3"
+        className="min-h-0 flex-1 overflow-y-auto scroll-stable overflow-x-hidden px-2 pb-8 pt-2"
       >
         {notices.length > 0 && (
-          <div role="status" className="mb-3 flex flex-col gap-2">
+          <div role="status" className="mb-2 flex flex-col gap-2">
             {notices}
           </div>
         )}

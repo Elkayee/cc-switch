@@ -76,18 +76,18 @@ export function BackupStorageSection() {
       <CollapsibleTrigger asChild>
         <button
           type="button"
-          className="flex w-full items-center justify-between gap-2 rounded-md py-1 text-left"
+          className="flex w-full items-center justify-between gap-2 rounded-[4px] py-1 text-left"
         >
-          <span className="flex items-center gap-1 text-sm font-medium">
+          <span className="flex items-center gap-1 text-ui font-medium">
             <ChevronRight
-              className={`h-3.5 w-3.5 text-fg-2 transition-transform ${
+              className={`h-4 w-4 text-muted-foreground transition-transform ${
                 open ? "rotate-90" : ""
               }`}
             />
             {t("settings.backupStorage.title")}
           </span>
           {locations.length > 0 && (
-            <span className="text-xs text-fg-2">
+            <span className="text-ui text-muted-foreground">
               {t("settings.backupStorage.total", {
                 size: formatBytes(totalBytes),
               })}
@@ -98,36 +98,36 @@ export function BackupStorageSection() {
 
       <CollapsibleContent className="pt-2">
         {isLoading ? (
-          <div className="text-sm text-fg-2 py-2">Loading...</div>
+          <div className="text-ui text-muted-foreground py-2">Loading...</div>
         ) : isError ? (
-          <div className="text-sm text-fg-2 py-2">
+          <div className="text-ui text-muted-foreground py-2">
             {t("settings.backupStorage.loadFailed")}
           </div>
         ) : (
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {locations.map((location) => (
               <div
                 key={location.id}
-                className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-subtle text-sm"
+                className="flex items-center justify-between gap-2 px-2 py-2 rounded-[8px] bg-subtle text-ui"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 text-xs font-medium">
+                  <div className="flex items-center gap-2 text-ui font-medium">
                     <span className="truncate">
                       {itemText(location.id, "name")}
                     </span>
                     {location.id.startsWith("legacy") && (
-                      <span className="shrink-0 rounded px-1 py-px text-[10px] font-normal text-fg-2 border border-border">
+                      <span className="shrink-0 rounded px-1 py-px text-ui font-normal text-muted-foreground border border-border">
                         {t("settings.backupStorage.legacy")}
                       </span>
                     )}
                   </div>
                   <div
-                    className="font-mono text-xs text-fg-2 truncate"
+                    className="font-mono text-ui text-muted-foreground truncate"
                     title={location.path}
                   >
                     {location.path}
                   </div>
-                  <div className="text-xs text-fg-2">
+                  <div className="text-ui text-muted-foreground">
                     {formatBytes(location.sizeBytes)} &middot;{" "}
                     {t("settings.backupStorage.itemCount", {
                       count: location.itemCount,
@@ -142,11 +142,10 @@ export function BackupStorageSection() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
                       onClick={() => void handleReveal(location.id)}
                       aria-label={revealLabel}
                     >
-                      <FolderOpen className="h-3 w-3" />
+                      <FolderOpen className="h-4 w-4" />
                     </Button>
                   </HoverTip>
                   {location.deletable && (
@@ -154,12 +153,12 @@ export function BackupStorageSection() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive"
                         onClick={() => setPending(location)}
                         disabled={isDeleting}
                         aria-label={deleteLabel}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </HoverTip>
                   )}

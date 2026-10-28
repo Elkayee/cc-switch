@@ -51,9 +51,10 @@ const SYNC_METHODS: {
   },
 ];
 
-const LEGEND_CLASS = "mb-2 p-0 text-body font-semibold text-fg-1";
+const LEGEND_CLASS =
+  "mb-2 p-0 text-[12.35px] leading-[1.3] font-semibold text-fg-1";
 const RADIO_LABEL_CLASS =
-  "flex cursor-pointer items-center gap-2.5 text-body text-fg-1 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
+  "flex cursor-pointer items-center gap-2 text-[12.35px] leading-[1.3] text-fg-1 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60";
 
 /** Skills 页 ⋯ →「存储与同步」对话框：主副本放在哪、怎么同步到各应用（原来在设置 → 通用）。 */
 export function SkillsStorageSheet({
@@ -200,7 +201,7 @@ export function SkillsStorageSheet({
 
         {settings && (
           <>
-            <fieldset className="m-0 flex min-w-0 flex-col gap-2.5 border-0 p-0">
+            <fieldset className="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
               <legend className={LEGEND_CLASS}>
                 {t("skills.storageSheet.locationTitle")}
               </legend>
@@ -220,7 +221,7 @@ export function SkillsStorageSheet({
                 <div className="flex min-w-0 items-center gap-2 pl-[26px]">
                   <code
                     id="skills-storage-cc-path"
-                    className="min-w-0 truncate font-mono text-caption text-fg-2"
+                    className="min-w-0 truncate font-mono text-[12.35px] leading-[1.3] text-fg-2"
                     title={ccSwitchDirRaw ?? ccSwitchDir}
                   >
                     {ccSwitchDir}
@@ -231,7 +232,7 @@ export function SkillsStorageSheet({
                       path: ccSwitchDir,
                     })}
                     onClick={() => void handleOpenFolder()}
-                    className="shrink-0 whitespace-nowrap text-caption font-medium text-fg-1 underline decoration-border-strong underline-offset-[3px] hover:decoration-fg-1"
+                    className="shrink-0 whitespace-nowrap text-[12.35px] leading-[1.3] font-medium text-fg-1 underline decoration-border-strong underline-offset-[3px] hover:decoration-fg-1"
                   >
                     {t("skills.storageSheet.openFolder")}
                   </button>
@@ -250,29 +251,28 @@ export function SkillsStorageSheet({
                   />
                   <span>
                     {t("skills.storageSheet.locationUnified")}{" "}
-                    <code className="whitespace-nowrap font-mono text-caption">
+                    <code className="whitespace-nowrap font-mono text-[12.35px] leading-[1.3]">
                       {UNIFIED_DIR}
                     </code>
                   </span>
                 </label>
                 <p
                   id="skills-storage-unified-warn"
-                  className="m-0 pl-[26px] text-caption text-warning-text"
+                  className="m-0 pl-[26px] text-[12.35px] leading-[1.3] text-warning-text"
                 >
                   {t("skills.storageSheet.unifiedWarning")}
                 </p>
               </div>
-              <div className="flex items-center justify-between gap-3 pt-0.5">
+              <div className="flex items-center justify-between gap-2 pt-0.5">
                 <p
                   id="skills-storage-move-hint"
-                  className="m-0 min-w-0 text-caption text-fg-2"
+                  className="m-0 min-w-0 text-[12.35px] leading-[1.3] text-fg-2"
                 >
                   {t("skills.storageSheet.moveHint", { count: installedCount })}
                 </p>
                 <Button
                   type="button"
                   variant="neutral"
-                  size="regular"
                   className="shrink-0"
                   disabled={isMigrating || locationUnchanged}
                   aria-describedby="skills-storage-move-hint"
@@ -305,15 +305,15 @@ export function SkillsStorageSheet({
                   <span>
                     {t(option.labelKey)}
                     {option.descKey && (
-                      <span className="ml-2 text-caption text-fg-2">
+                      <span className="ml-2 text-[12.35px] leading-[1.3] text-fg-2">
                         {t(option.descKey)}
                       </span>
                     )}
                   </span>
                 </label>
               ))}
-              <div className="flex items-center gap-3 pt-0.5">
-                <p className="m-0 min-w-0 flex-1 text-caption text-fg-2">
+              <div className="flex items-center gap-2 pt-0.5">
+                <p className="m-0 min-w-0 flex-1 text-[12.35px] leading-[1.3] text-fg-2">
                   {t("skills.storageSheet.resyncHint")}
                 </p>
                 <Button
@@ -342,7 +342,6 @@ export function SkillsStorageSheet({
           <Button
             type="button"
             variant="solid"
-            size="regular"
             autoFocus
             disabled={isMigrating}
             onClick={() => onOpenChange(false)}

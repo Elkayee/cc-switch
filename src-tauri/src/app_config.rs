@@ -739,7 +739,7 @@ impl MultiAppConfig {
         if is_v1 {
             return Err(AppError::localized(
                 "config.unsupported_v1",
-                "检测到旧版 v1 配置格式。当前版本已不再支持运行时自动迁移。\n\n解决方案：\n1. 安装 v3.2.x 版本进行一次性自动迁移\n2. 或手动编辑 ~/.cc-switch/config.json，将顶层结构调整为：\n   {\"version\": 2, \"claude\": {...}, \"codex\": {...}, \"mcp\": {...}}\n\n",
+                "Detected legacy v1 config. Runtime auto-migration is no longer supported.\n\nSolutions:\n1. Install v3.2.x for one-time auto-migration\n2. Or manually edit ~/.cc-switch/config.json to adjust the top-level structure:\n   {\"version\": 2, \"claude\": {...}, \"codex\": {...}, \"mcp\": {...}}\n\n",
                 "Detected legacy v1 config. Runtime auto-migration is no longer supported.\n\nSolutions:\n1. Install v3.2.x for one-time auto-migration\n2. Or manually edit ~/.cc-switch/config.json to adjust the top-level structure:\n   {\"version\": 2, \"claude\": {...}, \"codex\": {...}, \"mcp\": {...}}\n\n",
             ));
         }
@@ -1045,7 +1045,7 @@ impl MultiAppConfig {
                     // 检测配置冲突（同 ID 但配置不同）
                     if existing.server != *entry.get("server").unwrap_or(&serde_json::json!({})) {
                         conflicts.push(format!(
-                            "MCP '{id}' 在 {} 和之前的应用中配置不同，将使用首次遇到的配置",
+                            "MCP '{id}' differs between {} and a previous app; using the first config found",
                             app.as_str()
                         ));
                     }
@@ -1119,7 +1119,7 @@ impl MultiAppConfig {
             "MCP 迁移完成，共迁移 {} 个服务器{}",
             unified_servers.len(),
             if !conflicts.is_empty() {
-                format!("（存在 {} 个冲突）", conflicts.len())
+                format!("({} conflicts)", conflicts.len())
             } else {
                 String::new()
             }

@@ -41,7 +41,7 @@ pub async fn execute_usage_script(
         let runtime = Runtime::new().map_err(|e| {
             AppError::localized(
                 "usage_script.runtime_create_failed",
-                format!("创建 JS 运行时失败: {e}"),
+                format!("Failed to create JS runtime: {e}"),
                 format!("Failed to create JS runtime: {e}"),
             )
         })?;
@@ -57,7 +57,7 @@ pub async fn execute_usage_script(
             .ok_or_else(|| {
                 AppError::localized(
                     "usage_script.invalid_timeout",
-                    "无法计算脚本执行截止时间",
+                    "Unable to compute script execution deadline",
                     "Unable to compute script execution deadline",
                 )
             })?;
@@ -71,7 +71,7 @@ pub async fn execute_usage_script(
         let context = Context::full(&runtime).map_err(|e| {
             AppError::localized(
                 "usage_script.context_create_failed",
-                format!("创建 JS 上下文失败: {e}"),
+                format!("Failed to create JS context: {e}"),
                 format!("Failed to create JS context: {e}"),
             )
         })?;
@@ -81,7 +81,7 @@ pub async fn execute_usage_script(
             let config: rquickjs::Object = ctx.eval(script_with_vars.clone()).map_err(|e| {
                 AppError::localized(
                     "usage_script.config_parse_failed",
-                    format!("解析配置失败: {e}"),
+                    format!("Failed to parse config: {e}"),
                     format!("Failed to parse config: {e}"),
                 )
             })?;
@@ -90,7 +90,7 @@ pub async fn execute_usage_script(
             let request: rquickjs::Object = config.get("request").map_err(|e| {
                 AppError::localized(
                     "usage_script.request_missing",
-                    format!("缺少 request 配置: {e}"),
+                    format!("Missing request config: {e}"),
                     format!("Missing request config: {e}"),
                 )
             })?;
@@ -101,14 +101,14 @@ pub async fn execute_usage_script(
                 .map_err(|e| {
                     AppError::localized(
                         "usage_script.request_serialize_failed",
-                        format!("序列化 request 失败: {e}"),
+                        format!("Failed to serialize request: {e}"),
                         format!("Failed to serialize request: {e}"),
                     )
                 })?
                 .ok_or_else(|| {
                     AppError::localized(
                         "usage_script.serialize_none",
-                        "序列化返回 None",
+                        "Serialization returned None",
                         "Serialization returned None",
                     )
                 })?
@@ -116,7 +116,7 @@ pub async fn execute_usage_script(
                 .map_err(|e| {
                     AppError::localized(
                         "usage_script.get_string_failed",
-                        format!("获取字符串失败: {e}"),
+                        format!("Failed to get string: {e}"),
                         format!("Failed to get string: {e}"),
                     )
                 })?;
@@ -129,7 +129,7 @@ pub async fn execute_usage_script(
     let request: RequestConfig = serde_json::from_str(&request_config).map_err(|e| {
         AppError::localized(
             "usage_script.request_format_invalid",
-            format!("request 配置格式错误: {e}"),
+            format!("Invalid request config: {e}"),
             format!("Invalid request config format: {e}"),
         )
     })?;
@@ -146,7 +146,7 @@ pub async fn execute_usage_script(
         let context = Context::full(&runtime).map_err(|e| {
             AppError::localized(
                 "usage_script.context_create_failed",
-                format!("创建 JS 上下文失败: {e}"),
+                format!("Failed to create JS context: {e}"),
                 format!("Failed to create JS context: {e}"),
             )
         })?;
@@ -156,7 +156,7 @@ pub async fn execute_usage_script(
             let config: rquickjs::Object = ctx.eval(script_with_vars.clone()).map_err(|e| {
                 AppError::localized(
                     "usage_script.config_reparse_failed",
-                    format!("重新解析配置失败: {e}"),
+                    format!("Failed to reparse config: {e}"),
                     format!("Failed to re-parse config: {e}"),
                 )
             })?;
@@ -165,7 +165,7 @@ pub async fn execute_usage_script(
             let extractor: Function = config.get("extractor").map_err(|e| {
                 AppError::localized(
                     "usage_script.extractor_missing",
-                    format!("缺少 extractor 函数: {e}"),
+                    format!("Missing extractor function: {e}"),
                     format!("Missing extractor function: {e}"),
                 )
             })?;
@@ -175,7 +175,7 @@ pub async fn execute_usage_script(
                 ctx.json_parse(response_data.as_str()).map_err(|e| {
                     AppError::localized(
                         "usage_script.response_parse_failed",
-                        format!("解析响应 JSON 失败: {e}"),
+                        format!("Failed to parse response JSON: {e}"),
                         format!("Failed to parse response JSON: {e}"),
                     )
                 })?;
@@ -184,7 +184,7 @@ pub async fn execute_usage_script(
             let result_js: rquickjs::Value = extractor.call((response_js,)).map_err(|e| {
                 AppError::localized(
                     "usage_script.extractor_exec_failed",
-                    format!("执行 extractor 失败: {e}"),
+                    format!("Failed to run extractor: {e}"),
                     format!("Failed to execute extractor: {e}"),
                 )
             })?;
@@ -195,14 +195,14 @@ pub async fn execute_usage_script(
                 .map_err(|e| {
                     AppError::localized(
                         "usage_script.result_serialize_failed",
-                        format!("序列化结果失败: {e}"),
+                        format!("Failed to serialize result: {e}"),
                         format!("Failed to serialize result: {e}"),
                     )
                 })?
                 .ok_or_else(|| {
                     AppError::localized(
                         "usage_script.serialize_none",
-                        "序列化返回 None",
+                        "Serialization returned None",
                         "Serialization returned None",
                     )
                 })?
@@ -210,7 +210,7 @@ pub async fn execute_usage_script(
                 .map_err(|e| {
                     AppError::localized(
                         "usage_script.get_string_failed",
-                        format!("获取字符串失败: {e}"),
+                        format!("Failed to get string: {e}"),
                         format!("Failed to get string: {e}"),
                     )
                 })?;
@@ -219,7 +219,7 @@ pub async fn execute_usage_script(
             serde_json::from_str(&result_json).map_err(|e| {
                 AppError::localized(
                     "usage_script.json_parse_failed",
-                    format!("JSON 解析失败: {e}"),
+                    format!("JSON parse failed: {e}"),
                     format!("JSON parse failed: {e}"),
                 )
             })
@@ -254,7 +254,7 @@ async fn send_http_request(config: &RequestConfig, timeout_secs: u64) -> Result<
     let method: reqwest::Method = config.method.parse().map_err(|_| {
         AppError::localized(
             "usage_script.invalid_http_method",
-            format!("不支持的 HTTP 方法: {}", config.method),
+            format!("Unsupported HTTP method: {}", config.method),
             format!("Unsupported HTTP method: {}", config.method),
         )
     })?;
@@ -277,7 +277,7 @@ async fn send_http_request(config: &RequestConfig, timeout_secs: u64) -> Result<
     let resp = req.send().await.map_err(|e| {
         AppError::localized(
             "usage_script.request_failed",
-            format!("请求失败: {e}"),
+            format!("Request failed: {e}"),
             format!("Request failed: {e}"),
         )
     })?;
@@ -286,7 +286,7 @@ async fn send_http_request(config: &RequestConfig, timeout_secs: u64) -> Result<
     let text = resp.text().await.map_err(|e| {
         AppError::localized(
             "usage_script.read_response_failed",
-            format!("读取响应失败: {e}"),
+            format!("Failed to read response: {e}"),
             format!("Failed to read response: {e}"),
         )
     })?;
@@ -318,7 +318,7 @@ fn validate_result(result: &Value) -> Result<(), AppError> {
         if arr.is_empty() {
             return Err(AppError::localized(
                 "usage_script.empty_array",
-                "脚本返回的数组不能为空",
+                "Script returned empty array",
                 "Script returned empty array",
             ));
         }
@@ -326,7 +326,7 @@ fn validate_result(result: &Value) -> Result<(), AppError> {
             validate_single_usage(item).map_err(|e| {
                 AppError::localized(
                     "usage_script.array_validation_failed",
-                    format!("数组索引[{idx}]验证失败: {e}"),
+                    format!("Array index [{idx}] validation failed: {e}"),
                     format!("Validation failed at index [{idx}]: {e}"),
                 )
             })?;
@@ -343,7 +343,7 @@ fn validate_single_usage(result: &Value) -> Result<(), AppError> {
     let obj = result.as_object().ok_or_else(|| {
         AppError::localized(
             "usage_script.must_return_object",
-            "脚本必须返回对象或对象数组",
+            "Script must return object or array of objects",
             "Script must return object or array of objects",
         )
     })?;
@@ -355,7 +355,7 @@ fn validate_single_usage(result: &Value) -> Result<(), AppError> {
     {
         return Err(AppError::localized(
             "usage_script.isvalid_type_error",
-            "isValid 必须是布尔值或 null",
+            "isValid must be boolean or null",
             "isValid must be boolean or null",
         ));
     }
@@ -365,7 +365,7 @@ fn validate_single_usage(result: &Value) -> Result<(), AppError> {
     {
         return Err(AppError::localized(
             "usage_script.invalidmessage_type_error",
-            "invalidMessage 必须是字符串或 null",
+            "invalidMessage must be string or null",
             "invalidMessage must be string or null",
         ));
     }
@@ -375,28 +375,28 @@ fn validate_single_usage(result: &Value) -> Result<(), AppError> {
     {
         return Err(AppError::localized(
             "usage_script.remaining_type_error",
-            "remaining 必须是数字或 null",
+            "remaining must be number or null",
             "remaining must be number or null",
         ));
     }
     if obj.contains_key("unit") && !result["unit"].is_null() && !result["unit"].is_string() {
         return Err(AppError::localized(
             "usage_script.unit_type_error",
-            "unit 必须是字符串或 null",
+            "unit must be string or null",
             "unit must be string or null",
         ));
     }
     if obj.contains_key("total") && !result["total"].is_null() && !result["total"].is_number() {
         return Err(AppError::localized(
             "usage_script.total_type_error",
-            "total 必须是数字或 null",
+            "total must be number or null",
             "total must be number or null",
         ));
     }
     if obj.contains_key("used") && !result["used"].is_null() && !result["used"].is_number() {
         return Err(AppError::localized(
             "usage_script.used_type_error",
-            "used 必须是数字或 null",
+            "used must be number or null",
             "used must be number or null",
         ));
     }
@@ -406,14 +406,14 @@ fn validate_single_usage(result: &Value) -> Result<(), AppError> {
     {
         return Err(AppError::localized(
             "usage_script.planname_type_error",
-            "planName 必须是字符串或 null",
+            "planName must be string or null",
             "planName must be string or null",
         ));
     }
     if obj.contains_key("extra") && !result["extra"].is_null() && !result["extra"].is_string() {
         return Err(AppError::localized(
             "usage_script.extra_type_error",
-            "extra 必须是字符串或 null",
+            "extra must be string or null",
             "extra must be string or null",
         ));
     }
@@ -448,7 +448,7 @@ fn validate_base_url(base_url: &str) -> Result<(), AppError> {
     if base_url.is_empty() {
         return Err(AppError::localized(
             "usage_script.base_url_empty",
-            "base_url 不能为空",
+            "base_url cannot be empty",
             "base_url cannot be empty",
         ));
     }
@@ -457,7 +457,7 @@ fn validate_base_url(base_url: &str) -> Result<(), AppError> {
     let parsed_url = Url::parse(base_url).map_err(|e| {
         AppError::localized(
             "usage_script.base_url_invalid",
-            format!("无效的 base_url: {e}"),
+            format!("Invalid base_url: {e}"),
             format!("Invalid base_url: {e}"),
         )
     })?;
@@ -468,7 +468,7 @@ fn validate_base_url(base_url: &str) -> Result<(), AppError> {
     if parsed_url.scheme() != "https" && !is_loopback {
         return Err(AppError::localized(
             "usage_script.base_url_https_required",
-            "base_url 必须使用 HTTPS 协议（localhost 除外）",
+            "base_url must use HTTPS (localhost allowed)",
             "base_url must use HTTPS (localhost allowed)",
         ));
     }
@@ -477,7 +477,7 @@ fn validate_base_url(base_url: &str) -> Result<(), AppError> {
     let hostname = parsed_url.host_str().ok_or_else(|| {
         AppError::localized(
             "usage_script.base_url_hostname_missing",
-            "base_url 必须包含有效的主机名",
+            "base_url must include a valid hostname",
             "base_url must include a valid hostname",
         )
     })?;
@@ -486,7 +486,7 @@ fn validate_base_url(base_url: &str) -> Result<(), AppError> {
     if hostname.is_empty() {
         return Err(AppError::localized(
             "usage_script.base_url_hostname_empty",
-            "base_url 主机名不能为空",
+            "base_url hostname cannot be empty",
             "base_url hostname cannot be empty",
         ));
     }
@@ -508,7 +508,7 @@ fn validate_request_url(
     let parsed_request = Url::parse(request_url).map_err(|e| {
         AppError::localized(
             "usage_script.request_url_invalid",
-            format!("无效的请求 URL: {e}"),
+            format!("Invalid request URL: {e}"),
             format!("Invalid request URL: {e}"),
         )
     })?;
@@ -520,7 +520,7 @@ fn validate_request_url(
     if !is_custom_template && parsed_request.scheme() != "https" && !is_request_loopback {
         return Err(AppError::localized(
             "usage_script.request_https_required",
-            "请求 URL 必须使用 HTTPS 协议（localhost 除外）",
+            "Request URL must use HTTPS (localhost allowed)",
             "Request URL must use HTTPS (localhost allowed)",
         ));
     }
@@ -532,7 +532,7 @@ fn validate_request_url(
         let parsed_base = Url::parse(base_url).map_err(|e| {
             AppError::localized(
                 "usage_script.base_url_invalid",
-                format!("无效的 base_url: {e}"),
+                format!("Invalid base_url: {e}"),
                 format!("Invalid base_url: {e}"),
             )
         })?;
@@ -542,7 +542,7 @@ fn validate_request_url(
             return Err(AppError::localized(
                 "usage_script.request_host_mismatch",
                 format!(
-                    "请求域名 {} 与 base_url 域名 {} 不匹配（必须是同源请求）",
+                    "Request host {} does not match base_url host {} (must be same-origin)",
                     parsed_request.host_str().unwrap_or("unknown"),
                     parsed_base.host_str().unwrap_or("unknown")
                 ),
@@ -566,7 +566,7 @@ fn validate_request_url(
             (Some(request_port), Some(base_port)) => {
                 return Err(AppError::localized(
                     "usage_script.request_port_mismatch",
-                    format!("请求端口 {request_port} 必须与 base_url 端口 {base_port} 匹配"),
+                    format!("Request port {request_port} must match base_url port {base_port}"),
                     format!("Request port {request_port} must match base_url port {base_port}"),
                 ));
             }
@@ -574,7 +574,7 @@ fn validate_request_url(
                 // 理论上不会发生，因为 port_or_known_default() 应该总是返回 Some
                 return Err(AppError::localized(
                     "usage_script.request_port_unknown",
-                    "无法确定端口号",
+                    "Unable to determine port number",
                     "Unable to determine port number",
                 ));
             }

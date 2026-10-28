@@ -116,7 +116,7 @@ function HelpCard({
         onCloseAutoFocus={(event) => event.preventDefault()}
         onPointerEnter={onPointerEnter}
         onPointerLeave={onPointerLeave}
-        className="z-[120] w-max max-w-[300px] rounded-[8px] border border-border bg-surface px-3 pb-2.5 pt-[9px] text-caption text-fg-1 shadow-v7-md outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
+        className="z-[120] w-max max-w-[300px] rounded-[8px] border border-border bg-surface p-2 text-[12.35px] leading-[1.3] text-fg-1 shadow-sm outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
       >
         {title ? (
           <span className="mb-0.5 block font-semibold">{title}</span>
@@ -173,7 +173,7 @@ export function HelpTip({
             className,
           )}
         >
-          <CircleHelp className="h-3.5 w-3.5" strokeWidth={1.5} />
+          <CircleHelp className="h-4 w-4" strokeWidth={1.5} />
         </button>
       </PopoverPrimitive.Trigger>
       <HelpCard
@@ -236,7 +236,7 @@ export function DisabledReason({
     <PopoverPrimitive.Root open={hover.open} onOpenChange={hover.onOpenChange}>
       <PopoverPrimitive.Anchor asChild>
         <span
-          className="inline-flex"
+          className="inline-flex text-[12.35px] leading-[1.3]"
           onPointerEnter={hover.onPointerEnter}
           onPointerLeave={hover.onPointerLeave}
           onFocus={hover.onFocus}

@@ -197,17 +197,15 @@ describe("WhatsNewNotice", () => {
     );
     expect(screen.getByText("v4.0.1")).toBeInTheDocument();
 
-    fireEvent.click(
-      screen.getAllByRole("button", { name: "whatsNew.versionDetails" })[0],
-    );
-    expect(mocks.openExternal).toHaveBeenCalledWith(
-      "https://ccswitch.io/zh/changelog/4.0.4",
-    );
+    // Fork: no links to the upstream website changelog
+    expect(
+      screen.queryByRole("button", { name: "whatsNew.versionDetails" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "whatsNew.viewFull" }),
+    ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "whatsNew.viewFull" }));
-    expect(mocks.openExternal).toHaveBeenLastCalledWith(
-      "https://ccswitch.io/zh/changelog",
-    );
+    fireEvent.click(screen.getByRole("button", { name: "whatsNew.confirm" }));
     await waitFor(() => expect(title()).not.toBeInTheDocument());
     expect(mocks.save).toHaveBeenCalledWith(
       expect.objectContaining({ whatsNewSeenVersion: "4.0.4" }),

@@ -25,7 +25,7 @@ interface TablePaginationProps {
 }
 
 const NAV_BUTTON =
-  "inline-flex h-7 w-7 items-center justify-center rounded-control text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 disabled:pointer-events-none disabled:opacity-45";
+  "inline-flex h-6 w-6 items-center justify-center rounded-[4px] text-muted-foreground transition-colors hover:bg-subtle hover:text-foreground disabled:pointer-events-none disabled:opacity-45";
 
 /**
  * 用量页表格共用的翻页条：总数、上一页、可输入的页码、下一页。
@@ -68,7 +68,7 @@ export function TablePagination({
   if (totalPages <= 1 && !resizable) return null;
 
   return (
-    <div className="flex h-11 items-center gap-2 border-t border-border bg-subtle px-4 text-caption text-fg-3">
+    <div className="flex h-9 items-center gap-2 border-t border-border bg-subtle px-4 text-caption text-fg-3">
       <span className="tabular-nums">{t("usage.totalRecords", { total })}</span>
       {resizable && (
         <Select

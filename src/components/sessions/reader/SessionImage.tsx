@@ -81,7 +81,7 @@ export const SessionImage = memo(function SessionImage({
         role="img"
         aria-label={`${alt} · ${rt("image.failed")}`}
         className={cn(
-          "inline-flex h-24 w-32 flex-col items-center justify-center gap-1 rounded-[8px] border border-border bg-subtle text-caption text-fg-3",
+          "inline-flex h-24 w-32 flex-col items-center justify-center gap-1 rounded-[8px] border border-border bg-subtle text-[12.35px] leading-[1.3] text-fg-3",
           className,
         )}
       >

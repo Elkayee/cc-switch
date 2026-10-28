@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { HelpTip } from "@/components/ui/help-tip";
 import JsonEditor from "@/components/JsonEditor";
@@ -14,7 +15,13 @@ const QUICK_TOGGLES = [
   "disableAutoUpgrade",
   "disableArtifact",
   "disableAutoModeServer",
+  "enableTodoTools",
 ] as const;
+
+/** 没有 `claudeConfig.<key>Help` 文案的开关，不画「?」按钮。 */
+const TOGGLES_WITHOUT_HELP = new Set<(typeof QUICK_TOGGLES)[number]>([
+  "enableTodoTools",
+]);
 
 interface CommonConfigEditorProps {
   value: string;
@@ -101,6 +108,9 @@ export function CommonConfigEditor({
         disableArtifact:
           config?.env?.CLAUDE_CODE_DISABLE_ARTIFACT === "1" ||
           config?.env?.CLAUDE_CODE_DISABLE_ARTIFACT === 1,
+        enableTodoTools:
+          config?.env?.CLAUDE_CODE_ENABLE_TODO_TOOLS === "1" ||
+          config?.env?.CLAUDE_CODE_ENABLE_TODO_TOOLS === 1,
         disableAutoModeServer:
           config?.env?.[CLAUDE_AUTO_MODE_SERVER_ENV] === "0" ||
           config?.env?.[CLAUDE_AUTO_MODE_SERVER_ENV] === 0,
@@ -111,6 +121,7 @@ export function CommonConfigEditor({
         enableToolSearch: false,
         disableAutoUpgrade: false,
         disableArtifact: false,
+        enableTodoTools: false,
         disableAutoModeServer: false,
       };
     }
@@ -156,6 +167,17 @@ export function CommonConfigEditor({
               config.env.CLAUDE_CODE_DISABLE_ARTIFACT = "1";
             } else {
               delete config.env.CLAUDE_CODE_DISABLE_ARTIFACT;
+              if (Object.keys(config.env).length === 0) delete config.env;
+            }
+            break;
+          case "enableTodoTools":
+            // Opus 4.8 / Sonnet 5 / Fable 5 / Mythos 5+ 默认不再带 TodoWrite
+            // 与 TaskCreate/Get/Update/List；设 1 把这些工具加回 tools 数组。
+            if (!config.env) config.env = {};
+            if (checked) {
+              config.env.CLAUDE_CODE_ENABLE_TODO_TOOLS = "1";
+            } else {
+              delete config.env.CLAUDE_CODE_ENABLE_TODO_TOOLS;
               if (Object.keys(config.env).length === 0) delete config.env;
             }
             break;
@@ -207,7 +229,7 @@ export function CommonConfigEditor({
   return (
     <div className="space-y-2">
       <Label htmlFor="settingsConfig">{t("provider.configJson")}</Label>
-      <p className="text-xs text-fg-2">
+      <p className="text-ui text-muted-foreground">
         {t("claudeConfig.keyFieldsHint", {
           defaultValue:
             "地址、Key、模型、上下文窗口和兼容开关随供应商切换；其余字段是 Claude Code 全局设置，保存后对所有供应商生效。",
@@ -216,18 +238,18 @@ export function CommonConfigEditor({
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         {QUICK_TOGGLES.map((key) => (
           <span key={key} className="inline-flex items-center gap-1">
-            <label className="inline-flex items-center gap-2 text-sm text-fg-2 cursor-pointer">
-              <input
-                type="checkbox"
+            <label className="inline-flex items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground cursor-pointer">
+              <Checkbox
                 checked={toggleStates[key]}
-                onChange={(e) => handleToggle(key, e.target.checked)}
-                className="ui-checkbox"
+                onCheckedChange={(checked) => handleToggle(key, checked)}
               />
               <span>{t(`claudeConfig.${key}`)}</span>
             </label>
-            <HelpTip title={t(`claudeConfig.${key}`)}>
-              {t(`claudeConfig.${key}Help`)}
-            </HelpTip>
+            {!TOGGLES_WITHOUT_HELP.has(key) && (
+              <HelpTip title={t(`claudeConfig.${key}`)}>
+                {t(`claudeConfig.${key}Help`)}
+              </HelpTip>
+            )}
           </span>
         ))}
       </div>

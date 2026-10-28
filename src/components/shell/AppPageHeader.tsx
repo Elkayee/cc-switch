@@ -12,7 +12,7 @@ interface AppPageHeaderProps {
   leading?: ReactNode;
   icon?: ReactNode;
   title: ReactNode;
-  /** 应用页用 16px 的名字 + 13px 的页面名；全局页和设置用 18px 的页面标题 */
+  /** 保留给调用方；紧凑样式下标题统一为 12.35px semibold */
   variant?: "app" | "page";
   /** 应用页的页面名（如「供应商」），灰字跟在应用名后面 */
   subtitle?: ReactNode;
@@ -26,13 +26,12 @@ interface AppPageHeaderProps {
 }
 
 /**
- * 内容区页头：高 52，整条可拖动窗口，左边是图标 + 标题，右边是操作。
+ * 内容区页头：高 48，整条可拖动窗口，左边是图标 + 标题，右边是操作。
  */
 export function AppPageHeader({
   leading,
   icon,
   title,
-  variant = "page",
   subtitle,
   titleExtra,
   actions,
@@ -47,7 +46,7 @@ export function AppPageHeader({
   return (
     <header
       className={cn(
-        "flex h-[52px] shrink-0 items-center gap-5 border-b border-border pe-4 ps-6",
+        "flex h-12 shrink-0 items-center gap-2 border-b border-border pe-2 ps-2",
         className,
       )}
       {...dragRegionAttr}
@@ -57,7 +56,7 @@ export function AppPageHeader({
       <div
         {...dragRegionAttr}
         className={cn(
-          "flex min-w-0 items-center gap-2.5",
+          "flex min-w-0 items-center gap-2",
           truncateTitle ? "flex-1" : "shrink-0",
         )}
       >
@@ -69,7 +68,7 @@ export function AppPageHeader({
         {icon && (
           <span
             aria-hidden="true"
-            className="pointer-events-none flex h-[22px] w-[22px] shrink-0 items-center justify-center text-fg-1"
+            className="pointer-events-none flex h-5 w-5 shrink-0 items-center justify-center text-fg-1"
           >
             {icon}
           </span>
@@ -78,7 +77,7 @@ export function AppPageHeader({
           {...dragRegionAttr}
           className={cn(
             "m-0 whitespace-nowrap",
-            variant === "app" ? "text-title" : "text-page",
+            "text-[12.35px] font-semibold leading-[1.3]",
             truncateTitle && "min-w-0 truncate",
           )}
         >
@@ -87,7 +86,7 @@ export function AppPageHeader({
         {(subtitle || titleExtra) && (
           <div className="flex min-w-0 items-center gap-1" style={NO_DRAG}>
             {subtitle && (
-              <span className="whitespace-nowrap text-body text-fg-3">
+              <span className="whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-3">
                 {subtitle}
               </span>
             )}

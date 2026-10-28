@@ -9,10 +9,7 @@ import type { AppId } from "@/lib/api";
  */
 
 export type AppPage =
-  | "providers"
-  | "workspace"
-  | "openclawConfig"
-  | "hermesMemory";
+  "providers" | "workspace" | "openclawConfig" | "hermesMemory";
 
 export type GlobalPage =
   | "usage"
@@ -27,12 +24,7 @@ export type GlobalPage =
 export type View = AppPage | GlobalPage | "settings";
 
 export type SettingsSection =
-  | "general"
-  | "appConfig"
-  | "routing"
-  | "network"
-  | "data"
-  | "about";
+  "general" | "appConfig" | "routing" | "network" | "data" | "about";
 
 export const SETTINGS_SECTIONS: SettingsSection[] = [
   "general",

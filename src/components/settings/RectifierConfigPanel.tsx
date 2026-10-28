@@ -64,10 +64,13 @@ export function RectifierConfigPanel() {
   if (isLoading) return null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2 px-2 py-2">
         <div className="space-y-0.5">
           <Label>{t("settings.advanced.rectifier.enabled")}</Label>
+          <p className="text-ui text-muted-foreground">
+            {t("settings.advanced.rectifier.enabledDescription")}
+          </p>
         </div>
         <Switch
           checked={config.enabled}
@@ -75,14 +78,14 @@ export function RectifierConfigPanel() {
         />
       </div>
 
-      <div className="space-y-4">
-        <h4 className="text-sm font-medium text-fg-2">
+      <div className="space-y-2">
+        <h4 className="text-ui font-semibold text-muted-foreground">
           {t("settings.advanced.rectifier.requestGroup")}
         </h4>
-        <div className="flex items-center justify-between pl-4">
+        <div className="flex items-center justify-between gap-2 py-2 pl-6 pr-2">
           <div className="space-y-0.5">
             <Label>{t("settings.advanced.rectifier.thinkingSignature")}</Label>
-            <p className="text-xs text-fg-2">
+            <p className="text-ui text-muted-foreground">
               {t("settings.advanced.rectifier.thinkingSignatureDescription")}
             </p>
           </div>
@@ -94,10 +97,10 @@ export function RectifierConfigPanel() {
             }
           />
         </div>
-        <div className="flex items-center justify-between pl-4">
+        <div className="flex items-center justify-between gap-2 py-2 pl-6 pr-2">
           <div className="space-y-0.5">
             <Label>{t("settings.advanced.rectifier.thinkingBudget")}</Label>
-            <p className="text-xs text-fg-2">
+            <p className="text-ui text-muted-foreground">
               {t("settings.advanced.rectifier.thinkingBudgetDescription")}
             </p>
           </div>
@@ -109,10 +112,10 @@ export function RectifierConfigPanel() {
             }
           />
         </div>
-        <div className="flex items-center justify-between pl-4">
+        <div className="flex items-center justify-between gap-2 py-2 pl-6 pr-2">
           <div className="space-y-0.5">
             <Label>{t("settings.advanced.rectifier.mediaFallback")}</Label>
-            <p className="text-xs text-fg-2">
+            <p className="text-ui text-muted-foreground">
               {t("settings.advanced.rectifier.mediaFallbackDescription")}
             </p>
           </div>
@@ -124,10 +127,10 @@ export function RectifierConfigPanel() {
             }
           />
         </div>
-        <div className="flex items-center justify-between pl-8">
+        <div className="flex items-center justify-between gap-2 py-2 pl-8 pr-2">
           <div className="space-y-0.5">
             <Label>{t("settings.advanced.rectifier.mediaHeuristic")}</Label>
-            <p className="text-xs text-fg-2">
+            <p className="text-ui text-muted-foreground">
               {t("settings.advanced.rectifier.mediaHeuristicDescription")}
             </p>
           </div>
@@ -141,18 +144,18 @@ export function RectifierConfigPanel() {
         </div>
       </div>
 
-      <div className="border-t pt-6 mt-6">
-        <div className="space-y-1 mb-4">
-          <h3 className="text-sm font-medium">
+      <div className="border-t pt-2 mt-2">
+        <div className="space-y-1 mb-2">
+          <h3 className="text-ui font-semibold">
             {t("settings.advanced.optimizer.title")}
           </h3>
-          <p className="text-xs text-fg-2">
+          <p className="text-ui text-muted-foreground">
             {t("settings.advanced.optimizer.description")}
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2 px-2 py-2">
             <div className="space-y-0.5">
               <Label>{t("settings.advanced.optimizer.enabled")}</Label>
             </div>
@@ -164,13 +167,13 @@ export function RectifierConfigPanel() {
             />
           </div>
 
-          <div className="space-y-4 pl-4">
-            <div className="flex items-center justify-between">
+          <div className="space-y-2 pl-4">
+            <div className="flex items-center justify-between gap-2 px-2 py-2">
               <div className="space-y-0.5">
                 <Label>
                   {t("settings.advanced.optimizer.thinkingOptimizer")}
                 </Label>
-                <p className="text-xs text-fg-2">
+                <p className="text-ui text-muted-foreground">
                   {t(
                     "settings.advanced.optimizer.thinkingOptimizerDescription",
                   )}
@@ -185,10 +188,10 @@ export function RectifierConfigPanel() {
               />
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2 px-2 py-2">
               <div className="space-y-0.5">
                 <Label>{t("settings.advanced.optimizer.cacheInjection")}</Label>
-                <p className="text-xs text-fg-2">
+                <p className="text-ui text-muted-foreground">
                   {t("settings.advanced.optimizer.cacheInjectionDescription")}
                 </p>
               </div>

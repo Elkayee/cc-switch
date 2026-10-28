@@ -74,7 +74,7 @@ export function CustomUserAgentField({
               <DropdownMenuItem
                 key={preset}
                 onSelect={() => onChange(preset)}
-                className="font-mono text-xs"
+                className="font-mono text-[12.35px] leading-[1.3]"
               >
                 {preset}
               </DropdownMenuItem>
@@ -82,8 +82,15 @@ export function CustomUserAgentField({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {!valid && (
-        <p className="text-xs text-destructive">
+      {valid ? (
+        <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
+          {t("providerForm.customUserAgentHint", {
+            defaultValue:
+              "仅在开启本地路由/代理接管后生效，会替换转发到供应商 API 请求中的 User-Agent。",
+          })}
+        </p>
+      ) : (
+        <p className="text-[12.35px] leading-[1.3] text-destructive">
           {t("providerForm.customUserAgentInvalid", {
             defaultValue:
               "User-Agent 不能包含控制字符（如换行符），否则将被忽略。",

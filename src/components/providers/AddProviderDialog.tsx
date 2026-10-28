@@ -409,8 +409,7 @@ export function AddProviderDialog({
           }
         } else if (appId === "opencode") {
           const options = parsedConfig.options as
-            | Record<string, any>
-            | undefined;
+            Record<string, any> | undefined;
           if (options?.baseURL) {
             addUrl(options.baseURL);
           }
@@ -564,8 +563,8 @@ export function AddProviderDialog({
         step === "pick"
           ? "flex h-full flex-col space-y-0 p-0"
           : isPiFamilyApp(appId)
-            ? "pb-0 pt-4"
-            : "pt-4"
+            ? "pb-0 pt-2"
+            : "pt-2"
       }
     >
       <PresetStepContext.Provider value={stepState}>
@@ -574,7 +573,7 @@ export function AddProviderDialog({
         )}
         <div className={step === "pick" ? "hidden" : undefined}>
           {waitingForClaudeBase ? (
-            <div className="py-12 text-center text-body text-fg-2">
+            <div className="py-12 text-center text-[12.35px] leading-[1.3] text-muted-foreground">
               {t("common.loading")}
             </div>
           ) : (

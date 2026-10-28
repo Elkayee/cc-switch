@@ -400,7 +400,7 @@ export function SettingsPage({
               body: t("settings.advanced.globalProxy.description"),
             }}
           >
-            <div className="rounded-panel border border-border bg-surface p-5">
+            <div className="rounded-[8px] border border-border bg-card p-2">
               <GlobalProxySettings />
             </div>
           </SettingsBlock>
@@ -412,15 +412,8 @@ export function SettingsPage({
               title={t("settings.data.location")}
               actions={
                 appConfigDirty ? (
-                  <Button
-                    variant="solid"
-                    size="compact"
-                    disabled={isSaving}
-                    onClick={() => void handleSave()}
-                  >
-                    {isSaving && (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    )}
+                  <Button disabled={isSaving} onClick={() => void handleSave()}>
+                    {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                     {t("common.save")}
                   </Button>
                 ) : null
@@ -453,7 +446,7 @@ export function SettingsPage({
                 body: t("settings.advanced.data.description"),
               }}
             >
-              <div className="rounded-panel border border-border bg-surface p-5">
+              <div className="rounded-[8px] border border-border bg-card p-2">
                 <ImportExportSection
                   status={importStatus}
                   selectedFile={selectedFile}
@@ -474,7 +467,7 @@ export function SettingsPage({
                 body: t("settings.advanced.backup.description"),
               }}
             >
-              <div className="rounded-panel border border-border bg-surface p-5">
+              <div className="rounded-[8px] border border-border bg-card p-2">
                 <BackupListSection
                   backupIntervalHours={settings.backupIntervalHours}
                   backupRetainCount={settings.backupRetainCount}
@@ -489,7 +482,7 @@ export function SettingsPage({
                 body: t("settings.advanced.cloudSync.description"),
               }}
             >
-              <div className="rounded-panel border border-border bg-surface p-5">
+              <div className="rounded-[8px] border border-border bg-card p-2">
                 <WebdavSyncSection
                   config={settings.webdavSync}
                   s3Config={settings.s3Sync}
@@ -506,16 +499,15 @@ export function SettingsPage({
               }}
               actions={
                 <Button
-                  variant="neutral"
-                  size="compact"
+                  variant="outline"
                   onClick={() => void handleRevealLogFile()}
                 >
-                  <FolderOpen className="h-3.5 w-3.5" />
+                  <FolderOpen className="h-4 w-4" />
                   {t("settings.advanced.logConfig.openLog")}
                 </Button>
               }
             >
-              <div className="rounded-panel border border-border bg-surface p-5">
+              <div className="rounded-[8px] border border-border bg-card p-2">
                 <LogConfigPanel />
               </div>
             </SettingsBlock>
@@ -539,7 +531,7 @@ export function SettingsPage({
       >
         {isBusy ? (
           <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-fg-3" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <SettingsBody>{renderSection()}</SettingsBody>
@@ -550,28 +542,23 @@ export function SettingsPage({
         open={showRestartPrompt}
         onOpenChange={(open) => !open && handleRestartLater()}
       >
-        <DialogContent zIndex="alert" className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("settings.restartRequired")}</DialogTitle>
+        <DialogContent
+          zIndex="alert"
+          className="max-w-[480px] gap-2 rounded-[8px] border-border p-2"
+        >
+          <DialogHeader className="border-b-0 bg-transparent p-0">
+            <DialogTitle className="text-[12.35px] leading-[1.3]">
+              {t("settings.restartRequired")}
+            </DialogTitle>
           </DialogHeader>
-          <div className="px-6">
-            <p className="text-body text-fg-2">
-              {t("settings.restartRequiredMessage")}
-            </p>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="neutral"
-              size="regular"
-              onClick={handleRestartLater}
-            >
+          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
+            {t("settings.restartRequiredMessage")}
+          </p>
+          <DialogFooter className="border-t-0 bg-transparent p-0">
+            <Button variant="ghost" onClick={handleRestartLater}>
               {t("settings.restartLater")}
             </Button>
-            <Button
-              variant="solid"
-              size="regular"
-              onClick={() => void handleRestartNow()}
-            >
+            <Button onClick={() => void handleRestartNow()}>
               {t("settings.restartNow")}
             </Button>
           </DialogFooter>

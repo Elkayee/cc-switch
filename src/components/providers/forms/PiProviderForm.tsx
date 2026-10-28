@@ -1566,7 +1566,7 @@ export function PiProviderForm({
         onChangeCapture={() => {
           if (formError) setFormError(null);
         }}
-        className="space-y-6"
+        className="space-y-2 rounded-[8px] p-2 border border-border-default"
       >
         {!isEdit && (
           <ProviderPresetSelector
@@ -1582,7 +1582,7 @@ export function PiProviderForm({
           <div
             role="alert"
             aria-live="assertive"
-            className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+            className="rounded-[8px] border border-destructive/30 bg-destructive/10 px-4 py-3 text-ui text-destructive"
           >
             {formError}
           </div>
@@ -1591,7 +1591,7 @@ export function PiProviderForm({
         {hasConfigurationSelection && !isSettingsConfigValid && (
           <p
             role="status"
-            className="rounded-lg border border-transparent bg-warning-soft px-4 py-3 text-sm text-warning-text"
+            className="rounded-[8px] border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-ui text-amber-900 dark:text-amber-200"
           >
             {t("pi.form.fixJsonFirst")}
           </p>
@@ -1600,7 +1600,7 @@ export function PiProviderForm({
         {hasConfigurationSelection && (
           <fieldset
             disabled={!isSettingsConfigValid}
-            className="min-w-0 space-y-6 border-0 p-0 disabled:opacity-50"
+            className="min-w-0 space-y-3 border-0 p-0 disabled:opacity-50"
           >
             <BasicFormFields
               form={form}
@@ -1622,8 +1622,8 @@ export function PiProviderForm({
                   <p
                     className={
                       isDuplicateProviderKey
-                        ? "text-xs text-destructive"
-                        : "text-xs text-fg-2"
+                        ? "text-ui text-destructive"
+                        : "text-ui text-muted-foreground"
                     }
                   >
                     {isDuplicateProviderKey
@@ -1674,7 +1674,6 @@ export function PiProviderForm({
               shouldShowLink={Boolean(selectedPreset?.apiKeyUrl)}
               websiteUrl={selectedPreset?.apiKeyUrl ?? ""}
               isPartner={selectedPreset?.isPartner}
-              partnerPromotionKey={selectedPreset?.partnerPromotionKey}
             />
 
             <div className="space-y-2">
@@ -1709,25 +1708,23 @@ export function PiProviderForm({
                     id="pi-add-model"
                     type="button"
                     variant="outline"
-                    size="sm"
                     onClick={addModel}
-                    className="h-7 gap-1"
                   >
-                    <Plus className="h-3.5 w-3.5" />
+                    <Plus className="h-4 w-4" />
                     {t("pi.form.addModel")}
                   </Button>
                 </div>
               </div>
 
               {models.length === 0 ? (
-                <p role="status" className="py-2 text-sm text-fg-2">
+                <p role="status" className="py-2 text-ui text-muted-foreground">
                   {t("pi.form.noModels", {
                     defaultValue: "暂无模型配置",
                   })}
                 </p>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 px-1 text-xs text-fg-2">
+                  <div className="flex items-center gap-2 text-ui text-muted-foreground">
                     <span className="w-9" />
                     <span className={cn("flex-1", REQUIRED_LABEL)}>
                       {t("pi.form.modelId")}
@@ -1735,7 +1732,7 @@ export function PiProviderForm({
                     <span className={cn("flex-1", REQUIRED_LABEL)}>
                       {t("pi.form.modelName")}
                     </span>
-                    <span className="w-9" />
+                    <span className="w-6" />
                   </div>
                   {models.map((model) => {
                     const isExpanded = expandedModelKeys.has(model.key);
@@ -1761,7 +1758,7 @@ export function PiProviderForm({
                             aria-label={t("pi.form.toggleModelDetails", {
                               defaultValue: "展开或收起模型详情",
                             })}
-                            className="h-9 w-9 shrink-0"
+                            className="shrink-0"
                           >
                             <ChevronRight
                               className={`h-4 w-4 transition-transform motion-reduce:transition-none ${
@@ -1811,7 +1808,7 @@ export function PiProviderForm({
                               size="icon"
                               onClick={() => removeModel(model.key)}
                               aria-label={t("pi.form.removeModel")}
-                              className="h-9 w-9 shrink-0 text-fg-2 hover:text-destructive"
+                              className="shrink-0 text-muted-foreground hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -1819,9 +1816,9 @@ export function PiProviderForm({
                         </div>
 
                         {isExpanded && (
-                          <div className="ml-9 grid gap-3 border-l-2 border-muted pl-4 sm:grid-cols-2">
-                            <div className="flex min-h-9 flex-wrap items-center gap-x-8 gap-y-2 sm:col-span-2">
-                              <div className="flex items-center gap-2.5">
+                          <div className="ml-8 grid gap-3 border-l-2 border-muted pl-4 sm:grid-cols-2">
+                            <div className="flex min-h-6 flex-wrap items-center gap-x-8 gap-y-2 sm:col-span-2">
+                              <div className="flex items-center gap-2">
                                 <Label
                                   htmlFor={`pi-model-reasoning-${model.key}`}
                                   className="cursor-pointer"
@@ -1839,7 +1836,7 @@ export function PiProviderForm({
                                   }
                                 />
                               </div>
-                              <div className="flex items-center gap-2.5">
+                              <div className="flex items-center gap-2">
                                 <Label
                                   htmlFor={`pi-model-image-input-${model.key}`}
                                   className="cursor-pointer"
@@ -1917,11 +1914,10 @@ export function PiProviderForm({
                                 tabIndex={-1}
                                 className="w-full space-y-2 sm:col-span-2"
                               >
-                                <div className="flex min-h-9 items-center">
+                                <div className="flex min-h-6 items-center">
                                   <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     onClick={() =>
                                       setExpandedThinkingMapKeys((current) => {
                                         const next = new Set(current);
@@ -1944,7 +1940,7 @@ export function PiProviderForm({
                                         : t("pi.form.customizeThinkingLevels")
                                     }
                                     aria-expanded={thinkingMapIsExpanded}
-                                    className="-ml-2 h-8 gap-1.5 px-2 text-fg-1"
+                                    className="h-6 gap-1 px-2 text-foreground"
                                   >
                                     <span>
                                       {t("pi.form.thinkingLevelsLabel")}
@@ -1961,7 +1957,7 @@ export function PiProviderForm({
 
                                 {thinkingMapIsExpanded &&
                                   editableThinkingLevelMap && (
-                                    <div className="overflow-hidden rounded-lg border border-border/70 bg-surface">
+                                    <div className="overflow-hidden rounded-[8px] border border-border/70 bg-surface">
                                       {PI_THINKING_LEVELS.map((level) => {
                                         const mode = thinkingLevelMode(
                                           editableThinkingLevelMap,
@@ -1989,8 +1985,9 @@ export function PiProviderForm({
                                             }
                                           >
                                             <PopoverTrigger asChild>
-                                              <button
+                                              <Button
                                                 type="button"
+                                                variant="ghost"
                                                 aria-label={t(
                                                   "pi.form.editThinkingLevel",
                                                   {
@@ -1999,7 +1996,7 @@ export function PiProviderForm({
                                                     ),
                                                   },
                                                 )}
-                                                className="group flex h-[42px] w-full items-center gap-3 border-b border-border/40 px-4 text-left text-sm transition-colors last:border-b-0 hover:bg-subtle"
+                                                className="group h-[42px] w-full justify-start gap-3 rounded-none border-b border-border/40 px-4 last:border-b-0"
                                               >
                                                 <span className="flex-1">
                                                   {t(
@@ -2009,8 +2006,8 @@ export function PiProviderForm({
                                                 <span
                                                   className={
                                                     mode === "value"
-                                                      ? "max-w-[18rem] truncate text-right font-mono text-xs text-fg-1"
-                                                      : "text-xs text-fg-2"
+                                                      ? "max-w-[18rem] truncate text-right font-mono text-ui text-foreground"
+                                                      : "text-ui text-muted-foreground"
                                                   }
                                                 >
                                                   {mode === "default"
@@ -2025,7 +2022,7 @@ export function PiProviderForm({
                                                 </span>
                                                 <PopoverAnchor asChild>
                                                   <span
-                                                    className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-[color,background-color,transform] duration-200 ${
+                                                    className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] transition-[color,background-color,transform] duration-200 ${
                                                       popoverOpen
                                                         ? "translate-x-0.5 bg-primary/10 text-primary"
                                                         : "text-fg-3 group-hover:translate-x-0.5 group-hover:text-fg-2"
@@ -2034,7 +2031,7 @@ export function PiProviderForm({
                                                     <ChevronRight className="h-3.5 w-3.5" />
                                                   </span>
                                                 </PopoverAnchor>
-                                              </button>
+                                              </Button>
                                             </PopoverTrigger>
                                             <PopoverContent
                                               side="left"
@@ -2044,12 +2041,12 @@ export function PiProviderForm({
                                               sticky="always"
                                               className="pi-thinking-popover z-[1000] w-72 space-y-3 p-4 shadow-xl"
                                             >
-                                              <p className="text-sm font-medium">
+                                              <p className="text-ui font-medium">
                                                 {t(
                                                   `pi.form.thinkingLevels.${level}`,
                                                 )}
                                               </p>
-                                              <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+                                              <label className="flex cursor-pointer items-center gap-2 text-ui">
                                                 <input
                                                   type="radio"
                                                   name={`pi-thinking-level-mode-${model.key}-${level}`}
@@ -2067,7 +2064,7 @@ export function PiProviderForm({
                                                   "pi.form.thinkingLevelFollowDefault",
                                                 )}
                                               </label>
-                                              <div className="flex items-center gap-2.5 text-sm">
+                                              <div className="flex items-center gap-2 text-ui">
                                                 <input
                                                   id={`pi-thinking-level-value-${model.key}-${level}`}
                                                   type="radio"
@@ -2126,10 +2123,10 @@ export function PiProviderForm({
                                                       ),
                                                     },
                                                   )}
-                                                  className="h-8 min-w-0 flex-1 font-mono text-xs"
+                                                  className="h-8 min-w-0 flex-1 font-mono text-ui"
                                                 />
                                               </div>
-                                              <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+                                              <label className="flex cursor-pointer items-center gap-2 text-ui">
                                                 <input
                                                   type="radio"
                                                   name={`pi-thinking-level-mode-${model.key}-${level}`}

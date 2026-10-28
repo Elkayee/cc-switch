@@ -53,7 +53,7 @@ pub fn import_from_claude(config: &mut MultiAppConfig) -> Result<usize, AppError
     let Some(text) = text_opt else { return Ok(0) };
 
     let v: Value = serde_json::from_str(&text)
-        .map_err(|e| AppError::McpValidation(format!("解析 ~/.claude.json 失败: {e}")))?;
+        .map_err(|e| AppError::McpValidation(format!("Failed to parse ~/.claude.json: {e}")))?;
     let Some(map) = v.get("mcpServers").and_then(|x| x.as_object()) else {
         return Ok(0);
     };

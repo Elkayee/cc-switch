@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import en from "@/i18n/locales/en.json";
 import ja from "@/i18n/locales/ja.json";
+import vi from "@/i18n/locales/vi.json";
 import zhTW from "@/i18n/locales/zh-TW.json";
 import zh from "@/i18n/locales/zh.json";
 
@@ -45,6 +46,7 @@ describe("xAI OAuth locale coverage", () => {
     ["zh-TW", zhTW],
     ["en", en],
     ["ja", ja],
+    ["vi", vi],
   ])("defines every required key in %s", (_locale, translations) => {
     const missing = requiredKeys.filter((key) => {
       const value = readTranslation(translations, key);

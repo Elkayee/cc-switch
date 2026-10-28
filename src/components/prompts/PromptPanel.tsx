@@ -525,7 +525,7 @@ const StandardPromptPanel: React.FC<PromptPanelProps> = ({
     >
       {listEmpty ? (
         loading ? (
-          <div className="py-12 text-center text-body text-fg-2">
+          <div className="py-12 text-center text-[12.35px] leading-[1.3] text-fg-2">
             {t("prompts.loading")}
           </div>
         ) : (

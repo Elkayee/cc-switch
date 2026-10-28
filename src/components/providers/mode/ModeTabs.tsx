@@ -1,5 +1,14 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Layers, Plug, Route, Settings2, Shuffle } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Layers,
+  Plug,
+  Route,
+  Settings2,
+  Shuffle,
+} from "lucide-react";
 import type { AppMode } from "@/types/proxy";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -9,6 +18,8 @@ import {
   SegmentThumb,
   useSlidingIndicator,
 } from "@/components/ui/sliding-indicator";
+import { copyText } from "@/lib/clipboard";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 const MODE_ICON = { direct: Plug, route: Route, stack: Layers } as const;
@@ -43,6 +54,10 @@ interface ModeTabsProps {
   active: AppMode;
   view: AppMode;
   onView: (mode: AppMode) => void;
+  /** 状态行：「前导 + 值」，空间不够先截前导；值仅在独自超出整栏时才截断 */
+  status?: { lead: string; value: string };
+  /** Routing endpoint URL, shown with a copy button */
+  endpoint?: string;
   failover?: {
     enabled: boolean;
     disabled?: boolean;
@@ -65,6 +80,8 @@ export function ModeTabs({
   active,
   view,
   onView,
+  status,
+  endpoint,
   failover,
   onOpenRouteSettings,
   onOpenStackSettings,
@@ -77,17 +94,17 @@ export function ModeTabs({
   );
 
   return (
-    <div className="flex min-h-12 shrink-0 items-center gap-4 px-6 pt-3">
+    <div className="flex min-h-8 shrink-0 items-center gap-2 px-2 pt-2">
       <div
         ref={indicator.ref}
         role="group"
         aria-label={t("mode.tabsLabel")}
-        className="relative inline-flex h-9 shrink-0 items-center gap-0.5 rounded-[10px] bg-subtle p-[3px]"
+        className="relative inline-flex h-6 shrink-0 items-center gap-0 rounded-[4px] bg-subtle p-0.5"
       >
         <SegmentThumb
           rect={indicator.rect}
           animate={indicator.animate}
-          className="rounded-[7px]"
+          className="rounded-[3px]"
         />
         {modes.map((mode) => {
           const Icon = MODE_ICON[mode];
@@ -100,7 +117,7 @@ export function ModeTabs({
               aria-pressed={selected}
               onClick={() => onView(mode)}
               className={cn(
-                "relative inline-flex h-[30px] min-w-[96px] items-center justify-center gap-1.5 rounded-[7px] px-4 text-body transition-colors duration-150",
+                "relative inline-flex h-5 min-w-[60px] items-center justify-center gap-1 rounded-[3px] px-2 text-[12.35px] leading-[1.3] transition-colors duration-150",
                 isActive
                   ? MODE_TONE[mode].text
                   : selected
@@ -109,11 +126,7 @@ export function ModeTabs({
                 selected || isActive ? "font-semibold" : "font-medium",
               )}
             >
-              <Icon
-                className="h-3.5 w-3.5"
-                strokeWidth={2}
-                aria-hidden="true"
-              />
+              <Icon className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
               {t(`mode.names.${mode}`)}
               {isActive && (
                 <span
@@ -137,7 +150,15 @@ export function ModeTabs({
         ))}
       </HelpTip>
 
-      <div className="flex-1" />
+      {status && (status.lead || status.value) && (
+        <div className="flex min-w-0 flex-1 items-center gap-1 text-[12.35px] leading-[1.3] text-fg-2">
+          {status.lead && <span className="truncate">{status.lead}</span>}
+          <span className="max-w-full shrink-0 truncate" title={status.value}>
+            {status.value}
+          </span>
+        </div>
+      )}
+      {!status && <div className="flex-1" />}
       {searchSlotRef && (
         <div
           ref={searchSlotRef}
@@ -145,9 +166,11 @@ export function ModeTabs({
         />
       )}
 
+      {endpoint && <EndpointCopy url={endpoint} />}
+
       {failover && (
         <HoverTip content={t("mode.failover")}>
-          <label className="flex shrink-0 cursor-pointer items-center gap-1.5">
+          <label className="flex shrink-0 cursor-pointer items-center gap-1">
             <Shuffle
               className="h-4 w-4 text-fg-2"
               strokeWidth={1.5}
@@ -166,8 +189,8 @@ export function ModeTabs({
         <HoverTip content={t("mode.routeSettings")}>
           <Button
             variant="quiet"
-            size="compact"
-            className="h-8 w-8 shrink-0 px-0"
+            size="icon"
+            className="shrink-0"
             aria-label={t("mode.routeSettings")}
             onClick={onOpenRouteSettings}
           >
@@ -188,6 +211,53 @@ export function ModeTabs({
           </Button>
         </HoverTip>
       )}
+    </div>
+  );
+}
+
+/** Read-only endpoint URL + copy button. Truncates before it pushes the controls off the row. */
+function EndpointCopy({ url }: { url: string }) {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
+  const copy = () => {
+    void copyText(url)
+      .then(() => setCopied(true))
+      .catch((error: unknown) => {
+        toast.error(error instanceof Error ? error.message : String(error));
+      });
+  };
+
+  const label = t("mode.copyEndpoint");
+  return (
+    <div className="flex min-w-0 shrink items-center gap-1">
+      <span
+        className="min-w-0 truncate font-mono text-[12.35px] leading-[1.3] text-fg-2"
+        title={url}
+      >
+        {url}
+      </span>
+      <HoverTip content={label}>
+        <Button
+          variant="quiet"
+          size="icon-compact"
+          className="shrink-0"
+          aria-label={label}
+          onClick={copy}
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" strokeWidth={1.5} />
+          ) : (
+            <Copy className="h-4 w-4" strokeWidth={1.5} />
+          )}
+        </Button>
+      </HoverTip>
     </div>
   );
 }

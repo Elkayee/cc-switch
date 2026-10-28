@@ -770,7 +770,7 @@ fn export_sql_returns_error_for_invalid_path() {
     match err {
         AppError::IoContext { context, .. } => {
             assert!(
-                context.contains("原子写入失败") || context.contains("写入失败"),
+                context.contains("atomic write failed") || context.contains("write failed"),
                 "expected IO error message about atomic write failure, got: {context}"
             );
         }

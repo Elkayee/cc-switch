@@ -300,6 +300,7 @@ pub struct MigrationResult {
 enum PiSkillDeployment {
     Symlink { expected_target: PathBuf },
     Copy { expected_hash: String },
+    ForceReplace,
 }
 
 // ========== skills.sh API 类型 ==========
@@ -321,8 +322,12 @@ struct SkillsShApiResponse {
 }
 
 /// skills.sh API 原始技能条目
+///
+/// 搜索接口带 `id`；公开 leaderboard（`initialSkills`）没有该字段，缺省拼
+/// `{source}/{skillId}`，与搜索结果的 id 形态一致。
 #[derive(Debug, Clone, Deserialize)]
 struct SkillsShApiSkill {
+    #[serde(default)]
     pub id: String,
     #[serde(rename = "skillId")]
     pub skill_id: String,
@@ -720,13 +725,13 @@ impl SkillService {
             AppType::Mcode => crate::mcode_config::data_dir().join("skills"),
             AppType::Dsh => crate::dsh_config::data_dir().join("skills"),
             AppType::Kimi => crate::kimi_config::data_dir().join("skills"),
-            AppType::Claude => home.join(".claude").join("skills"),
+            AppType::Claude => crate::config::get_claude_config_dir().join("skills"),
             AppType::ClaudeDesktop => home.join(".claude-desktop").join("skills"),
-            AppType::Codex => home.join(".codex").join("skills"),
-            AppType::Gemini => home.join(".gemini").join("skills"),
-            AppType::GrokBuild => home.join(".grok").join("skills"),
-            AppType::OpenCode => home.join(".config").join("opencode").join("skills"),
-            AppType::OpenClaw => home.join(".openclaw").join("skills"),
+            AppType::Codex => crate::codex_config::get_codex_config_dir().join("skills"),
+            AppType::Gemini => crate::gemini_config::get_gemini_dir().join("skills"),
+            AppType::GrokBuild => crate::grok_config::get_grok_config_dir().join("skills"),
+            AppType::OpenCode => crate::opencode_config::get_opencode_dir().join("skills"),
+            AppType::OpenClaw => crate::openclaw_config::get_openclaw_dir().join("skills"),
             AppType::Hermes => crate::hermes_config::get_hermes_dir().join("skills"),
             AppType::Pi => crate::pi_config::get_pi_agent_dir()?.join("skills"),
             AppType::Omp => crate::omp_config::get_omp_agent_dir()?.join("skills"),
@@ -773,7 +778,7 @@ impl SkillService {
     fn ensure_distinct_skill_roots(ssot_dir: &Path, app_dir: &Path, app: &AppType) -> Result<()> {
         if Self::paths_alias(ssot_dir, app_dir) {
             return Err(anyhow!(
-                "Skill 存储目录不能与 {app:?} 的 Skills 目录相同: {}",
+                "Skill storage directory cannot be the same as the {app:?} Skills directory: {}",
                 ssot_dir.display()
             ));
         }
@@ -807,6 +812,18 @@ impl SkillService {
             skill.apps.omp = Self::skill_exists_in_app(&skill.directory, &AppType::Omp);
         }
         Ok(skills.into_values().collect())
+    }
+
+    /// Read the SSOT `SKILL.md` for an installed skill, including YAML frontmatter.
+    pub fn read_content(db: &Arc<Database>, id: &str) -> Result<String> {
+        let _guard = skill_state_read_guard();
+        let skill = db
+            .get_installed_skill(id)?
+            .ok_or_else(|| anyhow!("Skill not found: {id}"))?;
+        let dir_name = Self::sanitize_install_name(&skill.directory)
+            .ok_or_else(|| anyhow!("Invalid skill directory '{}'", skill.directory))?;
+        let path = Self::get_ssot_dir()?.join(dir_name).join("SKILL.md");
+        fs::read_to_string(&path).with_context(|| format!("Failed to read {}", path.display()))
     }
 
     /// Reuse an existing installation or reject a directory owned by another repo.
@@ -1244,7 +1261,7 @@ impl SkillService {
             hasher.update(rel_str.as_bytes());
             hasher.update(b"\0");
             let content = fs::read(file_path)
-                .with_context(|| format!("读取文件失败: {}", file_path.display()))?;
+                .with_context(|| format!("Failed to read file: {}", file_path.display()))?;
             hasher.update(&content);
             hasher.update(b"\0");
         }
@@ -1256,7 +1273,7 @@ impl SkillService {
     #[allow(clippy::only_used_in_recursion)]
     fn collect_files_for_hash(base: &Path, current: &Path, files: &mut Vec<PathBuf>) -> Result<()> {
         let entries = fs::read_dir(current)
-            .with_context(|| format!("读取目录失败: {}", current.display()))?;
+            .with_context(|| format!("Failed to read directory: {}", current.display()))?;
         for entry in entries {
             let entry = entry?;
             let name = entry.file_name().to_string_lossy().to_string();
@@ -1308,8 +1325,8 @@ impl SkillService {
     }
 
     fn collect_tree_entries(current: &Path, entries: &mut Vec<PathBuf>) -> Result<()> {
-        for entry in
-            fs::read_dir(current).with_context(|| format!("读取目录失败: {}", current.display()))?
+        for entry in fs::read_dir(current)
+            .with_context(|| format!("Failed to read directory: {}", current.display()))?
         {
             let entry = entry?;
             let path = entry.path();
@@ -1656,10 +1673,18 @@ impl SkillService {
             if skill.apps.is_enabled_for(&app) {
                 let destination =
                     Self::get_distinct_app_skills_dir(&ssot_dir, &app)?.join(&skill.directory);
-                if let Some(deployment) =
-                    Self::inspect_pi_skill_destination(&dest, &destination, &skill.directory)?
-                {
-                    deployments.push((destination, deployment));
+                if Self::paths_alias(&dest, &destination) {
+                    continue;
+                }
+                match Self::inspect_pi_skill_destination_inner(
+                    &dest,
+                    &destination,
+                    &skill.directory,
+                    true,
+                ) {
+                    Ok(Some(deployment)) => deployments.push((destination, deployment)),
+                    Ok(None) => {}
+                    Err(_) => deployments.push((destination, PiSkillDeployment::ForceReplace)),
                 }
             }
         }
@@ -1796,7 +1821,9 @@ impl SkillService {
         Self::validate_sync_source_dir(source, directory)?;
         let mut targets = vec![(ssot.to_path_buf(), false)];
         for (destination, deployment) in deployments {
-            Self::ensure_pi_skill_destination_matches(ssot, destination, directory)?;
+            if !matches!(deployment, PiSkillDeployment::ForceReplace) {
+                Self::ensure_pi_skill_destination_matches(ssot, destination, directory)?;
+            }
             targets.push((
                 destination.clone(),
                 matches!(deployment, PiSkillDeployment::Symlink { .. }),
@@ -2549,14 +2576,24 @@ impl SkillService {
     /// - Windows: 使用 std::os::windows::fs::symlink_dir
     #[cfg(unix)]
     fn create_symlink(src: &Path, dest: &Path) -> Result<()> {
-        std::os::unix::fs::symlink(src, dest)
-            .with_context(|| format!("创建符号链接失败: {} -> {}", src.display(), dest.display()))
+        std::os::unix::fs::symlink(src, dest).with_context(|| {
+            format!(
+                "Failed to create symlink: {} -> {}",
+                src.display(),
+                dest.display()
+            )
+        })
     }
 
     #[cfg(windows)]
     fn create_symlink(src: &Path, dest: &Path) -> Result<()> {
-        std::os::windows::fs::symlink_dir(src, dest)
-            .with_context(|| format!("创建符号链接失败: {} -> {}", src.display(), dest.display()))
+        std::os::windows::fs::symlink_dir(src, dest).with_context(|| {
+            format!(
+                "Failed to create symlink: {} -> {}",
+                src.display(),
+                dest.display()
+            )
+        })
     }
 
     /// 检查路径是否为符号链接
@@ -2630,6 +2667,15 @@ impl SkillService {
         destination: &Path,
         directory: &str,
     ) -> Result<Option<PiSkillDeployment>> {
+        Self::inspect_pi_skill_destination_inner(source, destination, directory, false)
+    }
+
+    fn inspect_pi_skill_destination_inner(
+        source: &Path,
+        destination: &Path,
+        directory: &str,
+        allow_divergent_copy: bool,
+    ) -> Result<Option<PiSkillDeployment>> {
         if !destination.exists() && !Self::is_symlink(destination) {
             return Ok(None);
         }
@@ -2652,21 +2698,31 @@ impl SkillService {
                     expected_target: resolved,
                 }));
             }
+            if allow_divergent_copy {
+                return Ok(Some(PiSkillDeployment::ForceReplace));
+            }
         } else if destination.is_dir() {
-            if let (Ok(destination_hash), Ok(source_hash)) = (
-                Self::compute_pi_deployment_hash(destination),
-                Self::compute_pi_deployment_hash(source),
-            ) {
+            let destination_hash = Self::compute_pi_deployment_hash(destination);
+            let source_hash = Self::compute_pi_deployment_hash(source);
+            if let (Ok(destination_hash), Ok(source_hash)) = (&destination_hash, &source_hash) {
                 if destination_hash == source_hash {
                     return Ok(Some(PiSkillDeployment::Copy {
-                        expected_hash: destination_hash,
+                        expected_hash: destination_hash.clone(),
                     }));
                 }
             }
+            if allow_divergent_copy {
+                return Ok(Some(match destination_hash {
+                    Ok(expected_hash) => PiSkillDeployment::Copy { expected_hash },
+                    Err(_) => PiSkillDeployment::ForceReplace,
+                }));
+            }
+        } else if allow_divergent_copy {
+            return Ok(Some(PiSkillDeployment::ForceReplace));
         }
 
         Err(anyhow!(
-            "Pi 中已存在同名但内容不同的 Skill，拒绝覆盖或删除: {directory}"
+            "A different skill with the same name already exists in Pi; refusing to overwrite or delete: {directory}"
         ))
     }
 
@@ -2693,7 +2749,7 @@ impl SkillService {
             PiSkillDeployment::Symlink { expected_target } => {
                 if !Self::is_symlink(destination) {
                     return Err(anyhow!(
-                        "Pi 中的 Skill 已在操作期间发生变化，拒绝覆盖: {directory}"
+                        "Skill in Pi changed during the operation; refusing to overwrite: {directory}"
                     ));
                 }
                 let target = fs::read_link(destination)?;
@@ -2707,7 +2763,7 @@ impl SkillService {
                 };
                 if &resolved != expected_target {
                     return Err(anyhow!(
-                        "Pi 中的 Skill 已在操作期间发生变化，拒绝覆盖: {directory}"
+                        "Skill in Pi changed during the operation; refusing to overwrite: {directory}"
                     ));
                 }
                 Self::remove_path(destination)?;
@@ -2722,8 +2778,14 @@ impl SkillService {
                     )
                 {
                     return Err(anyhow!(
-                        "Pi 中的 Skill 已在操作期间发生变化，拒绝覆盖: {directory}"
+                        "Skill in Pi changed during the operation; refusing to overwrite: {directory}"
                     ));
+                }
+                Self::replace_dest_with_copy(source, destination, directory)?;
+            }
+            PiSkillDeployment::ForceReplace => {
+                if destination.exists() || Self::is_symlink(destination) {
+                    Self::remove_path(destination)?;
                 }
                 Self::replace_dest_with_copy(source, destination, directory)?;
             }
@@ -2804,7 +2866,7 @@ impl SkillService {
                     }
                     Err(err) => {
                         log::warn!(
-                            "Symlink 创建失败，将回退到文件复制: {} -> {}. 错误: {err:#}",
+                            "Failed to create symlink, falling back to copy: {} -> {}. error: {err:#}",
                             source.display(),
                             dest.display()
                         );
@@ -2856,13 +2918,13 @@ impl SkillService {
 
     fn validate_sync_source_dir(source: &Path, directory: &str) -> Result<()> {
         if !source.is_dir() {
-            return Err(anyhow!("Skill 不存在于 SSOT: {directory}"));
+            return Err(anyhow!("Skill not found in SSOT: {directory}"));
         }
 
         let manifest = source.join("SKILL.md");
         if !manifest.is_file() {
             return Err(anyhow!(
-                "Skill 源目录缺少 SKILL.md，拒绝同步以避免覆盖目标目录: {}",
+                "Skill source directory is missing SKILL.md; refusing sync to avoid overwriting the target: {}",
                 source.display()
             ));
         }
@@ -4687,12 +4749,18 @@ impl SkillService {
 
     // ========== skills.sh 搜索 ==========
 
-    /// 搜索 skills.sh 公共目录
+    /// 搜索 skills.sh 公共目录。空 query 返回 Trending (24h) leaderboard，
+    /// 因为公开 `/api/search` 强制 2 字符、而 `/api/v1/skills?view=trending`
+    /// 需要 Vercel OIDC，桌面端用不了。
     pub async fn search_skills_sh(
         query: &str,
         limit: usize,
         offset: usize,
     ) -> Result<SkillsShSearchResult> {
+        if query.trim().is_empty() {
+            return Self::list_skills_sh_trending(limit, offset).await;
+        }
+
         let client = crate::proxy::http_client::get();
 
         let url = url::Url::parse_with_params(
@@ -4716,38 +4784,86 @@ impl SkillService {
         let skills = resp
             .skills
             .into_iter()
-            .filter_map(|s| {
-                let parts: Vec<&str> = s.source.splitn(2, '/').collect();
-                if parts.len() != 2 {
-                    return None;
-                }
-                let (owner, repo) = (parts[0].to_string(), parts[1].to_string());
-                // 用与 download_repo 同一套坐标校验，而不是就地写启发式：下面这个
-                // readme_url 最终交给 openExternal 打开，是和 build_skill_doc_url
-                // 同一个 sink。原来的 `contains('.')` 既漏（`splitn(2, '/')` 允许
-                // repo 里带 `/`，`owner/a/b` 能拼出三段路径），又误伤（GitHub 仓库
-                // 名合法含点）。校验 owner 同时也保留了"过滤非 GitHub 来源"的效果
-                // ——`skills.volces.com` 这类带点的 owner 本来就不是合法用户名。
-                if Self::validate_repo_ref(&owner, &repo, "main").is_err() {
-                    return None;
-                }
-                Some(SkillsShDiscoverableSkill {
-                    key: s.id,
-                    name: s.name,
-                    directory: s.skill_id.clone(),
-                    repo_owner: owner.clone(),
-                    repo_name: repo.clone(),
-                    repo_branch: "main".to_string(),
-                    installs: s.installs,
-                    readme_url: Some(format!("https://github.com/{}/{}", owner, repo)),
-                })
-            })
+            .filter_map(Self::map_skills_sh_api_skill)
             .collect();
 
         Ok(SkillsShSearchResult {
             skills,
             total_count: resp.count,
             query: resp.query,
+        })
+    }
+
+    /// skills.sh 公开 `/api/v1/skills?view=trending` 要 OIDC；homepage `/trending`
+    /// 把同一份 leaderboard SSR 进 RSC payload 的 `initialSkills`。解析该数组，
+    /// 再用与搜索相同的 GitHub 坐标过滤（`uizze.sh` 这类非仓库来源装不了）。
+    async fn list_skills_sh_trending(limit: usize, offset: usize) -> Result<SkillsShSearchResult> {
+        let client = crate::proxy::http_client::get();
+        let body = client
+            .get("https://www.skills.sh/trending")
+            .header("RSC", "1")
+            .header("Accept", "text/x-component")
+            .timeout(std::time::Duration::from_secs(10))
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
+
+        let all: Vec<_> = Self::parse_skills_sh_leaderboard(&body)?
+            .into_iter()
+            .filter_map(Self::map_skills_sh_api_skill)
+            .collect();
+        let total_count = all.len();
+        let skills = all.into_iter().skip(offset).take(limit).collect();
+
+        Ok(SkillsShSearchResult {
+            skills,
+            total_count,
+            query: String::new(),
+        })
+    }
+
+    fn parse_skills_sh_leaderboard(body: &str) -> Result<Vec<SkillsShApiSkill>> {
+        const MARKER: &str = "initialSkills\":";
+        let Some(pos) = body.find(MARKER) else {
+            anyhow::bail!("skills.sh leaderboard payload missing initialSkills");
+        };
+        let rest = body[pos + MARKER.len()..].trim_start();
+        let mut de = serde_json::Deserializer::from_str(rest);
+        Vec::<SkillsShApiSkill>::deserialize(&mut de)
+            .map_err(|e| anyhow!("failed to parse skills.sh leaderboard: {e}"))
+    }
+
+    fn map_skills_sh_api_skill(s: SkillsShApiSkill) -> Option<SkillsShDiscoverableSkill> {
+        let parts: Vec<&str> = s.source.splitn(2, '/').collect();
+        if parts.len() != 2 {
+            return None;
+        }
+        let (owner, repo) = (parts[0].to_string(), parts[1].to_string());
+        // 用与 download_repo 同一套坐标校验，而不是就地写启发式：下面这个
+        // readme_url 最终交给 openExternal 打开，是和 build_skill_doc_url
+        // 同一个 sink。原来的 `contains('.')` 既漏（`splitn(2, '/')` 允许
+        // repo 里带 `/`，`owner/a/b` 能拼出三段路径），又误伤（GitHub 仓库
+        // 名合法含点）。校验 owner 同时也保留了"过滤非 GitHub 来源"的效果
+        // ——`skills.volces.com` 这类带点的 owner 本来就不是合法用户名。
+        if Self::validate_repo_ref(&owner, &repo, "main").is_err() {
+            return None;
+        }
+        let key = if s.id.is_empty() {
+            format!("{owner}/{repo}/{}", s.skill_id)
+        } else {
+            s.id
+        };
+        Some(SkillsShDiscoverableSkill {
+            key,
+            name: s.name,
+            directory: s.skill_id,
+            repo_owner: owner.clone(),
+            repo_name: repo.clone(),
+            repo_branch: "main".to_string(),
+            installs: s.installs,
+            readme_url: Some(format!("https://github.com/{owner}/{repo}")),
         })
     }
 }
@@ -4990,6 +5106,34 @@ mod tests {
         assert!(skill_state_lock().try_write().is_ok());
     }
 
+    #[test]
+    fn parse_skills_sh_leaderboard_reads_initial_skills_array() {
+        let body = r#"1:"$Sreact.fragment"
+0:{"props":{"initialSkills":[{"source":"vercel-labs/skills","skillId":"find-skills","name":"find-skills","installs":123},{"source":"uizze.sh","skillId":"ui-taste","name":"ui-taste","installs":99}]},"rest":true}"#;
+        let parsed = SkillService::parse_skills_sh_leaderboard(body).expect("parse");
+        assert_eq!(parsed.len(), 2);
+        assert_eq!(parsed[0].skill_id, "find-skills");
+        assert!(parsed[0].id.is_empty());
+
+        let mapped: Vec<_> = parsed
+            .into_iter()
+            .filter_map(SkillService::map_skills_sh_api_skill)
+            .collect();
+        assert_eq!(mapped.len(), 1);
+        assert_eq!(mapped[0].key, "vercel-labs/skills/find-skills");
+        assert_eq!(mapped[0].repo_owner, "vercel-labs");
+        assert_eq!(mapped[0].repo_name, "skills");
+        assert_eq!(mapped[0].directory, "find-skills");
+        assert_eq!(mapped[0].installs, 123);
+    }
+
+    #[test]
+    fn parse_skills_sh_leaderboard_rejects_missing_marker() {
+        let err = SkillService::parse_skills_sh_leaderboard("no leaderboard here")
+            .expect_err("missing marker");
+        assert!(err.to_string().contains("initialSkills"));
+    }
+
     /// 构造一个模拟 GitHub 归档的 ZIP：带一层 `repo-main/` 根目录，
     /// 其中掺入用 `../` 逃逸的恶意条目。
     ///
@@ -5037,7 +5181,7 @@ mod tests {
             "user.name/topic",
         ] {
             assert!(
-                SkillService::validate_repo_ref("farion1231", "cc-switch", branch).is_ok(),
+                SkillService::validate_repo_ref("example-org", "example-repo", branch).is_ok(),
                 "must accept branch: {branch:?}"
             );
         }
@@ -5052,7 +5196,7 @@ mod tests {
         // 第一行就 INVALID_REPO_REF，整个技能面板列不出东西——前端两处
         // `repo.branch || "main"` 正是照着"空串可用"写的。
         assert!(
-            SkillService::validate_repo_ref("farion1231", "cc-switch", "").is_ok(),
+            SkillService::validate_repo_ref("example-org", "example-repo", "").is_ok(),
             "the empty-branch sentinel must stay usable"
         );
     }
@@ -6555,6 +6699,65 @@ mod tests {
 
         assert!(fs::read_to_string(destination.join("SKILL.md"))
             .expect("read refreshed copy")
+            .contains("name: new"));
+    }
+
+    #[test]
+    fn update_inspect_treats_divergent_pi_copy_as_refreshable() {
+        let temp = tempdir().expect("tempdir");
+        let source = temp.path().join("source");
+        let destination = temp.path().join("pi-skill");
+        write_skill(&source, "ssot");
+        write_skill(&destination, "pi-old");
+
+        assert!(
+            SkillService::inspect_pi_skill_destination(&source, &destination, "test-skill")
+                .is_err(),
+            "strict inspect must still reject divergent copies"
+        );
+
+        let deployment = SkillService::inspect_pi_skill_destination_inner(
+            &source,
+            &destination,
+            "test-skill",
+            true,
+        )
+        .expect("inspect divergent copy for update")
+        .expect("copy deployment");
+
+        fs::remove_dir_all(&source).expect("replace old source");
+        write_skill(&source, "new");
+        SkillService::refresh_pi_skill_destination(
+            &source,
+            &destination,
+            "test-skill",
+            &deployment,
+        )
+        .expect("refresh divergent copy during update");
+
+        assert!(fs::read_to_string(destination.join("SKILL.md"))
+            .expect("read refreshed copy")
+            .contains("name: new"));
+    }
+
+    #[test]
+    fn force_replace_overwrites_divergent_pi_copy() {
+        let temp = tempdir().expect("tempdir");
+        let source = temp.path().join("source");
+        let destination = temp.path().join("pi-skill");
+        write_skill(&source, "new");
+        write_skill(&destination, "pi-old");
+
+        SkillService::refresh_pi_skill_destination(
+            &source,
+            &destination,
+            "test-skill",
+            &PiSkillDeployment::ForceReplace,
+        )
+        .expect("force replace divergent copy");
+
+        assert!(fs::read_to_string(destination.join("SKILL.md"))
+            .expect("read replaced copy")
             .contains("name: new"));
     }
 

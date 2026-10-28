@@ -184,6 +184,10 @@ vi.mock("@/components/skills/UnifiedSkillsPanel", () => ({
   },
 }));
 
+vi.mock("@/components/ThemeToggle", () => ({
+  ThemeToggle: () => null,
+}));
+
 vi.mock("@/components/mcp/McpPanel", () => ({
   default: ({ open, onOpenChange }: any) =>
     open ? (
@@ -208,13 +212,16 @@ vi.mock("@/components/mcp/UnifiedMcpPanel", async () => {
   return { default: Body };
 });
 
-/** 侧栏里的应用行（v7 侧栏取代了原来页头的应用切换器） */
+/** 顶栏里的应用切换器 / 页面导航按钮（Fork 保留页头布局，没有 v7 侧栏） */
 const sidebarApp = (name: string) =>
-  // 首次启动提示是模态对话框，会把侧栏标成 aria-hidden，所以带上 hidden
-  within(document.querySelector("nav") as HTMLElement).getByRole("button", {
-    name,
-    hidden: true,
-  });
+  // 首次启动提示是模态对话框，会把页头标成 aria-hidden，所以带上 hidden
+  within(document.querySelector("#app-toolbar") as HTMLElement).getByRole(
+    "button",
+    {
+      name,
+      hidden: true,
+    },
+  );
 
 const renderApp = (AppComponent: ComponentType) => {
   const client = new QueryClient();

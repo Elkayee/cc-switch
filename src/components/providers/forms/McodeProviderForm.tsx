@@ -171,7 +171,7 @@ export function McodeProviderForm({
     <Form {...form}>
       <form
         id="provider-form"
-        className="space-y-6"
+        className="space-y-2 rounded-[8px] p-2 border border-border-default"
         onSubmit={form.handleSubmit(async (identity) => {
           if (!ready || busy) return;
           setBusy(true);
@@ -220,7 +220,7 @@ export function McodeProviderForm({
           />
         )}
         {error && (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-ui text-destructive">
             {error}
           </p>
         )}
@@ -252,8 +252,8 @@ export function McodeProviderForm({
                 <p
                   className={
                     keyTaken || keyInvalid
-                      ? "text-xs text-destructive"
-                      : "text-xs text-fg-2"
+                      ? "text-ui text-destructive"
+                      : "text-ui text-muted-foreground"
                   }
                 >
                   {keyTaken
@@ -278,7 +278,6 @@ export function McodeProviderForm({
             shouldShowApiKeyLink={Boolean(preset?.apiKeyUrl)}
             websiteUrl={preset?.apiKeyUrl ?? ""}
             isPartner={preset?.isPartner}
-            partnerPromotionKey={preset?.partnerPromotionKey}
             baseUrl={config.options?.baseURL ?? ""}
             onBaseUrlChange={(baseURL) => updateOptions({ baseURL })}
             headers={config.options?.headers ?? {}}

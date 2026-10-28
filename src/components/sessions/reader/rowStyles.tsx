@@ -12,11 +12,11 @@ import { useReaderT } from "./i18n";
 
 /** 可展开的一行：步骤、思考、折叠摘要 */
 export const ROW_BUTTON =
-  "group/row flex h-8 w-full min-w-0 items-center gap-2 rounded-control px-1.5 text-left text-caption transition-colors hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
+  "group/row flex h-6 w-full min-w-0 items-center gap-2 rounded-[4px] px-1.5 text-left text-[12.35px] leading-[1.3] transition-colors hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
 
 /** 不可展开的一行（redacted 思考等） */
 export const ROW_STATIC =
-  "flex h-8 w-full min-w-0 items-center gap-2 px-1.5 text-caption";
+  "flex h-6 w-full min-w-0 items-center gap-2 px-1.5 text-[12.35px] leading-[1.3]";
 
 export const TONE_CLASS: Record<StatusTone, string> = {
   success: "text-success-text",

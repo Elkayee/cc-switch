@@ -268,25 +268,25 @@ export function UsageDateRangePicker({
     return (
       <div
         className={cn(
-          "rounded-panel border px-3 py-2 transition-all",
+          "rounded-[8px] border px-2 py-2 transition-all",
           isEndLive
             ? "border-border bg-subtle cursor-not-allowed opacity-50"
             : isActive
-              ? "border-ring ring-1 ring-ring bg-surface cursor-pointer"
+              ? "border-ring ring-1 ring-ring bg-card cursor-pointer"
               : "border-border hover:border-border cursor-pointer",
         )}
         onClick={() => {
           if (!isEndLive) setActiveField(field);
         }}
       >
-        <div className="mb-1.5 text-badge font-medium uppercase tracking-wider text-fg-2">
+        <div className="mb-2 text-ui font-medium uppercase tracking-wider text-muted-foreground">
           {label}
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <Input
             type="date"
             className={cn(
-              "h-7 flex-1 border-0 bg-transparent p-0 text-body shadow-none focus:ring-0 focus-visible:ring-0",
+              "h-7 flex-1 border-0 bg-transparent p-0 text-[12.35px] leading-[1.3] shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtDate(ts)}
@@ -307,7 +307,7 @@ export function UsageDateRangePicker({
             type="time"
             step={60}
             className={cn(
-              "h-7 w-[90px] flex-none border-0 bg-transparent p-0 text-body shadow-none focus:ring-0 focus-visible:ring-0",
+              "h-7 w-[90px] flex-none border-0 bg-transparent p-0 text-[12.35px] leading-[1.3] shadow-none focus:ring-0 focus-visible:ring-0",
               isEndLive && "pointer-events-none",
             )}
             value={fmtTime(ts)}
@@ -341,15 +341,15 @@ export function UsageDateRangePicker({
             className="h-4 w-4 shrink-0 text-fg-3"
           />
           <span className="min-w-0 truncate">{triggerLabel}</span>
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-fg-2" />
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="usage-range-popover w-[620px] max-w-[calc(100vw-2rem)] rounded-panel border-border bg-surface p-3 shadow-v7-md"
+        className="usage-range-popover w-[620px] max-w-[calc(100vw-2rem)] rounded-panel border-border bg-surface p-2 shadow-v7-md"
         align="start"
       >
         {/* Preset shortcuts */}
-        <div className="flex flex-wrap gap-1.5 pb-2 border-b border-border">
+        <div className="flex flex-wrap gap-2 pb-2 border-b border-border">
           {PRESETS.map((preset) => (
             <Button
               key={preset}
@@ -358,7 +358,7 @@ export function UsageDateRangePicker({
               variant="neutral"
               aria-pressed={selection.preset === preset}
               className={cn(
-                "px-2.5",
+                "px-2",
                 selection.preset === preset &&
                   "border-fg-1 bg-selected font-semibold",
               )}
@@ -372,10 +372,10 @@ export function UsageDateRangePicker({
           ))}
         </div>
 
-        <div className="usage-range-layout mt-3 flex flex-col gap-3">
+        <div className="usage-range-layout mt-2 flex flex-col gap-2">
           {/* Left: date fields */}
           <div className="usage-range-fields space-y-2">
-            <p className="text-caption text-fg-2">
+            <p className="text-ui text-muted-foreground">
               {t("usage.customRangeHint", "支持日期与时间，最长 30 天")}
             </p>
             {renderField("start")}
@@ -393,12 +393,12 @@ export function UsageDateRangePicker({
                   }
                 }}
               />
-              <span className="text-caption text-fg-2">
+              <span className="text-ui text-muted-foreground">
                 {t("usage.liveEndTime", "结束时间跟随当前时刻")}
               </span>
             </label>
 
-            {error && <p className="text-caption text-danger-text">{error}</p>}
+            {error && <p className="text-ui text-danger-text">{error}</p>}
 
             <div className="flex gap-2 pt-1">
               <Button
@@ -423,9 +423,9 @@ export function UsageDateRangePicker({
           </div>
 
           {/* Right: calendar */}
-          <div className="usage-range-calendar rounded-panel border border-border bg-subtle p-2.5">
+          <div className="usage-range-calendar rounded-[8px] border border-border bg-subtle p-2">
             {/* Month navigation */}
-            <div className="flex items-center justify-between mb-1.5">
+            <div className="flex items-center justify-between mb-2">
               <HoverTip content={prevMonthLabel}>
                 <Button
                   type="button"
@@ -442,7 +442,7 @@ export function UsageDateRangePicker({
                     )
                   }
                 >
-                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <ChevronLeft className="h-4 w-4" />
                 </Button>
               </HoverTip>
               {/* 点月份标题跳回本月：动作不在字面上，用 HoverTip 说明 */}
@@ -451,7 +451,7 @@ export function UsageDateRangePicker({
               >
                 <button
                   type="button"
-                  className="text-body font-medium text-fg-1 transition-colors hover:text-fg-2"
+                  className="text-ui font-medium text-foreground transition-colors hover:text-muted-foreground"
                   onClick={goToToday}
                 >
                   {displayMonth.toLocaleDateString(locale, {
@@ -476,13 +476,13 @@ export function UsageDateRangePicker({
                     )
                   }
                 >
-                  <ChevronRight className="h-3.5 w-3.5" />
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </HoverTip>
             </div>
 
             {/* Weekday headers */}
-            <div className="grid grid-cols-7 text-center text-badge text-fg-2 mb-0.5">
+            <div className="grid grid-cols-7 text-center text-ui text-muted-foreground mb-0.5">
               {weekdayLabels.map((label, i) => (
                 <div key={i} className="py-0.5">
                   {label}
@@ -512,10 +512,10 @@ export function UsageDateRangePicker({
                     aria-current={isToday ? "date" : undefined}
                     aria-pressed={isEndpoint}
                     className={cn(
-                      "relative h-7 rounded text-caption transition-colors",
-                      !isCurrentMonth && "text-fg-3",
+                      "relative h-7 rounded text-[12.35px] leading-[1.3] transition-colors",
+                      !isCurrentMonth && "text-muted-foreground",
                       isCurrentMonth && !inRange && "hover:bg-subtle",
-                      inRange && !isEndpoint && "bg-selected text-fg-1",
+                      inRange && !isEndpoint && "bg-selected text-foreground",
                       isEndpoint && "bg-action text-action-fg font-medium",
                       isToday && !isEndpoint && "ring-1 ring-border-strong",
                     )}

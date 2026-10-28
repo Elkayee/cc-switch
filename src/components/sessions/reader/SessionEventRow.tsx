@@ -148,7 +148,7 @@ export const SessionEventRow = memo(function SessionEventRow({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex min-w-0 items-center gap-0.5 rounded-control px-1 hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex min-w-0 items-center gap-0.5 rounded-[4px] px-1 hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="truncate">{label}</span>
         <ChevronRight
@@ -166,7 +166,7 @@ export const SessionEventRow = memo(function SessionEventRow({
   const detail = open && display.detail && (
     <div
       className={cn(
-        "mt-1 rounded-[8px] bg-subtle px-3 py-2 text-left text-caption",
+        "mt-1 rounded-[8px] bg-subtle px-3 py-2 text-left text-[12.35px] leading-[1.3]",
         tone,
       )}
     >
@@ -184,7 +184,7 @@ export const SessionEventRow = memo(function SessionEventRow({
         <SessionPlainText
           content={display.detail}
           searchQuery={searchQuery}
-          className="text-caption text-inherit"
+          className="text-[12.35px] leading-[1.3] text-inherit"
         />
       )}
     </div>
@@ -195,7 +195,7 @@ export const SessionEventRow = memo(function SessionEventRow({
       <div className="min-w-0 px-1.5 py-1">
         <div
           className={cn(
-            "flex h-6 min-w-0 items-center gap-2 text-caption",
+            "flex h-6 min-w-0 items-center gap-2 text-[12.35px] leading-[1.3]",
             tone,
           )}
         >
@@ -212,7 +212,7 @@ export const SessionEventRow = memo(function SessionEventRow({
       <div
         role="note"
         className={cn(
-          "flex min-w-0 items-center justify-center gap-2.5 text-caption",
+          "flex min-w-0 items-center justify-center gap-2 text-[12.35px] leading-[1.3]",
           tone,
         )}
       >
@@ -260,7 +260,7 @@ export const SessionInjectedRow = memo(function SessionInjectedRow({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex h-6 max-w-full items-center gap-1 rounded-control pe-1.5 ps-1 text-caption text-fg-3 transition-colors hover:bg-subtle hover:text-fg-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex h-6 max-w-full items-center gap-1 rounded-[4px] pe-1.5 ps-1 text-[12.35px] leading-[1.3] text-fg-3 transition-colors hover:bg-subtle hover:text-fg-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ChevronRight
           aria-hidden
@@ -294,7 +294,7 @@ export const SessionInjectedRow = memo(function SessionInjectedRow({
             <SessionPlainText
               content={text}
               searchQuery={searchQuery}
-              className="text-caption text-fg-2"
+              className="text-[12.35px] leading-[1.3] text-fg-2"
             />
           )}
         </div>

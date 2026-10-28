@@ -139,7 +139,9 @@ impl PromptService {
 
         if let Some(prompt) = prompts.get(id) {
             if prompt.enabled {
-                return Err(AppError::InvalidInput("无法删除已启用的提示词".to_string()));
+                return Err(AppError::InvalidInput(
+                    "Cannot delete an enabled prompt".to_string(),
+                ));
             }
         }
 
@@ -187,11 +189,11 @@ impl PromptService {
                             let backup_prompt = Prompt {
                                 id: backup_id.clone(),
                                 name: format!(
-                                    "原始提示词 {}",
+                                    "Original prompt {}",
                                     chrono::Local::now().format("%Y-%m-%d %H:%M")
                                 ),
                                 content: live_content,
-                                description: Some("自动备份的原始提示词".to_string()),
+                                description: Some("Auto-backed-up original prompt".to_string()),
                                 enabled: false,
                                 created_at: Some(timestamp),
                                 updated_at: Some(timestamp),
@@ -217,7 +219,7 @@ impl PromptService {
             write_text_file(&target_path, &prompt.content)?; // 原子写入
             state.db.save_prompt(app.as_str(), prompt)?;
         } else {
-            return Err(AppError::InvalidInput(format!("提示词 {id} 不存在")));
+            return Err(AppError::InvalidInput(format!("Prompt {id} not found")));
         }
 
         // Save all prompts to disable others
@@ -233,11 +235,11 @@ impl PromptService {
             PiAgentsFileGuard::acquire()?
                 .read()?
                 .content
-                .ok_or_else(|| AppError::Message("提示词文件不存在".to_string()))?
+                .ok_or_else(|| AppError::Message("Prompt file not found".to_string()))?
         } else {
             let file_path = prompt_file_path(&app)?;
             if !file_path.exists() {
-                return Err(AppError::Message("提示词文件不存在".to_string()));
+                return Err(AppError::Message("Prompt file not found".to_string()));
             }
             std::fs::read_to_string(&file_path).map_err(|e| AppError::io(&file_path, e))?
         };
@@ -251,7 +253,7 @@ impl PromptService {
                 chrono::Local::now().format("%Y-%m-%d %H:%M")
             ),
             content,
-            description: Some("从现有配置文件导入".to_string()),
+            description: Some("Import from existing config files".to_string()),
             enabled: false,
             created_at: Some(timestamp),
             updated_at: Some(timestamp),
@@ -322,7 +324,7 @@ impl PromptService {
             Ok(())
         } else {
             Err(AppError::Message(format!(
-                "部分应用 Prompt 同步失败: {}",
+                "Prompt sync failed for some apps: {}",
                 failures.join("; ")
             )))
         }
@@ -437,7 +439,7 @@ fn enable_mcode_prompt(state: &AppState, id: &str, target_path: &Path) -> Result
     let mut prompts = state.db.get_prompts("mcode")?;
     let target = prompts
         .get(id)
-        .ok_or_else(|| AppError::InvalidInput(format!("提示词 {id} 不存在")))?;
+        .ok_or_else(|| AppError::InvalidInput(format!("Prompt {id} not found")))?;
     validate_prompt_content(&AppType::Mcode, &target.content)?;
 
     let live_content = match std::fs::read_to_string(target_path) {
@@ -460,11 +462,11 @@ fn enable_mcode_prompt(state: &AppState, id: &str, target_path: &Path) -> Result
                 Prompt {
                     id: backup_id,
                     name: format!(
-                        "原始提示词 {}",
+                        "Original prompt {}",
                         chrono::Local::now().format("%Y-%m-%d %H:%M")
                     ),
                     content: live_content,
-                    description: Some("自动备份的原始提示词".to_string()),
+                    description: Some("Auto-backed-up original prompt".to_string()),
                     enabled: false,
                     created_at: Some(timestamp),
                     updated_at: Some(timestamp),
@@ -584,7 +586,7 @@ fn enable_pi_prompt(state: &AppState, id: &str) -> Result<(), AppError> {
     let target = prompts
         .get(id)
         .cloned()
-        .ok_or_else(|| AppError::InvalidInput(format!("提示词 {id} 不存在")))?;
+        .ok_or_else(|| AppError::InvalidInput(format!("Prompt {id} not found")))?;
     let snapshot = guard.read()?;
 
     if let Some(content) = snapshot.content.as_ref() {
@@ -594,11 +596,11 @@ fn enable_pi_prompt(state: &AppState, id: &str) -> Result<(), AppError> {
             let backup = Prompt {
                 id: unique_pi_backup_id(&prompts, timestamp),
                 name: format!(
-                    "原始提示词 {}",
+                    "Original prompt {}",
                     chrono::Local::now().format("%Y-%m-%d %H:%M")
                 ),
                 content: content.clone(),
-                description: Some("自动备份的原始提示词".to_string()),
+                description: Some("Auto-backed-up original prompt".to_string()),
                 enabled: false,
                 created_at: Some(timestamp),
                 updated_at: Some(timestamp),
@@ -615,7 +617,9 @@ fn delete_pi_prompt(state: &AppState, id: &str) -> Result<(), AppError> {
     let prompts = state.db.get_prompts(AppType::Pi.as_str())?;
     let snapshot = guard.read()?;
     if pi_active_prompt_id(&prompts, snapshot.content.as_deref()).as_deref() == Some(id) {
-        return Err(AppError::InvalidInput("无法删除已启用的提示词".to_string()));
+        return Err(AppError::InvalidInput(
+            "Cannot delete an enabled prompt".to_string(),
+        ));
     }
     state.db.delete_prompt(AppType::Pi.as_str(), id)?;
     Ok(())

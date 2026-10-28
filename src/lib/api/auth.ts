@@ -41,6 +41,23 @@ export interface ManagedAuthStatus {
   accounts: ManagedAuthAccount[];
 }
 
+/** Access token of a managed OAuth provider (xAI, ChatGPT, Copilot), as served to direct-connect clients. */
+export interface ProviderDirectToken {
+  access_token: string;
+  token_type: string;
+  auth_provider: ManagedAuthProvider;
+  /** Full URL a direct client POSTs to. */
+  endpoint: string;
+  /** Headers the upstream needs besides `Authorization: Bearer <token>`. */
+  headers: { name: string; value: string }[];
+  /** Unix ms. */
+  expires_at: number | null;
+  expires_in: number | null;
+  refreshed: boolean;
+  retry_after: number | null;
+  account_id: string;
+}
+
 export interface ManagedAuthDeviceCodeResponse {
   provider: ManagedAuthProvider;
   device_code: string;
@@ -159,7 +176,19 @@ export async function getClaudeLoginSwitch(): Promise<ClaudeLoginSwitchStatus> {
   return invoke<ClaudeLoginSwitchStatus>("get_claude_login_switch");
 }
 
+/** Current token; reports no rejection, so only a token with under an hour left is renewed. */
+export async function getProviderDirectToken(
+  app: string,
+  providerId: string,
+): Promise<ProviderDirectToken> {
+  return invoke<ProviderDirectToken>("get_provider_direct_token", {
+    app,
+    providerId,
+  });
+}
+
 export const authApi = {
+  getProviderDirectToken,
   authStartLogin,
   authPollForAccount,
   authCancelLogin,

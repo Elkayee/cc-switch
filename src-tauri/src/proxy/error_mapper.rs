@@ -75,15 +75,17 @@ pub fn get_error_message(error: &ProxyError) -> String {
                 .unwrap_or("上游未返回错误内容");
             format!("上游错误 ({status}): {body}")
         }
-        ProxyError::Timeout(msg) => format!("请求超时: {msg}"),
-        ProxyError::ForwardFailed(msg) => format!("转发失败: {msg}"),
-        ProxyError::NoAvailableProvider => "无可用 Provider".to_string(),
-        ProxyError::AllProvidersCircuitOpen => "所有供应商已熔断，无可用渠道".to_string(),
-        ProxyError::NoProvidersConfigured => "未配置供应商".to_string(),
-        ProxyError::MaxRetriesExceeded => "所有 Provider 都失败，重试耗尽".to_string(),
-        ProxyError::ProviderUnhealthy(msg) => format!("Provider 不健康: {msg}"),
-        ProxyError::DatabaseError(msg) => format!("数据库错误: {msg}"),
-        ProxyError::TransformError(msg) => format!("请求/响应转换错误: {msg}"),
+        ProxyError::Timeout(msg) => format!("Request timed out: {msg}"),
+        ProxyError::ForwardFailed(msg) => format!("Forward failed: {msg}"),
+        ProxyError::NoAvailableProvider => "No available provider".to_string(),
+        ProxyError::AllProvidersCircuitOpen => {
+            "All providers are circuit-open; no channel available".to_string()
+        }
+        ProxyError::NoProvidersConfigured => "No providers configured".to_string(),
+        ProxyError::MaxRetriesExceeded => "All providers failed; retries exhausted".to_string(),
+        ProxyError::ProviderUnhealthy(msg) => format!("Provider unhealthy: {msg}"),
+        ProxyError::DatabaseError(msg) => format!("Database error: {msg}"),
+        ProxyError::TransformError(msg) => format!("Request/response transform error: {msg}"),
         _ => error.to_string(),
     }
 }
@@ -150,7 +152,7 @@ mod tests {
             body: Some("Internal Server Error".to_string()),
         };
         let msg = get_error_message(&error);
-        assert!(msg.contains("上游错误"));
+        assert!(msg.contains("Upstream error"));
         assert!(msg.contains("500"));
         assert!(msg.contains("Internal Server Error"));
     }

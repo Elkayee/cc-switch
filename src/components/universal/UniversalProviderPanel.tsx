@@ -218,20 +218,20 @@ export function UniversalProviderPanel() {
   const providerList = Object.values(providers);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* 头部 */}
       <div className="flex items-center gap-2">
-        <Layers className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold">
+        <Layers className="h-4 w-4 text-primary" />
+        <h2 className="text-[12.35px] leading-[1.3] font-semibold">
           {t("universalProvider.title", { defaultValue: "统一供应商" })}
         </h2>
-        <span className="rounded-full bg-subtle px-2 py-0.5 text-xs text-fg-2">
+        <span className="rounded-full bg-muted px-2 py-0.5 text-[12.35px] leading-[1.3] text-muted-foreground">
           {providerList.length}
         </span>
       </div>
 
       {/* 描述 */}
-      <p className="text-sm text-fg-2">
+      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
         {t("universalProvider.description", {
           defaultValue:
             "统一供应商可以同时管理 Claude、Codex 和 Gemini 的配置。修改后会自动同步到所有启用的应用。",
@@ -244,21 +244,21 @@ export function UniversalProviderPanel() {
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       ) : providerList.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-12 text-center">
-          <Layers className="mb-3 h-10 w-10 text-fg-3" />
-          <p className="text-sm text-fg-2">
+        <div className="flex flex-col items-center justify-center rounded-[8px] border border-dashed py-8 text-center">
+          <Layers className="mb-2 h-6 w-6 text-muted-foreground/50" />
+          <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
             {t("universalProvider.empty", {
               defaultValue: "还没有统一供应商",
             })}
           </p>
-          <p className="mt-1 text-xs text-fg-3">
+          <p className="mt-1 text-[12.35px] leading-[1.3] text-muted-foreground/70">
             {t("universalProvider.emptyHint", {
               defaultValue: "点击下方「添加统一供应商」按钮创建一个",
             })}
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {providerList.map((provider) => (
             <UniversalProviderCard
               key={provider.id}

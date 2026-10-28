@@ -705,9 +705,10 @@ fn restore_codex_state_db_official_threads(
     }
 
     let mut conn = Connection::open(db_path)
-        .map_err(|e| AppError::Database(format!("打开 Codex state DB 失败: {e}")))?;
-    conn.busy_timeout(Duration::from_secs(5))
-        .map_err(|e| AppError::Database(format!("设置 Codex state DB busy_timeout 失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to open Codex state DB: {e}")))?;
+    conn.busy_timeout(Duration::from_secs(5)).map_err(|e| {
+        AppError::Database(format!("Failed to set Codex state DB busy_timeout: {e}"))
+    })?;
 
     if !Database::table_exists(&conn, "threads")?
         || !Database::has_column(&conn, "threads", "model_provider")?
@@ -729,7 +730,11 @@ fn restore_codex_state_db_official_threads(
             .query_row(&count_sql, params_from_iter(values.iter()), |row| {
                 row.get(0)
             })
-            .map_err(|e| AppError::Database(format!("统计 Codex state DB 待还原行失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!(
+                    "Failed to count Codex state DB rows pending restore: {e}"
+                ))
+            })?;
         matching_rows += count;
     }
     if matching_rows == 0 {
@@ -738,9 +743,11 @@ fn restore_codex_state_db_official_threads(
 
     backup_codex_state_db(db_path, codex_dir, backup_root, &conn)?;
 
-    let tx = conn
-        .transaction()
-        .map_err(|e| AppError::Database(format!("开启 Codex state DB 还原事务失败: {e}")))?;
+    let tx = conn.transaction().map_err(|e| {
+        AppError::Database(format!(
+            "Failed to begin Codex state DB restore transaction: {e}"
+        ))
+    })?;
     let mut changed = 0;
     for chunk in ids.chunks(STATE_DB_ID_CHUNK) {
         let placeholders = placeholders(chunk.len());
@@ -753,10 +760,15 @@ fn restore_codex_state_db_official_threads(
         values.extend(chunk.iter().map(|id| (*id).clone()));
         changed += tx
             .execute(&update_sql, params_from_iter(values.iter()))
-            .map_err(|e| AppError::Database(format!("还原 Codex state DB provider 失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to restore Codex state DB provider: {e}"))
+            })?;
     }
-    tx.commit()
-        .map_err(|e| AppError::Database(format!("提交 Codex state DB 还原事务失败: {e}")))?;
+    tx.commit().map_err(|e| {
+        AppError::Database(format!(
+            "Failed to commit Codex state DB restore transaction: {e}"
+        ))
+    })?;
     Ok(changed)
 }
 
@@ -1284,9 +1296,10 @@ fn migrate_codex_state_db_provider_bucket_to(
     }
 
     let mut conn = Connection::open(db_path)
-        .map_err(|e| AppError::Database(format!("打开 Codex state DB 失败: {e}")))?;
-    conn.busy_timeout(Duration::from_secs(5))
-        .map_err(|e| AppError::Database(format!("设置 Codex state DB busy_timeout 失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to open Codex state DB: {e}")))?;
+    conn.busy_timeout(Duration::from_secs(5)).map_err(|e| {
+        AppError::Database(format!("Failed to set Codex state DB busy_timeout: {e}"))
+    })?;
 
     if !Database::table_exists(&conn, "threads")?
         || !Database::has_column(&conn, "threads", "model_provider")?
@@ -1303,7 +1316,11 @@ fn migrate_codex_state_db_provider_bucket_to(
             params_from_iter(source_provider_ids.iter()),
             |row| row.get(0),
         )
-        .map_err(|e| AppError::Database(format!("统计 Codex state DB 待迁移行失败: {e}")))?;
+        .map_err(|e| {
+            AppError::Database(format!(
+                "Failed to count Codex state DB rows pending migration: {e}"
+            ))
+        })?;
     if matching_rows == 0 {
         return Ok(0);
     }
@@ -1315,14 +1332,21 @@ fn migrate_codex_state_db_provider_bucket_to(
     let mut values = Vec::with_capacity(source_provider_ids.len() + 1);
     values.push(target_provider_id.to_string());
     values.extend(source_provider_ids.iter().cloned());
-    let tx = conn
-        .transaction()
-        .map_err(|e| AppError::Database(format!("开启 Codex state DB 迁移事务失败: {e}")))?;
+    let tx = conn.transaction().map_err(|e| {
+        AppError::Database(format!(
+            "Failed to begin Codex state DB migrate transaction: {e}"
+        ))
+    })?;
     let changed = tx
         .execute(&update_sql, params_from_iter(values.iter()))
-        .map_err(|e| AppError::Database(format!("迁移 Codex state DB provider 失败: {e}")))?;
-    tx.commit()
-        .map_err(|e| AppError::Database(format!("提交 Codex state DB 迁移事务失败: {e}")))?;
+        .map_err(|e| {
+            AppError::Database(format!("Failed to migrate Codex state DB provider: {e}"))
+        })?;
+    tx.commit().map_err(|e| {
+        AppError::Database(format!(
+            "Failed to commit Codex state DB migrate transaction: {e}"
+        ))
+    })?;
     Ok(changed)
 }
 
@@ -1357,12 +1381,13 @@ fn backup_codex_state_db(
     }
 
     let mut backup_conn = Connection::open(&backup_path)
-        .map_err(|e| AppError::Database(format!("创建 Codex state DB 备份失败: {e}")))?;
-    let backup = Backup::new(source_conn, &mut backup_conn)
-        .map_err(|e| AppError::Database(format!("初始化 Codex state DB 备份失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create Codex state DB back up: {e}")))?;
+    let backup = Backup::new(source_conn, &mut backup_conn).map_err(|e| {
+        AppError::Database(format!("Failed to initialize Codex state DB back up: {e}"))
+    })?;
     backup
         .run_to_completion(5, Duration::from_millis(25), None)
-        .map_err(|e| AppError::Database(format!("写入 Codex state DB 备份失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to write Codex state DB back up: {e}")))?;
     Ok(())
 }
 

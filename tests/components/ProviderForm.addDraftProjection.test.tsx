@@ -107,11 +107,19 @@ function renderForm(appId: AppId, bases: Base[]) {
 }
 
 function clickPreset(name: string) {
-  const matches = screen
-    .getAllByRole("button")
+  let matches = screen
+    .queryAllByRole("button")
     .filter(
       (button) => button.querySelector("span.truncate")?.textContent === name,
     );
+  if (matches.length === 0) {
+    fireEvent.click(screen.getByRole("button", { name: /unofficial/i }));
+    matches = screen
+      .queryAllByRole("button")
+      .filter(
+        (button) => button.querySelector("span.truncate")?.textContent === name,
+      );
+  }
   expect(matches, `预设按钮「${name}」应唯一`).toHaveLength(1);
   fireEvent.click(matches[0]);
 }

@@ -210,7 +210,7 @@ fn schema_migration_rejects_future_version() {
     let err =
         Database::apply_schema_migrations_on_conn(&conn).expect_err("should reject higher version");
     assert!(
-        err.to_string().contains("数据库版本过新"),
+        err.to_string().contains("Database version is too new"),
         "unexpected error: {err}"
     );
 }

@@ -12,9 +12,9 @@ const WEBSITE_URL = "https://moark.com";
 const API_KEY_URL = "https://moark.com/dashboard/tokens";
 const DEFAULT_MODEL = "deepseek-v4.1-flash";
 
-describe("MoArk (模力方舟) provider presets", () => {
+describe("MoArk provider presets", () => {
   it("uses the Anthropic-native root endpoint for Claude Code", () => {
-    const preset = providerPresets.find((item) => item.name === "模力方舟");
+    const preset = providerPresets.find((item) => item.name === "MoArk");
 
     expect(preset).toBeDefined();
     expect(preset?.websiteUrl).toBe(WEBSITE_URL);
@@ -34,9 +34,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("uses the OpenAI-compatible Responses endpoint for Codex", () => {
-    const preset = codexProviderPresets.find(
-      (item) => item.name === "模力方舟",
-    );
+    const preset = codexProviderPresets.find((item) => item.name === "MoArk");
 
     expect(preset).toBeDefined();
     expect(preset?.websiteUrl).toBe(WEBSITE_URL);
@@ -51,9 +49,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("declares the Codex model catalog so /model lists every MoArk model", () => {
-    const preset = codexProviderPresets.find(
-      (item) => item.name === "模力方舟",
-    );
+    const preset = codexProviderPresets.find((item) => item.name === "MoArk");
     const catalog = preset?.modelCatalog ?? [];
 
     // 缺 modelCatalog 时 Codex 退回通用元数据，/model 只会列出默认模型。
@@ -84,9 +80,9 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("keeps Codex capacities in step with the OpenClaw preset", () => {
-    const codex = codexProviderPresets.find((item) => item.name === "模力方舟");
+    const codex = codexProviderPresets.find((item) => item.name === "MoArk");
     const openclaw = openclawProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const openclawById = new Map(
       (openclaw?.settingsConfig.models ?? []).map((model) => [model.id, model]),
@@ -105,9 +101,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("uses the Codex NativeResponses profile for the direct gateway", () => {
-    const preset = codexProviderPresets.find(
-      (item) => item.name === "模力方舟",
-    );
+    const preset = codexProviderPresets.find((item) => item.name === "MoArk");
 
     // moark.com 不在 CODEX_NATIVE_RESPONSES_HOSTS 兜底名单里，而这条路径是原生
     // Responses 直连、没有代理去改写 custom→function。不显式声明 apiFormat 会让
@@ -117,9 +111,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("declares only platform- or vendor-verified Codex reasoning levels", () => {
-    const preset = codexProviderPresets.find(
-      (item) => item.name === "模力方舟",
-    );
+    const preset = codexProviderPresets.find((item) => item.name === "MoArk");
     const levels = Object.fromEntries(
       (preset?.modelCatalog ?? []).map((model) => [
         model.model,
@@ -171,7 +163,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("uses the OpenAI-compatible endpoint for Pi", () => {
-    const preset = piProviderPresets.find((item) => item.name === "模力方舟");
+    const preset = piProviderPresets.find((item) => item.name === "MoArk");
 
     expect(preset).toBeDefined();
     expect(preset?.websiteUrl).toBe(WEBSITE_URL);
@@ -197,7 +189,7 @@ describe("MoArk (模力方舟) provider presets", () => {
 
   it("uses the OpenAI-compatible endpoint for OpenCode", () => {
     const preset = opencodeProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const models = preset?.settingsConfig.models ?? {};
 
@@ -230,7 +222,7 @@ describe("MoArk (模力方舟) provider presets", () => {
 
   it("uses the OpenAI Completions endpoint for OpenClaw", () => {
     const preset = openclawProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const modelIds = (preset?.settingsConfig.models ?? []).map(
       (model) => model.id,
@@ -256,7 +248,7 @@ describe("MoArk (模力方舟) provider presets", () => {
 
   it("declares positive capacity limits for every OpenCode model", () => {
     const preset = opencodeProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const models = preset?.settingsConfig.models ?? {};
 
@@ -272,10 +264,10 @@ describe("MoArk (模力方舟) provider presets", () => {
 
   it("keeps OpenCode capacities consistent with the OpenClaw preset", () => {
     const opencode = opencodeProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const openclaw = openclawProviderPresets.find(
-      (item) => item.name === "模力方舟",
+      (item) => item.name === "MoArk",
     );
     const openclawById = new Map(
       (openclaw?.settingsConfig.models ?? []).map((model) => [model.id, model]),
@@ -294,9 +286,7 @@ describe("MoArk (模力方舟) provider presets", () => {
   });
 
   it("inherits the Pi preset for MiniMax Code", () => {
-    const preset = mcodeProviderPresets.find(
-      (item) => item.name === "模力方舟",
-    );
+    const preset = mcodeProviderPresets.find((item) => item.name === "MoArk");
 
     expect(preset).toBeDefined();
     expect(preset?.settingsConfig.kind).toBe("custom");

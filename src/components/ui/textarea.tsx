@@ -8,7 +8,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (
       <textarea
-        className={cn(fieldClass, "flex min-h-[80px] py-2", className)}
+        className={cn(
+          fieldClass,
+          "flex min-h-[120px] resize-y py-1",
+          className,
+        )}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="none"

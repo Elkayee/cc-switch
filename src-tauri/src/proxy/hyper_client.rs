@@ -295,7 +295,7 @@ pub async fn send_request(
             send_raw_request(&uri, &method, &headers, original_cases, &body, proxy_url),
         )
         .await
-        .map_err(|_| ProxyError::Timeout(format!("请求超时: {}s", timeout.as_secs())))?;
+        .map_err(|_| ProxyError::Timeout(format!("Request timed out: {}s", timeout.as_secs())))?;
 
         match result {
             Ok(resp) => return Ok(resp),

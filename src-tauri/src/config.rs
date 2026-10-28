@@ -30,6 +30,73 @@ pub fn get_home_dir() -> PathBuf {
     })
 }
 
+/// `CC_SWITCH_DEV` appends `-dev` to live-config directory names so a `just dev`
+/// session does not share Claude/Codex/etc. dirs with the installed release.
+/// Applied to defaults **and** saved overrides. `CC_SWITCH_TEST_HOME` disables it.
+const DEV_DIR_SUFFIX: &str = "-dev";
+
+pub(crate) fn dir_suffix() -> Option<&'static str> {
+    resolve_dir_suffix(
+        env_flag_enabled("CC_SWITCH_DEV"),
+        std::env::var_os("CC_SWITCH_TEST_HOME").is_some(),
+    )
+}
+
+fn env_flag_enabled(name: &str) -> bool {
+    std::env::var(name)
+        .ok()
+        .map(|value| {
+            let trimmed = value.trim();
+            !trimmed.is_empty() && trimmed != "0"
+        })
+        .unwrap_or(false)
+}
+
+/// True when `CC_SWITCH_DEV` isolates this process from the installed release.
+pub(crate) fn is_dev_session() -> bool {
+    dir_suffix().is_some()
+}
+
+/// Per-device data dir (`settings.json`, write-ahead intents, backups): `~/.cc-switch`,
+/// or `~/.cc-switch-dev` in a dev session. Never follows `app_config_dir` overrides.
+pub(crate) fn device_dir() -> PathBuf {
+    apply_dir_suffix(get_home_dir().join(".cc-switch"))
+}
+
+fn resolve_dir_suffix(is_dev: bool, has_test_home_override: bool) -> Option<&'static str> {
+    if !is_dev || has_test_home_override {
+        None
+    } else {
+        Some(DEV_DIR_SUFFIX)
+    }
+}
+
+pub(crate) fn apply_dir_suffix(path: PathBuf) -> PathBuf {
+    apply_dir_suffix_with(path, dir_suffix())
+}
+
+fn apply_dir_suffix_with(path: PathBuf, suffix: Option<&str>) -> PathBuf {
+    let Some(suffix) = suffix else {
+        return path;
+    };
+    match path.file_name() {
+        Some(name) => {
+            if name.to_string_lossy().ends_with(suffix) {
+                return path;
+            }
+            let mut new_name = name.to_os_string();
+            new_name.push(suffix);
+            path.with_file_name(new_name)
+        }
+        None => path,
+    }
+}
+
+/// Override (if any) else `default`, then apply the `-dev` suffix when `CC_SWITCH_DEV` is set.
+pub(crate) fn resolve_tool_config_dir(override_dir: Option<PathBuf>, default: PathBuf) -> PathBuf {
+    apply_dir_suffix(override_dir.unwrap_or(default))
+}
+
 /// 检测路径是否为 WSL 网络路径（如 \\wsl$\Ubuntu\... 或 \\wsl.localhost\Ubuntu\...）
 /// 注意：仅检测直接 UNC 路径，映射磁盘符（如 Z: -> \\wsl$\...）无法检测
 #[cfg(windows)]
@@ -89,11 +156,10 @@ fn test_home_override() -> Option<PathBuf> {
 
 /// 获取 Claude Code 配置目录路径
 pub fn get_claude_config_dir() -> PathBuf {
-    if let Some(custom) = crate::settings::get_claude_override_dir() {
-        return custom;
-    }
-
-    get_home_dir().join(".claude")
+    resolve_tool_config_dir(
+        crate::settings::get_claude_override_dir(),
+        get_home_dir().join(".claude"),
+    )
 }
 
 /// 默认 Claude MCP 配置文件路径 (~/.claude.json)
@@ -284,6 +350,9 @@ fn derive_mcp_path_from_override(dir: &Path) -> PathBuf {
 
 /// 获取 Claude MCP 配置文件路径
 pub fn get_claude_mcp_path() -> PathBuf {
+    if dir_suffix().is_some() {
+        return derive_mcp_path_from_override(&get_claude_config_dir());
+    }
     if let Some(custom_dir) = crate::settings::get_claude_override_dir() {
         if let Some(path) = default_mcp_path_for_config_dir(&custom_dir) {
             return path;
@@ -309,46 +378,75 @@ pub fn get_claude_settings_path() -> PathBuf {
     settings
 }
 
+/// 兼容 v3.10.3：当用户环境存在 `HOME` 且与真实用户目录不同，v3.10.3 可能在
+/// `HOME/.cc-switch/` 下创建/使用了数据库。仅在“默认位置没有数据库”时回退到
+/// 旧位置，避免再次出现“供应商消失”问题，同时也避免新安装因为 `HOME` 被设置
+/// 而写入非预期路径。
+///
+/// `has_test_home_override` 必须优先于本回退：否则在设置了 `HOME` 的 shell
+/// （Git Bash / MSYS / CI）里，即使调用方已经把 home 重定向到沙箱，只要沙箱里
+/// 还没有数据库，这里就会读到真实用户目录并绕过隔离——即“沙箱逃逸”。
+///
+/// 纯函数（不读环境变量、不做真实文件系统访问之外的 I/O），便于直接测试两条
+/// 分支，而不必依赖测试运行所在机器的真实 `HOME` 状态。
+#[cfg(windows)]
+fn resolve_windows_legacy_dir(
+    default_dir: &std::path::Path,
+    home_env: Option<&str>,
+    has_test_home_override: bool,
+    db_exists: impl Fn(&std::path::Path) -> bool,
+) -> Option<PathBuf> {
+    if has_test_home_override || db_exists(&default_dir.join("cc-switch.db")) {
+        return None;
+    }
+
+    let trimmed = home_env?.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+
+    let legacy_dir = PathBuf::from(trimmed).join(".cc-switch");
+    if db_exists(&legacy_dir.join("cc-switch.db")) {
+        Some(legacy_dir)
+    } else {
+        None
+    }
+}
+
 /// 获取应用配置目录路径 (~/.cc-switch)
+///
+/// 优先级：Store `app_config_dir_override` → `{home}/.cc-switch`，`CC_SWITCH_DEV` 再加 `-dev`
 pub fn get_app_config_dir() -> PathBuf {
     if let Some(custom) = crate::app_store::get_app_config_dir_override() {
-        return custom;
+        return apply_dir_suffix(custom);
     }
 
     let default_dir = get_home_dir().join(".cc-switch");
+    if dir_suffix().is_some() {
+        return apply_dir_suffix(default_dir);
+    }
 
     // 兼容 v3.10.3：当用户环境存在 `HOME` 且与真实用户目录不同，
     // v3.10.3 可能在 `HOME/.cc-switch/` 下创建/使用了数据库。
     // 这里仅在“默认位置没有数据库”时回退到旧位置，避免再次出现“供应商消失”问题，
     // 同时也避免新安装因为 `HOME` 被设置而写入非预期路径。
     //
-    // `CC_SWITCH_TEST_HOME` 是测试用的显式 home 覆盖，必须在这里短路：测试的临时
-    // 目录本来就不带 cc-switch.db，若不先返回，下面的 HOME 回退会把测试指向真实
-    // 用户库（Windows 上 runner 的 HOME 下常常确实有该 db），既污染用户数据，又让
-    // 隔离测试读到别人写的状态而失败。
-    #[cfg(windows)]
-    if test_home_override().is_some() {
-        return default_dir;
-    }
-
+    // 决策逻辑抽到 `resolve_windows_legacy_dir`（纯函数）以便直接测试，
+    // 避免通过真实环境变量 + 真实用户目录间接断言。
     #[cfg(windows)]
     {
-        let default_db = default_dir.join("cc-switch.db");
-        if !default_db.exists() {
-            if let Ok(home_env) = std::env::var("HOME") {
-                let trimmed = home_env.trim();
-                if !trimmed.is_empty() {
-                    let legacy_dir = PathBuf::from(trimmed).join(".cc-switch");
-                    if legacy_dir.join("cc-switch.db").exists() {
-                        log::info!(
-                            "Detected v3.10.3 legacy database at {}, using it instead of {}",
-                            legacy_dir.display(),
-                            default_dir.display()
-                        );
-                        return legacy_dir;
-                    }
-                }
-            }
+        if let Some(legacy_dir) = resolve_windows_legacy_dir(
+            &default_dir,
+            std::env::var("HOME").ok().as_deref(),
+            std::env::var_os("CC_SWITCH_TEST_HOME").is_some(),
+            |path| path.exists(),
+        ) {
+            log::info!(
+                "Detected v3.10.3 legacy database at {}, using it instead of {}",
+                legacy_dir.display(),
+                default_dir.display()
+            );
+            return legacy_dir;
         }
     }
 
@@ -385,7 +483,10 @@ pub fn get_provider_config_path(provider_id: &str, provider_name: Option<&str>) 
 /// 读取 JSON 配置文件
 pub fn read_json_file<T: for<'a> Deserialize<'a>>(path: &Path) -> Result<T, AppError> {
     if !path.exists() {
-        return Err(AppError::Config(format!("文件不存在: {}", path.display())));
+        return Err(AppError::Config(format!(
+            "File not found: {}",
+            path.display()
+        )));
     }
 
     let content = fs::read_to_string(path).map_err(|e| AppError::io(path, e))?;
@@ -515,10 +616,10 @@ pub(crate) fn stage_write(
 
     let parent = path
         .parent()
-        .ok_or_else(|| AppError::Config("无效的路径".to_string()))?;
+        .ok_or_else(|| AppError::Config("Invalid path".to_string()))?;
     let file_name = path
         .file_name()
-        .ok_or_else(|| AppError::Config("无效的文件名".to_string()))?
+        .ok_or_else(|| AppError::Config("Invalid file name".to_string()))?
         .to_string_lossy()
         .to_string();
     let ts = std::time::SystemTime::now()
@@ -671,7 +772,11 @@ pub(crate) fn commit_staged(tmp: &Path, path: &Path) -> Result<(), AppError> {
         if !completed {
             let source = last_error.unwrap_or_else(std::io::Error::last_os_error);
             return Err(AppError::IoContext {
-                context: format!("原子替换失败: {} -> {}", tmp.display(), path.display()),
+                context: format!(
+                    "Atomic replace failed: {} -> {}",
+                    tmp.display(),
+                    path.display()
+                ),
                 source,
             });
         }
@@ -681,7 +786,11 @@ pub(crate) fn commit_staged(tmp: &Path, path: &Path) -> Result<(), AppError> {
     {
         if let Err(source) = fs::rename(tmp, path) {
             return Err(AppError::IoContext {
-                context: format!("原子替换失败: {} -> {}", tmp.display(), path.display()),
+                context: format!(
+                    "Atomic replace failed: {} -> {}",
+                    tmp.display(),
+                    path.display()
+                ),
                 source,
             });
         }
@@ -692,6 +801,236 @@ pub(crate) fn commit_staged(tmp: &Path, path: &Path) -> Result<(), AppError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn dir_suffix_only_in_dev_without_test_home() {
+        assert_eq!(resolve_dir_suffix(true, false), Some("-dev"));
+        assert_eq!(resolve_dir_suffix(true, true), None);
+        assert_eq!(resolve_dir_suffix(false, false), None);
+        assert_eq!(resolve_dir_suffix(false, true), None);
+    }
+
+    /// Guard for `CC_SWITCH_DEV`: a dev session must never touch the release's
+    /// `~/.cc-switch` or its proxy port. Upstream code (and merges) tend to add
+    /// `.join(".cc-switch")` / `15721` directly; route them through
+    /// `config::device_dir()` / `proxy::types::default_listen_port()` instead.
+    #[test]
+    fn no_hardcoded_release_dir_or_port_outside_the_dev_aware_helpers() {
+        // Files that own the literal. Test modules are skipped (scan stops at the first `#[cfg(test)]`).
+        const DIR_ALLOWED: &[&str] = &["config.rs"];
+        const PORT_ALLOWED: &[&str] = &["proxy/types.rs", "database/schema.rs"];
+
+        // `15721` as a number, not inside a longer digit run (the Claude Desktop profile UUID).
+        fn has_port_literal(line: &str) -> bool {
+            line.match_indices("15721").any(|(at, hit)| {
+                let before = line[..at].chars().next_back();
+                let after = line[at + hit.len()..].chars().next();
+                !before.is_some_and(|c| c.is_ascii_digit())
+                    && !after.is_some_and(|c| c.is_ascii_digit())
+            })
+        }
+
+        fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap().flatten() {
+                let path = entry.path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().is_some_and(|ext| ext == "rs") {
+                    out.push(path);
+                }
+            }
+        }
+
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+        let mut files = Vec::new();
+        walk(&root, &mut files);
+
+        let mut offenders = Vec::new();
+        for file in files {
+            let rel = file
+                .strip_prefix(&root)
+                .unwrap()
+                .to_string_lossy()
+                .replace('\\', "/");
+            let text = fs::read_to_string(&file).unwrap();
+            for (index, line) in text.lines().enumerate() {
+                if line.trim() == "#[cfg(test)]" {
+                    break;
+                }
+                let trimmed = line.trim_start();
+                if trimmed.starts_with("//") {
+                    continue;
+                }
+                if line.contains("\".cc-switch\"") && !DIR_ALLOWED.contains(&rel.as_str()) {
+                    offenders.push(format!("{rel}:{}: \".cc-switch\"", index + 1));
+                }
+                if has_port_literal(line) && !PORT_ALLOWED.contains(&rel.as_str()) {
+                    offenders.push(format!("{rel}:{}: 15721", index + 1));
+                }
+            }
+        }
+        assert!(
+            offenders.is_empty(),
+            "use config::device_dir() / proxy::types::default_listen_port() so CC_SWITCH_DEV stays isolated:
+{}",
+            offenders.join("
+")
+        );
+    }
+
+    #[test]
+    fn single_instance_plugin_stays_behind_the_dev_check() {
+        let lib =
+            fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("src/lib.rs")).unwrap();
+        let gate = lib
+            .find("if !config::is_dev_session()")
+            .expect("lib.rs must skip single-instance when CC_SWITCH_DEV is set");
+        let plugin = lib
+            .find("builder.plugin(single_instance)")
+            .expect("single-instance plugin registration moved");
+        assert!(gate < plugin && plugin - gate < 200);
+    }
+
+    #[test]
+    fn dev_suffix_never_resolves_to_the_release_data_dir() {
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.cc-switch"), Some("-dev")),
+            PathBuf::from("/home/u/.cc-switch-dev")
+        );
+    }
+
+    #[test]
+    fn dir_suffix_appends_to_last_component() {
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.claude"), Some("-dev")),
+            PathBuf::from("/home/u/.claude-dev")
+        );
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.config/opencode"), Some("-dev")),
+            PathBuf::from("/home/u/.config/opencode-dev")
+        );
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.claude"), None),
+            PathBuf::from("/home/u/.claude")
+        );
+    }
+
+    #[test]
+    fn dir_suffix_does_not_double_apply() {
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.claude-dev"), Some("-dev")),
+            PathBuf::from("/home/u/.claude-dev")
+        );
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.config/opencode-dev"), Some("-dev")),
+            PathBuf::from("/home/u/.config/opencode-dev")
+        );
+    }
+
+    #[test]
+    fn resolve_tool_config_dir_applies_suffix_to_override() {
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from("/home/u/.claude"), Some("-dev")),
+            PathBuf::from("/home/u/.claude-dev")
+        );
+        assert_eq!(
+            apply_dir_suffix_with(PathBuf::from(r"C:\Users\0x317\.claude"), Some("-dev")),
+            PathBuf::from(r"C:\Users\0x317\.claude-dev")
+        );
+    }
+
+    /// Direct tests of the extracted decision function — deterministic, no env
+    /// vars, no real filesystem/home-directory state, so they cannot pass
+    /// vacuously depending on what happens to exist on the machine running them
+    /// (unlike testing through `get_app_config_dir()`, where "the real home
+    /// already has a legacy DB" would make the override-priority branch
+    /// unreachable and the assertion trivially true).
+    #[cfg(windows)]
+    mod windows_legacy_dir_resolution {
+        use super::resolve_windows_legacy_dir;
+        use std::path::{Path, PathBuf};
+
+        fn exists_only(existing: &'static [&'static str]) -> impl Fn(&Path) -> bool {
+            move |path: &Path| {
+                let path = path.to_string_lossy().replace('\\', "/");
+                existing.iter().any(|candidate| path == *candidate)
+            }
+        }
+
+        /// The bug this whole function exists to fix: a test override present
+        /// but its sandbox not yet populated must NOT fall through to a real
+        /// legacy database.
+        #[test]
+        fn test_home_override_suppresses_the_fallback_even_with_no_sandbox_db() {
+            let default_dir = PathBuf::from("/sandbox/.cc-switch");
+            let result = resolve_windows_legacy_dir(
+                &default_dir,
+                Some("/real-home"),
+                true, // has_test_home_override
+                exists_only(&["/real-home/.cc-switch/cc-switch.db"]),
+            );
+            assert_eq!(result, None);
+        }
+
+        /// Without the override, a real legacy database must still be found —
+        /// this is the behavior the fallback exists to provide.
+        #[test]
+        fn legacy_db_is_used_when_default_is_empty_and_no_override_is_set() {
+            let default_dir = PathBuf::from("/home/.cc-switch");
+            let result = resolve_windows_legacy_dir(
+                &default_dir,
+                Some("/legacy-home"),
+                false,
+                exists_only(&["/legacy-home/.cc-switch/cc-switch.db"]),
+            );
+            assert_eq!(result, Some(PathBuf::from("/legacy-home/.cc-switch")));
+        }
+
+        /// If the default location already has a database, the fallback must
+        /// never override it, override flag or not.
+        #[test]
+        fn default_db_present_short_circuits_regardless_of_override() {
+            let default_dir = PathBuf::from("/home/.cc-switch");
+            let exists = exists_only(&[
+                "/home/.cc-switch/cc-switch.db",
+                "/legacy-home/.cc-switch/cc-switch.db",
+            ]);
+            assert_eq!(
+                resolve_windows_legacy_dir(&default_dir, Some("/legacy-home"), false, &exists),
+                None
+            );
+            assert_eq!(
+                resolve_windows_legacy_dir(&default_dir, Some("/legacy-home"), true, &exists),
+                None
+            );
+        }
+
+        #[test]
+        fn no_home_env_or_empty_home_env_yields_no_fallback() {
+            let default_dir = PathBuf::from("/home/.cc-switch");
+            let exists = exists_only(&["/legacy-home/.cc-switch/cc-switch.db"]);
+            assert_eq!(
+                resolve_windows_legacy_dir(&default_dir, None, false, &exists),
+                None
+            );
+            assert_eq!(
+                resolve_windows_legacy_dir(&default_dir, Some("   "), false, &exists),
+                None
+            );
+        }
+
+        #[test]
+        fn legacy_home_without_its_own_db_yields_no_fallback() {
+            let default_dir = PathBuf::from("/home/.cc-switch");
+            let result = resolve_windows_legacy_dir(
+                &default_dir,
+                Some("/legacy-home"),
+                false,
+                exists_only(&[]), // nothing exists anywhere
+            );
+            assert_eq!(result, None);
+        }
+    }
 
     /// 共享的环境变量互斥锁：改 `HOME` / `CC_SWITCH_TEST_HOME` 这类进程级
     /// 状态的测试都必须经它（配合 `#[serial_test::serial]`）。锁必须放在
@@ -1056,7 +1395,11 @@ mod tests {
 /// 复制文件
 pub fn copy_file(from: &Path, to: &Path) -> Result<(), AppError> {
     fs::copy(from, to).map_err(|e| AppError::IoContext {
-        context: format!("复制文件失败 ({} -> {})", from.display(), to.display()),
+        context: format!(
+            "Failed to copy file ({} -> {})",
+            from.display(),
+            to.display()
+        ),
         source: e,
     })?;
     Ok(())

@@ -32,7 +32,7 @@ pub(crate) fn zip_skills_ssot(dest_path: &Path) -> Result<(), AppError> {
     let source = SkillService::get_ssot_dir().map_err(|e| {
         localized(
             "webdav.sync.skills_ssot_dir_failed",
-            format!("获取 Skills SSOT 目录失败: {e}"),
+            format!("Failed to get Skills SSOT directory: {e}"),
             format!("Failed to resolve Skills SSOT directory: {e}"),
         )
     })?;
@@ -62,7 +62,7 @@ pub(crate) fn zip_skills_ssot(dest_path: &Path) -> Result<(), AppError> {
     writer.finish().map_err(|e| {
         localized(
             "webdav.sync.skills_zip_write_failed",
-            format!("写入 skills.zip 失败: {e}"),
+            format!("Failed to write skills.zip: {e}"),
             format!("Failed to write skills.zip: {e}"),
         )
     })?;
@@ -73,7 +73,7 @@ pub(crate) fn restore_skills_zip(raw: &[u8]) -> Result<(), AppError> {
     let tmp = tempdir().map_err(|e| {
         io_context_localized(
             "webdav.sync.skills_extract_tmpdir_failed",
-            "创建 skills 解压临时目录失败",
+            "Failed to create temporary directory for skills extraction",
             "Failed to create temporary directory for skills extraction",
             e,
         )
@@ -85,7 +85,7 @@ pub(crate) fn restore_skills_zip(raw: &[u8]) -> Result<(), AppError> {
     let mut archive = zip::ZipArchive::new(file).map_err(|e| {
         localized(
             "webdav.sync.skills_zip_parse_failed",
-            format!("解析 skills.zip 失败: {e}"),
+            format!("Failed to parse skills.zip: {e}"),
             format!("Failed to parse skills.zip: {e}"),
         )
     })?;
@@ -112,7 +112,7 @@ pub(crate) fn restore_skills_zip(raw: &[u8]) -> Result<(), AppError> {
         let mut entry = archive.by_index(idx).map_err(|e| {
             localized(
                 "webdav.sync.skills_zip_entry_read_failed",
-                format!("读取 ZIP 项失败: {e}"),
+                format!("Failed to read ZIP entry: {e}"),
                 format!("Failed to read ZIP entry: {e}"),
             )
         })?;
@@ -140,7 +140,7 @@ pub(crate) fn restore_skills_zip(raw: &[u8]) -> Result<(), AppError> {
     let ssot = SkillService::get_ssot_dir().map_err(|e| {
         localized(
             "webdav.sync.skills_ssot_dir_failed",
-            format!("获取 Skills SSOT 目录失败: {e}"),
+            format!("Failed to get Skills SSOT directory: {e}"),
             format!("Failed to resolve Skills SSOT directory: {e}"),
         )
     })?;
@@ -275,14 +275,14 @@ pub(crate) fn backup_current_skills() -> Result<SkillsBackup, AppError> {
     let ssot = SkillService::get_ssot_dir().map_err(|e| {
         localized(
             "webdav.sync.skills_ssot_dir_failed",
-            format!("获取 Skills SSOT 目录失败: {e}"),
+            format!("Failed to get Skills SSOT directory: {e}"),
             format!("Failed to resolve Skills SSOT directory: {e}"),
         )
     })?;
     let tmp = tempdir().map_err(|e| {
         io_context_localized(
             "webdav.sync.skills_backup_tmpdir_failed",
-            "创建 skills 备份临时目录失败",
+            "Failed to create temporary directory for skills backup",
             "Failed to create temporary directory for skills backup",
             e,
         )
@@ -378,7 +378,7 @@ fn zip_dir_recursive(
             .map_err(|e| {
                 localized(
                     "webdav.sync.zip_relative_path_failed",
-                    format!("生成 ZIP 相对路径失败: {e}"),
+                    format!("Failed to build relative ZIP path: {e}"),
                     format!("Failed to build relative ZIP path: {e}"),
                 )
             })?;
@@ -397,7 +397,7 @@ fn zip_dir_recursive(
                 .map_err(|e| {
                     localized(
                         "webdav.sync.zip_add_directory_failed",
-                        format!("写入 ZIP 目录失败: {e}"),
+                        format!("Failed to write ZIP directory: {e}"),
                         format!("Failed to write ZIP directory entry: {e}"),
                     )
                 })?;
@@ -406,7 +406,7 @@ fn zip_dir_recursive(
             writer.start_file(&rel_str, options).map_err(|e| {
                 localized(
                     "webdav.sync.zip_start_file_failed",
-                    format!("写入 ZIP 文件头失败: {e}"),
+                    format!("Failed to start ZIP file entry: {e}"),
                     format!("Failed to start ZIP file entry: {e}"),
                 )
             })?;
@@ -417,7 +417,7 @@ fn zip_dir_recursive(
             writer.write_all(&buf).map_err(|e| {
                 localized(
                     "webdav.sync.zip_write_file_failed",
-                    format!("写入 ZIP 文件内容失败: {e}"),
+                    format!("Failed to write ZIP file content: {e}"),
                     format!("Failed to write ZIP file content: {e}"),
                 )
             })?;
@@ -486,7 +486,7 @@ fn copy_entry_with_total_limit<R: Read, W: Write>(
             let max_mb = max_total_bytes / 1024 / 1024;
             return Err(localized(
                 "webdav.sync.skills_zip_too_large",
-                format!("skills.zip 解压后体积超过上限（{max_mb} MB）"),
+                format!("Unpacked skills.zip exceeds size limit ({max_mb} MB)"),
                 format!("skills.zip extracted size exceeds limit ({max_mb} MB)"),
             ));
         }
@@ -534,7 +534,9 @@ mod tests {
         )
         .expect_err("stream larger than limit should be rejected");
         assert!(
-            err.to_string().contains("too large") || err.to_string().contains("超过"),
+            err.to_string().contains("too large")
+                || err.to_string().contains("exceeds")
+                || err.to_string().contains("超过"),
             "unexpected error: {err}"
         );
         assert_eq!(

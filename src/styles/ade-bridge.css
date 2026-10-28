@@ -1,0 +1,74 @@
+/* ADE embed bridge v1.0 — edit values only here.
+ *
+ * Hex values are the Spec ADE contract. Parallel --*-hsl channels keep the
+ * existing shadcn/Tailwind `hsl(var(--token) / <alpha>)` opacity pattern working.
+ *
+ * Selectors include both ADE host classes (.ade-theme-*) and the app's own
+ * .dark/.light classes so either path resolves the same eight tokens.
+ */
+
+:root,
+.dark,
+.ade-theme-dark {
+  color-scheme: dark;
+
+  --ade-bg: #0c0d10;
+  --ade-surface: #15171c;
+  --ade-raised: #1f232a;
+  --ade-border: #262b33;
+  --ade-text: #e6e8ec;
+  --ade-text-secondary: #9aa0a9;
+  --ade-font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  --ade-font-mono:
+    "Lilex", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* HSL channels (no hsl() wrapper) for Tailwind opacity modifiers */
+  --ade-bg-hsl: 225 14.3% 5.5%;
+  --ade-surface-hsl: 223 14.3% 9.6%;
+  --ade-raised-hsl: 218 15.1% 14.3%;
+  --ade-border-hsl: 217 14.6% 17.5%;
+  --ade-text-hsl: 220 13.6% 91.4%;
+  --ade-text-secondary-hsl: 216 8% 63.3%;
+}
+
+.light,
+.ade-theme-light {
+  color-scheme: light;
+
+  --ade-bg: #f7f8fa;
+  --ade-surface: #ffffff;
+  --ade-raised: #f1f2f5;
+  --ade-border: #d8dbe1;
+  --ade-text: #15171c;
+  --ade-text-secondary: #5c616b;
+  --ade-font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
+  --ade-font-mono:
+    "Lilex", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --ade-bg-hsl: 220 23.1% 97.5%;
+  --ade-surface-hsl: 0 0% 100%;
+  --ade-raised-hsl: 225 16.7% 95.3%;
+  --ade-border-hsl: 220 13% 86.5%;
+  --ade-text-hsl: 223 14.3% 9.6%;
+  --ade-text-secondary-hsl: 220 7.5% 39%;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not(.ade-theme-dark):not(.ade-theme-light):not(.dark):not(.light) {
+    color-scheme: light;
+
+    --ade-bg: #f7f8fa;
+    --ade-surface: #ffffff;
+    --ade-raised: #f1f2f5;
+    --ade-border: #d8dbe1;
+    --ade-text: #15171c;
+    --ade-text-secondary: #5c616b;
+
+    --ade-bg-hsl: 220 23.1% 97.5%;
+    --ade-surface-hsl: 0 0% 100%;
+    --ade-raised-hsl: 225 16.7% 95.3%;
+    --ade-border-hsl: 220 13% 86.5%;
+    --ade-text-hsl: 223 14.3% 9.6%;
+    --ade-text-secondary-hsl: 220 7.5% 39%;
+  }
+}

@@ -113,7 +113,7 @@ export function ModeDialog(props: ModeDialogProps) {
       {state && (
         <DialogContent
           zIndex="alert"
-          className="max-w-[480px] gap-0 overflow-y-auto rounded-dialog border-border bg-surface p-6 shadow-v7-lg sm:rounded-dialog"
+          className="max-w-[480px] gap-0 overflow-y-auto rounded-[8px] border-border bg-surface p-2 shadow-lg sm:rounded-[8px]"
         >
           {state.kind === "enter" ? (
             <EnterBody {...props} state={state} onCancel={cancel} />
@@ -271,20 +271,22 @@ function EnterBody({
       : provider.name;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="space-y-1">
-        <DialogTitle className="text-title">{title}</DialogTitle>
-        <DialogDescription className="text-body text-fg-2">
+        <DialogTitle className="text-[12.35px] font-semibold leading-[1.3]">
+          {title}
+        </DialogTitle>
+        <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
           {lead}
         </DialogDescription>
       </div>
 
-      <div className="space-y-1.5">
-        <label className="text-caption font-semibold text-fg-2">
+      <div className="space-y-1">
+        <label className="text-[12.35px] font-semibold leading-[1.3] text-fg-2">
           {pickLabel}
         </label>
         <Select value={pick} onValueChange={setPick} disabled={busy}>
-          <SelectTrigger className="h-9" aria-label={pickLabel}>
+          <SelectTrigger aria-label={pickLabel}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="z-[70]">
@@ -298,7 +300,7 @@ function EnterBody({
         {officialLeftOut && (
           <p
             data-testid="stack-official-note"
-            className="rounded-control bg-warning-soft px-3 py-2 text-caption text-warning-text"
+            className="rounded-[4px] bg-warning-soft p-2 text-[12.35px] leading-[1.3] text-warning-text"
           >
             {t("mode.dialog.stackOfficialNote")}
           </p>
@@ -319,7 +321,7 @@ function EnterBody({
         </div>
       )}
 
-      <ul className="space-y-1.5 rounded-panel bg-subtle px-4 py-3 text-caption text-fg-2">
+      <ul className="space-y-1 rounded-[8px] bg-subtle p-2 text-[12.35px] leading-[1.3] text-fg-2">
         {notes.map((note) => (
           <li key={note} className="flex gap-2">
             <span aria-hidden="true">·</span>
@@ -331,29 +333,22 @@ function EnterBody({
       {error && (
         <p
           role="alert"
-          className="rounded-control bg-danger-soft px-3 py-2 text-caption text-danger-text"
+          className="rounded-[4px] bg-danger-soft p-2 text-[12.35px] leading-[1.3] text-danger-text"
         >
           {error}
         </p>
       )}
 
-      <div className="flex flex-wrap justify-end gap-2 pt-1">
-        <Button
-          variant="neutral"
-          size="regular"
-          autoFocus
-          disabled={busy}
-          onClick={onCancel}
-        >
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="neutral" autoFocus disabled={busy} onClick={onCancel}>
           {t("common.cancel")}
         </Button>
         <Button
           variant={target}
-          size="regular"
           disabled={busy || !pick}
           onClick={() => void confirm()}
         >
-          {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {busy && <Loader2 className="h-4 w-4 animate-spin" />}
           {target === "route"
             ? t("mode.dialog.confirmRoute")
             : t("mode.dialog.confirmStack")}
@@ -507,12 +502,12 @@ function NeedsRouteBody({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="space-y-1">
-        <DialogTitle className="text-title">
+        <DialogTitle className="text-[12.35px] font-semibold leading-[1.3]">
           {t("mode.dialog.needsRouteTitle", { provider: name })}
         </DialogTitle>
-        <DialogDescription className="text-body text-fg-2">
+        <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
           {t("mode.dialog.needsRouteLead", {
             provider: name,
             reason: state.reason,
@@ -523,19 +518,13 @@ function NeedsRouteBody({
       {error && (
         <p
           role="alert"
-          className="rounded-control bg-danger-soft px-3 py-2 text-caption text-danger-text"
+          className="rounded-[4px] bg-danger-soft p-2 text-[12.35px] leading-[1.3] text-danger-text"
         >
           {error}
         </p>
       )}
-      <div className="flex flex-wrap justify-end gap-2 pt-1">
-        <Button
-          variant="neutral"
-          size="regular"
-          autoFocus
-          disabled={busy}
-          onClick={onCancel}
-        >
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="neutral" autoFocus disabled={busy} onClick={onCancel}>
           {t("common.cancel")}
         </Button>
         {/* Claude Desktop 直连写不进要经路由的卡，后端会拒绝 */}

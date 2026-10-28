@@ -22,7 +22,7 @@ export const formatCharCount = (count: number) =>
   count >= 1000 ? `${(count / 1000).toFixed(1)}k` : String(count);
 
 export const rowIconButton =
-  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-control text-fg-3 opacity-0 transition-[opacity,color,background-color] hover:bg-selected hover:text-fg-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-fg-3 opacity-0 transition-[opacity,color,background-color] hover:bg-selected hover:text-fg-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /** 长内容的「展开完整内容 / 收起」 */
 export const CollapseToggle = ({
@@ -40,7 +40,7 @@ export const CollapseToggle = ({
       type="button"
       aria-expanded={expanded}
       onClick={onToggle}
-      className="mt-1.5 inline-flex items-center gap-1 rounded-[2px] text-caption text-fg-2 transition-colors hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="mt-1.5 inline-flex items-center gap-1 rounded-[2px] text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {expanded ? (
         rt("collapseContent")
@@ -84,7 +84,7 @@ export const SessionQuestion = memo(function SessionQuestion({
   return (
     <div className="group/question flex min-w-0 flex-col items-end gap-1">
       {/* 时间与复制放在气泡外：气泡里只放正文；靠右本身就表示「你」，读屏另给文字 */}
-      <div className="flex h-5 items-center gap-1 text-caption text-fg-3">
+      <div className="flex h-5 items-center gap-1 text-[12.35px] leading-[1.3] text-fg-3">
         <span className="sr-only">
           {t("sessionManager.you", { defaultValue: "你" })}
         </span>
@@ -123,7 +123,7 @@ export const SessionQuestion = memo(function SessionQuestion({
         ) : null}
       </div>
       <div
-        className="min-w-0 max-w-full rounded-[16px] rounded-se-[4px] px-3.5 py-2 text-fg-1"
+        className="min-w-0 max-w-full rounded-[16px] rounded-se-[4px] px-3 py-2 text-fg-1"
         style={{
           // Agent 主题色铺一层浅色：深浅两套下都和左侧无底色的 Agent 输出区分开
           background:

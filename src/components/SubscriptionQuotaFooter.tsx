@@ -256,13 +256,13 @@ export const SubscriptionQuotaView: React.FC<SubscriptionQuotaViewProps> = ({
     }
     return (
       <QuotaBars
-        className="mt-3"
+        className="mt-2"
         title={t("subscription.title")}
         rows={[]}
         loading={loading}
         onRefresh={refetch}
         footer={
-          <p className="text-caption">
+          <p className="text-[12.35px] leading-[1.3]">
             <span className="font-medium text-danger-text">
               {t("quota.failed")}
             </span>{" "}
@@ -320,7 +320,7 @@ export const SubscriptionQuotaView: React.FC<SubscriptionQuotaViewProps> = ({
   const extra = quota.extraUsage;
   return (
     <QuotaBars
-      className="mt-3"
+      className="mt-2"
       title={t("subscription.title", { defaultValue: "Subscription Quota" })}
       rows={rows}
       queriedAt={quota.queriedAt}
@@ -328,7 +328,7 @@ export const SubscriptionQuotaView: React.FC<SubscriptionQuotaViewProps> = ({
       onRefresh={refetch}
       footer={
         extra?.isEnabled ? (
-          <div className="mt-2 border-t border-border pt-2 text-caption text-fg-2">
+          <div className="mt-2 border-t border-border pt-2 text-[12.35px] leading-[1.3] text-fg-2">
             <span className="font-medium">
               {t("subscription.extraUsage")}:{" "}
             </span>

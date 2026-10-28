@@ -16,7 +16,7 @@ import { isFailureStatus, shortenPath } from "./toolSummary";
 import type { ToolStep } from "./turns";
 
 const linkButton =
-  "rounded-[2px] text-caption text-fg-2 underline decoration-border-strong underline-offset-[3px] transition-colors hover:text-fg-1 hover:decoration-fg-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "rounded-[2px] text-[12.35px] leading-[1.3] text-fg-2 underline decoration-border-strong underline-offset-[3px] transition-colors hover:text-fg-1 hover:decoration-fg-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 /** 状态色：Gemini 的框线、Pi 的竖条用 */
 export const STATUS_BORDER: Record<ToolStatus, string> = {
@@ -58,12 +58,13 @@ export interface BlockTextProps {
 
 const VARIANT_CLASS = {
   output:
-    "whitespace-pre rounded-[8px] bg-subtle px-3 py-2 font-mono text-caption",
+    "whitespace-pre rounded-[8px] bg-subtle px-3 py-2 font-mono text-[12.35px] leading-[1.3]",
   params:
-    "whitespace-pre rounded-[8px] bg-subtle px-3 py-2 font-mono text-caption",
-  thinking: "whitespace-pre-wrap break-words text-caption italic",
+    "whitespace-pre rounded-[8px] bg-subtle px-3 py-2 font-mono text-[12.35px] leading-[1.3]",
+  thinking:
+    "whitespace-pre-wrap break-words text-[12.35px] leading-[1.3] italic",
   /** 注入文本、压缩摘要等长说明 */
-  plain: "whitespace-pre-wrap break-words text-caption",
+  plain: "whitespace-pre-wrap break-words text-[12.35px] leading-[1.3]",
 } as const;
 
 /**
@@ -120,7 +121,7 @@ export const BlockText = memo(function BlockText({
         {!showAll && hiddenLines <= 0 && truncated && "…"}
       </pre>
       {(canExpand || showAll) && (
-        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-caption text-fg-3">
+        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.35px] leading-[1.3] text-fg-3">
           {!showAll && hiddenLines > 0 && (
             <span className="tabular-nums">
               …{rt("moreLines", { count: hiddenLines })}
@@ -232,7 +233,9 @@ const Section = ({
   if (!collapsible) {
     return (
       <section className="min-w-0">
-        <h4 className="m-0 mb-1 text-caption font-medium text-fg-3">{label}</h4>
+        <h4 className="m-0 mb-1 text-[12.35px] leading-[1.3] font-medium text-fg-3">
+          {label}
+        </h4>
         {children}
       </section>
     );
@@ -243,7 +246,7 @@ const Section = ({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="-ms-1 mb-1 inline-flex h-6 items-center gap-0.5 rounded-control pe-1.5 ps-0.5 text-caption font-medium text-fg-3 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="-ms-1 mb-1 inline-flex h-6 items-center gap-0.5 rounded-[4px] pe-1.5 ps-0.5 text-[12.35px] leading-[1.3] font-medium text-fg-3 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ChevronRight
           aria-hidden
@@ -277,7 +280,11 @@ const DiffFromRef = ({
     );
   }
   if (content.error || !content.text) {
-    return <p className="m-0 text-caption text-fg-3">{rt("loadFailed")}</p>;
+    return (
+      <p className="m-0 text-[12.35px] leading-[1.3] text-fg-3">
+        {rt("loadFailed")}
+      </p>
+    );
   }
   return (
     <SessionDiff
@@ -302,7 +309,7 @@ const DiffSection = ({ call }: { call: ToolCallBlock }) => {
   return (
     <Section label={rt("diff")}>
       {diff && diff.files.length > 1 && (
-        <ul className="m-0 mb-1.5 list-none space-y-0.5 p-0 font-mono text-caption text-fg-2">
+        <ul className="m-0 mb-1.5 list-none space-y-0.5 p-0 font-mono text-[12.35px] leading-[1.3] text-fg-2">
           {diff.files.map((file) => (
             <li key={file.path} className="flex items-center gap-1.5">
               <span aria-hidden className="text-fg-3">
@@ -387,7 +394,7 @@ export const SessionStepDetails = memo(function SessionStepDetails({
       <div className="flex min-w-0 gap-1.5">
         <span
           aria-hidden
-          className="w-4 shrink-0 select-none pt-1.5 text-center font-mono text-caption leading-none text-fg-3"
+          className="w-4 shrink-0 select-none pt-1.5 text-center font-mono text-[12.35px] leading-[1.3] text-fg-3"
         >
           {style.resultConnector}
         </span>
@@ -406,7 +413,7 @@ export const SessionStepDetails = memo(function SessionStepDetails({
         "min-w-0 space-y-2 pb-2 pt-0.5",
         style.resultFrame === "box"
           ? cn(
-              "ms-6 rounded-[8px] border border-s-2 border-border p-2.5",
+              "ms-6 rounded-[8px] border border-s-2 border-border p-2",
               STATUS_BORDER_START[status],
             )
           : style.resultFrame === "none"
@@ -443,7 +450,7 @@ export const SessionStepDetails = memo(function SessionStepDetails({
         />
       )}
       {result?.savedPath && (
-        <div className="flex items-center gap-1.5 text-caption text-fg-3">
+        <div className="flex items-center gap-1.5 text-[12.35px] leading-[1.3] text-fg-3">
           <span>{rt("output")}</span>
           <PathChip path={result.savedPath} projectDir={projectDir} />
         </div>

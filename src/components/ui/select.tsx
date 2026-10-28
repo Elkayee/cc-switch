@@ -17,9 +17,9 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      // 和 Input 同一套外观（fieldClass）；展开时也保持聚焦态
+      // Same look as Input (fieldClass); stays in the focused state while open
       fieldClass,
-      "flex h-8 items-center justify-between whitespace-nowrap text-start data-[placeholder]:text-fg-3 data-[state=open]:border-ring data-[state=open]:ring-[3px] data-[state=open]:ring-ring/20 [&>span]:truncate",
+      "flex h-6 items-center justify-between whitespace-nowrap py-1 text-start data-[placeholder]:text-muted-foreground data-[state=open]:border-blue-500 data-[state=open]:ring-1 data-[state=open]:ring-blue-500/40 [&>span]:truncate",
       className,
     )}
     {...props}
@@ -40,7 +40,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-[100] max-h-[min(24rem,var(--radix-select-content-available-height))] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        "relative z-[100] max-h-[min(24rem,var(--radix-select-content-available-height))] min-w-[8rem] overflow-y-auto overflow-x-hidden rounded-[8px] border border-border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className,
       )}
       position={position}
@@ -72,7 +72,10 @@ const SelectLabel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SelectPrimitive.Label
     ref={ref}
-    className={cn("px-2 py-1.5 text-sm font-semibold", className)}
+    className={cn(
+      "px-2 py-1.5 text-[12.35px] leading-[1.3] font-semibold",
+      className,
+    )}
     {...props}
   />
 ));
@@ -85,7 +88,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm pl-7 pr-2 py-1.5 text-sm outline-none focus:bg-subtle focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex h-6 w-full cursor-default select-none items-center rounded-[4px] pl-7 pr-2 text-[12.35px] leading-[1.3] outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}

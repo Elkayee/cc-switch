@@ -122,14 +122,14 @@ export function SkillImportDialog({
     >
       <div className="flex shrink-0 flex-col gap-1">
         <div className="flex items-center gap-0.5">
-          <DialogTitle className="text-section">
+          <DialogTitle className="text-[12.35px] leading-[1.3] font-semibold">
             {t("skillsPage.import.title")}
           </DialogTitle>
           <HelpTip title={t("skillsPage.import.helpTitle")}>
             {t("skillsPage.import.help")}
           </HelpTip>
         </div>
-        <DialogDescription className="text-caption text-fg-2">
+        <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
           {t("skillsPage.import.lead")}
         </DialogDescription>
       </div>
@@ -162,7 +162,7 @@ export function SkillImportDialog({
         </Button>
       </div>
 
-      <ul className="m-0 max-h-[212px] min-h-0 list-none overflow-y-auto rounded-panel border border-border p-0">
+      <ul className="m-0 max-h-[212px] min-h-0 list-none overflow-y-auto rounded-[8px] border border-border p-0">
         {visible.map((skill, index) => {
           const id = `sk-imp-${index}`;
           const showDir =
@@ -171,7 +171,7 @@ export function SkillImportDialog({
             <li
               key={skill.directory}
               className={cn(
-                "flex items-center gap-2.5 py-2 pe-3 ps-3.5",
+                "flex items-center gap-2 py-2 px-2",
                 index > 0 && "border-t border-border",
               )}
             >
@@ -186,17 +186,17 @@ export function SkillImportDialog({
               />
               <label htmlFor={id} className="flex min-w-0 flex-1 flex-col">
                 <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="truncate text-body font-medium">
+                  <span className="truncate text-[12.35px] leading-[1.3] font-medium">
                     {skill.name}
                   </span>
                   {showDir && (
-                    <span className="truncate font-mono text-caption text-fg-3">
+                    <span className="truncate font-mono text-[12.35px] leading-[1.3] text-fg-3">
                       {skill.directory}
                     </span>
                   )}
                 </span>
                 <span
-                  className="truncate text-caption text-fg-2"
+                  className="truncate text-[12.35px] leading-[1.3] text-fg-2"
                   title={skill.path}
                 >
                   {t("skillsPage.import.foundIn", {
@@ -213,7 +213,7 @@ export function SkillImportDialog({
 
       <section className="flex shrink-0 flex-col gap-2">
         <div className="flex items-center gap-0.5">
-          <h3 className="m-0 text-body font-semibold">
+          <h3 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
             {t("skillsPage.import.appsTitle")}
           </h3>
           <HelpTip title={t("skillsPage.import.appsHelpTitle")}>
@@ -224,7 +224,7 @@ export function SkillImportDialog({
           {appChoices.map((app) => (
             <label
               key={app}
-              className="flex h-6 cursor-pointer items-center gap-2 text-body"
+              className="flex h-6 cursor-pointer items-center gap-2 text-[12.35px] leading-[1.3]"
             >
               <input
                 type="checkbox"
@@ -250,7 +250,6 @@ export function SkillImportDialog({
         <Button
           type="button"
           variant="neutral"
-          size="regular"
           disabled={isImporting}
           onClick={onClose}
         >
@@ -259,7 +258,6 @@ export function SkillImportDialog({
         <Button
           type="button"
           variant="solid"
-          size="regular"
           disabled={selected.size === 0 || isImporting}
           onClick={submit}
         >

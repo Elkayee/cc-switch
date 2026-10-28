@@ -133,7 +133,7 @@ pub fn set_has_completed_onboarding() -> Result<bool, AppError> {
 
     let obj = root
         .as_object_mut()
-        .ok_or_else(|| AppError::Config("~/.claude.json 根必须是对象".into()))?;
+        .ok_or_else(|| AppError::Config("~/.claude.json root must be an object".into()))?;
 
     let already = obj
         .get("hasCompletedOnboarding")
@@ -159,7 +159,7 @@ pub fn clear_has_completed_onboarding() -> Result<bool, AppError> {
     let mut root = read_json_value(&path)?;
     let obj = root
         .as_object_mut()
-        .ok_or_else(|| AppError::Config("~/.claude.json 根必须是对象".into()))?;
+        .ok_or_else(|| AppError::Config("~/.claude.json root must be an object".into()))?;
 
     let existed = obj.remove("hasCompletedOnboarding").is_some();
     if !existed {
@@ -172,12 +172,14 @@ pub fn clear_has_completed_onboarding() -> Result<bool, AppError> {
 
 pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
     if id.trim().is_empty() {
-        return Err(AppError::InvalidInput("MCP 服务器 ID 不能为空".into()));
+        return Err(AppError::InvalidInput(
+            "MCP server ID cannot be empty".into(),
+        ));
     }
     // 基础字段校验（尽量宽松）
     if !spec.is_object() {
         return Err(AppError::McpValidation(
-            "MCP 服务器定义必须为 JSON 对象".into(),
+            "MCP server definition must be a JSON object".into(),
         ));
     }
     let t_opt = spec.get("type").and_then(|x| x.as_str());
@@ -186,7 +188,7 @@ pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
     let is_sse = t_opt.map(|t| t == "sse").unwrap_or(false);
     if !(is_stdio || is_http || is_sse) {
         return Err(AppError::McpValidation(
-            "MCP 服务器 type 必须是 'stdio'、'http' 或 'sse'（或省略表示 stdio）".into(),
+            "MCP server type must be 'stdio', 'http', or 'sse' (omit for stdio)".into(),
         ));
     }
 
@@ -195,7 +197,7 @@ pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
         let cmd = spec.get("command").and_then(|x| x.as_str()).unwrap_or("");
         if cmd.is_empty() {
             return Err(AppError::McpValidation(
-                "stdio 类型的 MCP 服务器缺少 command 字段".into(),
+                "stdio MCP server is missing the command field".into(),
             ));
         }
     }
@@ -205,9 +207,9 @@ pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
         let url = spec.get("url").and_then(|x| x.as_str()).unwrap_or("");
         if url.is_empty() {
             return Err(AppError::McpValidation(if is_http {
-                "http 类型的 MCP 服务器缺少 url 字段".into()
+                "http MCP server is missing the url field".into()
             } else {
-                "sse 类型的 MCP 服务器缺少 url 字段".into()
+                "sse MCP server is missing the url field".into()
             }));
         }
     }
@@ -223,7 +225,7 @@ pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
     {
         let obj = root
             .as_object_mut()
-            .ok_or_else(|| AppError::Config("mcp.json 根必须是对象".into()))?;
+            .ok_or_else(|| AppError::Config("mcp.json root must be an object".into()))?;
         if !obj.contains_key("mcpServers") {
             obj.insert("mcpServers".into(), serde_json::json!({}));
         }
@@ -244,7 +246,9 @@ pub fn upsert_mcp_server(id: &str, spec: Value) -> Result<bool, AppError> {
 
 pub fn delete_mcp_server(id: &str) -> Result<bool, AppError> {
     if id.trim().is_empty() {
-        return Err(AppError::InvalidInput("MCP 服务器 ID 不能为空".into()));
+        return Err(AppError::InvalidInput(
+            "MCP server ID cannot be empty".into(),
+        ));
     }
     let path = user_config_path();
     if !path.exists() {
@@ -340,13 +344,13 @@ pub fn set_mcp_servers_map(
             map.clone()
         } else {
             return Err(AppError::McpValidation(format!(
-                "MCP 服务器 '{id}' 不是对象"
+                "MCP server '{id}' is not an object"
             )));
         };
 
         if let Some(server_val) = obj.remove("server") {
             let server_obj = server_val.as_object().cloned().ok_or_else(|| {
-                AppError::McpValidation(format!("MCP 服务器 '{id}' server 字段不是对象"))
+                AppError::McpValidation(format!("MCP server '{id}' server field is not an object"))
             })?;
             obj = server_obj;
         }
@@ -371,7 +375,7 @@ pub fn set_mcp_servers_map(
     {
         let obj = root
             .as_object_mut()
-            .ok_or_else(|| AppError::Config("~/.claude.json 根必须是对象".into()))?;
+            .ok_or_else(|| AppError::Config("~/.claude.json root must be an object".into()))?;
         obj.insert("mcpServers".into(), Value::Object(out));
     }
 

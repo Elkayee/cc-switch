@@ -50,24 +50,28 @@ interface DetailRow {
 function DetailSection({ title, rows }: { title: string; rows: DetailRow[] }) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="m-0 text-strong font-semibold text-fg-1">{title}</h3>
+      <h3 className="m-0 text-ui font-semibold text-fg-1">{title}</h3>
       {/* 卡片外框已经把一组框住，行与行靠间距分开，不再每行画线；只有「合计」上方留一道 */}
       <dl className="m-0 rounded-panel border border-border py-1.5">
         {rows.map((row) => (
           <div
             key={row.key}
             className={cn(
-              "flex min-h-8 items-center gap-3 px-3.5 py-1",
+              "flex min-h-8 items-center gap-3 px-3 py-1",
               row.key === "total" && "mt-1.5 border-t border-border pt-2.5",
             )}
           >
-            <dt className="shrink-0 text-caption text-fg-2">{row.label}</dt>
+            <dt className="shrink-0 text-ui text-muted-foreground">
+              {row.label}
+            </dt>
             <dd
               className={cn(
                 "m-0 min-w-0 flex-1 truncate text-end tabular-nums",
-                row.mono ? "font-mono text-caption" : "text-body",
+                row.mono
+                  ? "font-mono text-[12.35px] leading-[1.3]"
+                  : "text-[12.35px] leading-[1.3]",
                 row.strong && "font-semibold",
-                row.muted ? "text-fg-3" : "text-fg-1",
+                row.muted ? "text-muted-foreground" : "text-foreground",
               )}
               title={
                 row.title ??
@@ -321,7 +325,7 @@ function RequestDetailBody({ request }: { request: RequestLog }) {
   const { currency } = useMoneyFormat();
   const sections = useDetailSections(request);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <DetailSection title={t("usage.basicInfo")} rows={sections.basic} />
       <DetailSection
         title={t("usage.detail.tokensTitle")}
@@ -337,10 +341,10 @@ function RequestDetailBody({ request }: { request: RequestLog }) {
       />
       {request.errorMessage && (
         <section className="flex flex-col gap-2">
-          <h3 className="m-0 text-strong font-semibold text-danger-text">
+          <h3 className="m-0 text-ui font-medium font-semibold text-danger-text">
             {t("usage.errorMessage")}
           </h3>
-          <p className="m-0 whitespace-pre-wrap break-words rounded-panel bg-danger-soft px-3.5 py-2.5 font-mono text-caption text-fg-1">
+          <p className="m-0 whitespace-pre-wrap break-words rounded-[8px] bg-danger-soft px-2 py-2 font-mono text-ui text-foreground">
             {request.errorMessage}
           </p>
         </section>
@@ -376,12 +380,12 @@ export function RequestDetailPanel({
         // 不放副标题：时间、应用、供应商就是「基本信息」前三行
         aria-describedby={undefined}
       >
-        <SheetHeader className="pb-3">
+        <SheetHeader className="pb-2">
           <SheetTitle>{t("usage.requestDetail")}</SheetTitle>
         </SheetHeader>
         <SheetBody className="border-t border-border">
           {isLoading ? (
-            <div className="h-[320px] animate-pulse rounded-panel bg-subtle" />
+            <div className="h-[320px] animate-pulse rounded-[8px] bg-subtle" />
           ) : request ? (
             <RequestDetailBody request={request} />
           ) : error ? (
@@ -402,7 +406,7 @@ export function RequestDetailPanel({
               {extractErrorMessage(error) || String(error)}
             </Notice>
           ) : (
-            <p className="py-10 text-center text-body text-fg-3">
+            <p className="py-2 text-center text-ui text-muted-foreground">
               {t("usage.requestNotFound")}
             </p>
           )}

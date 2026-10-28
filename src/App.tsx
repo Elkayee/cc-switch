@@ -5,17 +5,24 @@ import {
   useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/lib/toast";
 import { invoke } from "@tauri-apps/api/core";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  ArrowLeft,
+  // Book, // Fork: Prompts toolbar button is commented out — do not restore on upstream merge
+  BarChart2,
   ExternalLink,
+  History,
   KeyRound,
+  LayoutGrid,
   MoreHorizontal,
   Plus,
   Search,
+  Settings,
 } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { Provider, VisibleApps } from "@/types";
@@ -37,6 +44,7 @@ import {
 } from "@/lib/api";
 import { checkAllEnvConflicts, checkEnvConflicts } from "@/lib/api/env";
 import { useProviderActions } from "@/hooks/useProviderActions";
+import { useHeaderNavLabels } from "@/hooks/useHeaderNavLabels";
 import { openclawKeys, useOpenClawHealth } from "@/hooks/useOpenClaw";
 import { hermesKeys, useOpenHermesWebUI } from "@/hooks/useHermes";
 import { hermesApi } from "@/lib/api/hermes";
@@ -49,6 +57,7 @@ import {
 } from "@/hooks/useTrayNavigation";
 import { useTauriEvent } from "@/hooks/useTauriEvent";
 import { useLastValidValue } from "@/hooks/useLastValidValue";
+import { useDesktopAppUpdateToast } from "@/hooks/useDesktopAppUpdateToast";
 import {
   extractErrorMessage,
   translateKimiProviderMutationError,
@@ -56,9 +65,17 @@ import {
 } from "@/utils/errorUtils";
 import { isTextEditableTarget } from "@/utils/domUtils";
 import { deepClone } from "@/utils/deepClone";
-import { isLinux, isMac, isWindows } from "@/lib/platform";
+import {
+  isLinux,
+  isMac,
+  isWindows,
+  DRAG_REGION_ATTR,
+  DRAG_REGION_STYLE,
+} from "@/lib/platform";
+import { cn } from "@/lib/utils";
 import {
   APP_STORAGE_KEY,
+  SETTINGS_SECTIONS,
   appPageBelongsTo,
   isAppPage,
   readStoredView,
@@ -68,13 +85,9 @@ import {
   type SettingsSection,
   type View,
 } from "@/lib/navigation";
-import { Sidebar } from "@/components/shell/Sidebar";
-import { useUpdate } from "@/contexts/UpdateContext";
-import { NewLayoutDialog } from "@/components/shell/NewLayoutDialog";
-import {
-  AppPageHeader,
-  WindowControlsContext,
-} from "@/components/shell/AppPageHeader";
+import { AppSwitcher } from "@/components/AppSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { AppPageHeader } from "@/components/shell/AppPageHeader";
 import { WindowControls } from "@/components/shell/WindowControls";
 import { APP_DISPLAY_NAME, AppGlyph } from "@/components/shell/AppGlyph";
 import { ProfileSwitcher } from "@/components/profiles/ProfileSwitcher";
@@ -107,7 +120,8 @@ import { PROMPT_APP_IDS } from "@/lib/query/prompts";
 import UnifiedSkillsPanel from "@/components/skills/UnifiedSkillsPanel";
 import { DeepLinkImportDialog } from "@/components/DeepLinkImportDialog";
 import { FirstRunNoticeDialog } from "@/components/FirstRunNoticeDialog";
-import { WhatsNewNotice } from "@/components/WhatsNewDialog";
+import { LanguagePickerDialog } from "@/components/LanguagePickerDialog";
+import { McpIcon, SkillsIcon, ViberSwitchLogo } from "@/components/BrandIcons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverTip } from "@/components/ui/hover-tip";
@@ -149,6 +163,9 @@ interface SyncStatusUpdatedPayload {
   error?: string;
 }
 
+const DEFAULT_DRAG_BAR_HEIGHT = isWindows() || isLinux() ? 0 : 28; // px
+const HEADER_HEIGHT = 48; // px — UI.md toolbar height (space 48)
+
 type OpenClawConfigTab = "env" | "tools" | "agents";
 
 const getInitialApp = (): AppId => {
@@ -159,10 +176,80 @@ const getInitialApp = (): AppId => {
   return "claude";
 };
 
+/** Header nav buttons in DOM order; labels appear left to right as space allows. */
+const HEADER_NAV_COUNT = 6;
+
+function HeaderNavButton({
+  label,
+  title,
+  onClick,
+  disabled,
+  visible = true,
+  showLabel = true,
+  dot = false,
+  active = false,
+  children,
+}: {
+  label: string;
+  title?: string;
+  onClick: () => void;
+  disabled?: boolean;
+  visible?: boolean;
+  showLabel?: boolean;
+  /** Small indicator (e.g. "updates available") */
+  dot?: boolean;
+  /** Current page: same raised chip as the active app in AppSwitcher */
+  active?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      disabled={disabled}
+      onClick={onClick}
+      title={title ?? label}
+      aria-label={title ?? label}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative h-7 min-w-0 gap-1 rounded-[8px] px-2",
+        active
+          ? "bg-background text-foreground shadow-sm hover:bg-background"
+          : "text-muted-foreground hover:text-foreground hover:bg-black/5 dark:hover:bg-white/5",
+        "transition-all duration-200 ease-in-out",
+        !showLabel && "w-7 px-1",
+        visible
+          ? "opacity-100"
+          : "pointer-events-none ml-0 w-0 min-w-0 scale-75 overflow-hidden px-0 opacity-0",
+      )}
+    >
+      {children}
+      {/* Always rendered so useHeaderNavLabels can measure it; hidden ones take no space. */}
+      <span
+        data-nav-label
+        data-nav-hidden={showLabel ? undefined : ""}
+        aria-hidden={showLabel ? undefined : true}
+        className={cn(
+          !showLabel &&
+            "pointer-events-none invisible absolute whitespace-nowrap",
+        )}
+      >
+        {label}
+      </span>
+      {dot ? (
+        <span
+          aria-hidden="true"
+          className="absolute right-0.5 top-0.5 h-1.5 w-1.5 rounded-full bg-green-500"
+        />
+      ) : null}
+    </Button>
+  );
+}
+
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const { hasUpdate } = useUpdate();
+  useDesktopAppUpdateToast();
 
   const [activeApp, setActiveApp] = useState<AppId>(getInitialApp);
   const sharedFeatureApp = sharedFeatureAppOf(activeApp);
@@ -211,9 +298,11 @@ function App() {
   }, [currentView]);
 
   const { data: settingsData } = useSettingsQuery();
-  // Windows 一律去掉系统标题栏，用页头里的应用内窗口按钮；Linux 由设置决定
+  // Fork: Windows keeps the native title bar; Linux opts in via settings
   const useAppWindowControls =
-    isWindows() || (isLinux() && (settingsData?.useAppWindowControls ?? false));
+    isLinux() && (settingsData?.useAppWindowControls ?? false);
+  const dragBarHeight = useAppWindowControls ? 32 : DEFAULT_DRAG_BAR_HEIGHT;
+  const contentTopOffset = dragBarHeight + HEADER_HEIGHT;
   const visibleApps = useMemo<VisibleApps>(
     () => ({
       ...DEFAULT_VISIBLE_APPS,
@@ -251,6 +340,7 @@ function App() {
   const checkToolUpdatesOnStartup =
     settingsData?.checkToolUpdatesOnStartup ?? false;
   const toolUpdatesAvailable = useToolUpdatesAvailable();
+  const appsUpdateAvailable = checkToolUpdatesOnStartup && toolUpdatesAvailable;
   const startupToolCheckDoneRef = useRef(false);
   useEffect(() => {
     if (!checkToolUpdatesOnStartup || startupToolCheckDoneRef.current) return;
@@ -293,6 +383,20 @@ function App() {
   const effectiveEditingProvider = useLastValidValue(editingProvider);
   const effectiveUsageProvider = useLastValidValue(usageProvider);
   const mainScrollRef = useRef<HTMLElement>(null);
+  const headerRowRef = useRef<HTMLDivElement>(null);
+  const headerSlotRef = useRef<HTMLDivElement>(null);
+  const headerClusterRef = useRef<HTMLDivElement>(null);
+  const headerBrandRef = useRef<HTMLDivElement>(null);
+  const [appsFullWidth, setAppsFullWidth] = useState(0);
+  const { count: navLabelCount, showBrand } = useHeaderNavLabels({
+    rowRef: headerRowRef,
+    slotRef: headerSlotRef,
+    clusterRef: headerClusterRef,
+    brandRef: headerBrandRef,
+    appsWidth: appsFullWidth,
+    itemCount: HEADER_NAV_COUNT,
+    labelKey: i18n.language,
+  });
   const providerScrollContainerRef = useRef<HTMLDivElement>(null);
 
   useUsageCacheBridge();
@@ -311,7 +415,11 @@ function App() {
     }
   }, [activeApp, currentView]);
 
-  const { isRunning: isProxyRunning, takeoverStatus } = useProxyStatus();
+  const {
+    isRunning: isProxyRunning,
+    takeoverStatus,
+    status: proxyStatus,
+  } = useProxyStatus();
   const modeAppId = isModeAppId(activeApp) ? activeApp : null;
   // 换了应用、新面板还没报上来时为 undefined：表单按应用实际生效的模式
   const currentModeView =
@@ -324,6 +432,12 @@ function App() {
   const isCurrentAppTakeoverActive = modeAppId
     ? takeoverStatus?.[modeAppId] || false
     : false;
+  // Fork: pinned-path routing (copy-URL button) needs to know if routing is live
+  const pinnedTakeoverOn =
+    isProxyRunning &&
+    (activeApp === "claude-desktop"
+      ? Boolean(takeoverStatus?.["claude-desktop"])
+      : isCurrentAppTakeoverActive);
 
   const { data, isLoading, refetch } = useProvidersQuery(activeApp, {
     isProxyRunning: currentAppUsesProxy && isProxyRunning,
@@ -913,15 +1027,24 @@ function App() {
     if (managementBusyRef.current || !confirmLeave(navigate)) navigate();
   });
 
-  // 侧栏、⌘K 进用量统计看全部应用；只有应用页 ⋯ 进来时带应用筛选
+  // 顶栏进用量统计看全部应用；只有应用页 ⋯ 进来时带应用筛选
   const openPageFromNav = (page: GlobalPage | "settings") => {
-    // 「设置」上的绿点说的是 CC Switch 有新版本，点进去直接到「关于」里的更新按钮
-    if (page === "settings" && hasUpdate) {
-      openSettings("about");
-      return;
-    }
     if (page === "usage") setUsageAppFilter("all");
     openPage(page);
+  };
+
+  // 顶栏「返回」：设置回到进设置前的页面，Skills 发现回到已安装，其余回供应商页
+  const goBack = () => {
+    if (managementBusyRef.current) return;
+    if (confirmLeave(goBack)) return;
+    closeProviderPanels();
+    if (currentViewRef.current === "settings") {
+      exitSettings();
+    } else {
+      setCurrentView(
+        currentViewRef.current === "skillsDiscovery" ? "skills" : "providers",
+      );
+    }
   };
 
   const openSettingsRef = useRef(openSettings);
@@ -1316,7 +1439,6 @@ function App() {
           <Button
             variant="quiet"
             size="icon-compact"
-            className="h-8 w-8"
             aria-label={t("appPage.moreActions", {
               name: APP_DISPLAY_NAME[activeApp],
             })}
@@ -1415,7 +1537,6 @@ function App() {
                 <Button
                   variant="quiet"
                   size="icon-compact"
-                  className="h-8 w-8"
                   aria-label={t("provider.searchAriaLabel")}
                   aria-pressed={providerSearchOpen}
                   onClick={() => setProviderSearchOpen((open) => !open)}
@@ -1520,6 +1641,10 @@ function App() {
           }
           onNeedsRouteHandled={() => setTrayNeedsRoute(null)}
           onViewChange={handleProviderModeViewChange}
+          isProxyRunning={currentAppUsesProxy && isProxyRunning}
+          pinnedTakeoverOn={pinnedTakeoverOn}
+          proxyListenAddress={proxyStatus?.address ?? ""}
+          proxyListenPort={proxyStatus?.port ?? 0}
           startupFailure={startupFailure}
           onDismissStartupFailure={() =>
             setStartupFailures((list) =>
@@ -1544,6 +1669,10 @@ function App() {
             currentProviderId={currentProviderId}
             appId={activeApp}
             isLoading={isLoading}
+            isProxyRunning={currentAppUsesProxy && isProxyRunning}
+            pinnedTakeoverOn={pinnedTakeoverOn}
+            proxyListenAddress={proxyStatus?.address ?? ""}
+            proxyListenPort={proxyStatus?.port ?? 0}
             onSwitch={(provider) =>
               void (isPiFamilyApp(activeApp)
                 ? handleEnablePiProvider(provider, activeApp)
@@ -1673,7 +1802,7 @@ function App() {
                   </HelpTip>
                   <Badge
                     variant="outline"
-                    className="ms-1 h-5 px-1.5 text-badge font-medium"
+                    className="ms-1 h-5 px-1.5 text-[12.35px] leading-[1.3] font-medium"
                   >
                     {t("settings.authCenter.beta", { defaultValue: "Beta" })}
                   </Badge>
@@ -1753,70 +1882,261 @@ function App() {
     return isAppPage(currentView) ? renderAppPage() : renderGlobalPage();
   };
 
+  const inAppPage = isAppPage(currentView);
+  const noDrag = { WebkitAppRegion: "no-drag" } as any;
+
   return (
-    <WindowControlsContext.Provider
-      value={useAppWindowControls ? <WindowControls /> : null}
+    <div
+      className="flex h-screen flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30"
+      style={{ overflowX: "hidden", paddingTop: contentTopOffset }}
     >
-      <div className="flex h-screen overflow-hidden bg-app text-fg-1 selection:bg-action/25">
-        <Sidebar
-          activeApp={activeApp}
-          view={currentView}
-          visibleApps={visibleApps}
-          settingsSection={settingsSection}
-          onSelectApp={selectApp}
-          onSelectPage={openPageFromNav}
-          onSelectSettingsSection={(section) => {
-            setAppConfigScrollTarget(undefined);
-            setSettingsSection(section);
-          }}
-          onExitSettings={exitSettings}
-          appsUpdateAvailable={
-            checkToolUpdatesOnStartup && toolUpdatesAvailable
-          }
-        />
-        <main
-          ref={mainScrollRef}
-          id="content-area"
-          className="relative isolate flex min-w-0 flex-1 flex-col overflow-hidden bg-app"
+      {(dragBarHeight > 0 || useAppWindowControls) && (
+        <div
+          className="fixed top-0 left-0 right-0 z-[70] flex items-center justify-end px-2"
+          data-tauri-drag-region
+          style={{ WebkitAppRegion: "drag", height: dragBarHeight } as any}
         >
-          {showEnvBanner && envConflicts.length > 0 && (
-            <EnvWarningBanner
-              conflicts={envConflicts}
-              onDismiss={() => {
-                setShowEnvBanner(false);
-                sessionStorage.setItem("env_banner_dismissed", "true");
-              }}
-              onDeleted={async () => {
-                try {
-                  const allConflicts = await checkAllEnvConflicts();
-                  const flatConflicts = Object.values(allConflicts).flat();
-                  setEnvConflicts(flatConflicts);
-                  if (flatConflicts.length === 0) {
-                    setShowEnvBanner(false);
-                  }
-                } catch (error) {
-                  console.error(
-                    "[App] Failed to re-check conflicts after deletion:",
-                    error,
-                  );
-                }
-              }}
-            />
+          {useAppWindowControls && (
+            <div className="flex items-center gap-1" style={noDrag}>
+              <WindowControls />
+            </div>
           )}
-          <div
-            key={
-              currentView === "settings"
-                ? "settings"
-                : isAppPage(currentView)
-                  ? "app"
-                  : currentView
-            }
-            className="flex min-h-0 flex-1 flex-col"
-          >
-            {renderContent()}
+        </div>
+      )}
+
+      <div
+        id="app-toolbar"
+        role="banner"
+        className="fixed z-50 w-full bg-background/80 backdrop-blur-md transition-all duration-300"
+        {...DRAG_REGION_ATTR}
+        style={
+          {
+            ...DRAG_REGION_STYLE,
+            top: dragBarHeight,
+            height: HEADER_HEIGHT,
+          } as any
+        }
+      >
+        <div
+          className="flex h-full items-center justify-between gap-2 px-2"
+          {...DRAG_REGION_ATTR}
+          style={{ ...DRAG_REGION_STYLE } as any}
+        >
+          <div className="flex shrink-0 items-center gap-2" style={noDrag}>
+            {!inAppPage && (
+              <Button
+                variant="outline"
+                size="icon"
+                disabled={managementBusy}
+                aria-label={t("common.back")}
+                title={t("common.back")}
+                onClick={goBack}
+                className={cn(
+                  "rounded-[3px]",
+                  managementBusy && "disabled:opacity-100",
+                )}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            )}
+            <div
+              ref={headerBrandRef}
+              className={cn("flex items-center gap-2", !inAppPage && "hidden")}
+            >
+              <ViberSwitchLogo />
+              {/* Always rendered so useHeaderNavLabels can measure it; hidden takes no space. */}
+              <span
+                data-brand-word
+                data-brand-hidden={showBrand ? undefined : ""}
+                aria-hidden="true"
+                className={cn(
+                  "select-none whitespace-nowrap text-[12.35px] font-semibold leading-[1.3] text-foreground",
+                  !showBrand && "pointer-events-none invisible absolute",
+                )}
+              >
+                {t("app.title")}
+              </span>
+            </div>
           </div>
-        </main>
+
+          <div
+            ref={headerRowRef}
+            className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden"
+          >
+            {currentView === "providers" &&
+              activeApp !== "mcode" &&
+              (settingsData?.showProfileSwitcher ?? true) && (
+                <div className="flex shrink-0 items-center" style={noDrag}>
+                  <ProfileSwitcher activeApp={activeApp} />
+                </div>
+              )}
+            {/* 弹性中段：空间不足时由 AppSwitcher 自行收纳溢出应用；
+                justify-end + overflow-hidden 只裁剪 resize 瞬间的过渡帧 */}
+            <div
+              ref={headerSlotRef}
+              className="flex min-w-0 flex-1 items-center justify-end overflow-hidden"
+            >
+              <AppSwitcher
+                activeApp={activeApp}
+                onSwitch={selectApp}
+                visibleApps={visibleApps}
+                onFullWidthChange={setAppsFullWidth}
+              />
+            </div>
+            {/* 固定右端：页面导航 + 主题 / 设置，shrink-0，任何配置下不被挤出 */}
+            <div
+              ref={headerClusterRef}
+              className="flex shrink-0 items-center gap-1.5"
+              style={noDrag}
+            >
+              <div
+                data-header-nav
+                className="flex items-center gap-1 rounded-[8px] bg-muted p-1"
+              >
+                <HeaderNavButton
+                  label={t("skills.manage")}
+                  showLabel={navLabelCount > 0}
+                  active={
+                    currentView === "skills" ||
+                    currentView === "skillsDiscovery"
+                  }
+                  onClick={() => openPageFromNav("skills")}
+                >
+                  <SkillsIcon className="h-4 w-4 shrink-0" />
+                </HeaderNavButton>
+                {/* Fork: keep Prompts out of the header toolbar. Do not restore on upstream merge.
+                  <HeaderNavButton
+                    label={t("prompts.manage")}
+                    onClick={() => openPageFromNav("prompts")}
+                  >
+                    <Book className="h-4 w-4 shrink-0" />
+                  </HeaderNavButton>
+                  */}
+                <HeaderNavButton
+                  label={t("mcp.nav", { defaultValue: "MCP" })}
+                  title={t("mcp.title")}
+                  showLabel={navLabelCount > 1}
+                  active={currentView === "mcp"}
+                  onClick={() => openPageFromNav("mcp")}
+                >
+                  <McpIcon size={16} />
+                </HeaderNavButton>
+                <HeaderNavButton
+                  label={t("nav.usage")}
+                  showLabel={navLabelCount > 2}
+                  active={currentView === "usage"}
+                  onClick={() => openPageFromNav("usage")}
+                >
+                  <BarChart2 className="h-4 w-4 shrink-0" />
+                </HeaderNavButton>
+                <HeaderNavButton
+                  label={t("sessionManager.title")}
+                  showLabel={navLabelCount > 3}
+                  active={currentView === "sessions"}
+                  onClick={() => openPageFromNav("sessions")}
+                >
+                  <History className="h-4 w-4 shrink-0" />
+                </HeaderNavButton>
+                <HeaderNavButton
+                  label={t("nav.auth")}
+                  showLabel={navLabelCount > 4}
+                  active={currentView === "auth"}
+                  onClick={() => openPageFromNav("auth")}
+                >
+                  <KeyRound className="h-4 w-4 shrink-0" />
+                </HeaderNavButton>
+                <HeaderNavButton
+                  label={t("nav.apps")}
+                  title={
+                    appsUpdateAvailable
+                      ? t("nav.appsHasUpdate")
+                      : t("nav.appsTitle")
+                  }
+                  showLabel={navLabelCount > 5}
+                  active={currentView === "apps"}
+                  dot={appsUpdateAvailable}
+                  onClick={() => openPageFromNav("apps")}
+                >
+                  <LayoutGrid className="h-4 w-4 shrink-0" />
+                </HeaderNavButton>
+              </div>
+              <div className="inline-flex h-7 shrink-0 items-center gap-1 rounded-[8px] bg-muted/50 px-1.5">
+                <ThemeToggle />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => openSettings("general")}
+                  title={t("common.settings")}
+                  aria-label={t("common.settings")}
+                  className="h-5 w-5 shrink-0 rounded-[4px] p-0 text-muted-foreground hover:bg-black/5 hover:text-foreground dark:hover:bg-white/5"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <main
+        ref={mainScrollRef}
+        id="content-area"
+        className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden"
+      >
+        {showEnvBanner && envConflicts.length > 0 && (
+          <EnvWarningBanner
+            conflicts={envConflicts}
+            onDismiss={() => {
+              setShowEnvBanner(false);
+              sessionStorage.setItem("env_banner_dismissed", "true");
+            }}
+            onDeleted={async () => {
+              try {
+                const allConflicts = await checkAllEnvConflicts();
+                const flatConflicts = Object.values(allConflicts).flat();
+                setEnvConflicts(flatConflicts);
+                if (flatConflicts.length === 0) {
+                  setShowEnvBanner(false);
+                }
+              } catch (error) {
+                console.error(
+                  "[App] Failed to re-check conflicts after deletion:",
+                  error,
+                );
+              }
+            }}
+          />
+        )}
+        {currentView === "settings" && (
+          <div className="shrink-0 px-2 pt-1">
+            <PageTabs
+              aria-label={t("settings.title")}
+              idPrefix="settings-section"
+              value={settingsSection}
+              onValueChange={(section) => {
+                setAppConfigScrollTarget(undefined);
+                setSettingsSection(section);
+              }}
+              items={SETTINGS_SECTIONS.map((section) => ({
+                value: section,
+                label: t(`settings.sections.${section}`),
+              }))}
+            />
+          </div>
+        )}
+        <div
+          key={
+            currentView === "settings"
+              ? "settings"
+              : inAppPage
+                ? "app"
+                : currentView
+          }
+          className="flex min-h-0 flex-1 flex-col animate-fade-in"
+        >
+          {renderContent()}
+        </div>
+      </main>
 
       <AddProviderDialog
         open={isAddOpen}
@@ -1915,10 +2235,9 @@ function App() {
       />
 
       <DeepLinkImportDialog />
+      <LanguagePickerDialog />
       <FirstRunNoticeDialog />
-      <NewLayoutDialog />
-      <WhatsNewNotice />
-    </WindowControlsContext.Provider>
+    </div>
   );
 }
 

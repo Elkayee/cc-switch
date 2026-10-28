@@ -220,7 +220,7 @@ impl StreamCheckService {
     ) -> Result<u16, AppError> {
         let url = base_url.trim();
         if url.is_empty() {
-            return Err(AppError::Message("base_url 为空".to_string()));
+            return Err(AppError::Message("base_url is empty".to_string()));
         }
 
         let mut req = client
@@ -313,7 +313,7 @@ impl StreamCheckService {
             .ok_or_else(|| {
                 AppError::localized(
                     "openclaw_base_url_missing",
-                    "OpenClaw 供应商缺少 baseUrl",
+                    "OpenClaw provider is missing `baseUrl`",
                     "OpenClaw provider is missing `baseUrl`",
                 )
             })
@@ -330,7 +330,7 @@ impl StreamCheckService {
             .ok_or_else(|| {
                 AppError::localized(
                     "hermes_base_url_missing",
-                    "Hermes 供应商缺少 base_url",
+                    "Hermes provider is missing `base_url`",
                     "Hermes provider is missing `base_url`",
                 )
             })
@@ -358,7 +358,7 @@ impl StreamCheckService {
         fallback.map(|s| s.to_string()).ok_or_else(|| {
             AppError::localized(
                 "opencode_base_url_missing",
-                "OpenCode 供应商缺少 options.baseURL，且当前 SDK 包没有默认端点",
+                "OpenCode provider is missing `options.baseURL` and the SDK package has no default endpoint",
                 "OpenCode provider is missing `options.baseURL` and the SDK package has no default endpoint",
             )
         })

@@ -253,18 +253,18 @@ fn s3_transport_error(
     err: &reqwest::Error,
 ) -> AppError {
     let (zh_reason, en_reason) = if err.is_timeout() {
-        ("请求超时", "request timed out")
+        ("request timed out", "request timed out")
     } else if err.is_connect() {
-        ("连接失败", "connection failed")
+        ("connection failed", "connection failed")
     } else if err.is_request() {
-        ("请求构造失败", "request build failed")
+        ("request build failed", "request build failed")
     } else {
-        ("网络请求失败", "network request failed")
+        ("network request failed", "network request failed")
     };
 
     AppError::localized(
         key,
-        format!("S3 {op_zh}失败（{zh_reason}）"),
+        format!("S3 {op_zh} failed ({zh_reason})"),
         format!("S3 {op_en} failed ({en_reason})"),
     )
 }
@@ -280,7 +280,7 @@ fn s3_stalled_error(key: &'static str, op_zh: &str, op_en: &str) -> AppError {
 
 fn s3_status_error(op: &str, status: StatusCode, url: &str) -> AppError {
     let safe_url = redact_url(url);
-    let mut zh = format!("S3 {op} 失败: {status} ({safe_url})");
+    let mut zh = format!("S3 {op} failed: {status} ({safe_url})");
     let mut en = format!("S3 {op} failed: {status} ({safe_url})");
 
     if matches!(status, StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN) {
@@ -298,7 +298,11 @@ fn response_too_large_error(url: &str, max_bytes: usize) -> AppError {
     let max_mb = max_bytes / 1024 / 1024;
     AppError::localized(
         "s3.response_too_large",
-        format!("S3 响应体超过上限（{} MB）: {}", max_mb, redact_url(url)),
+        format!(
+            "S3 response body exceeds limit ({} MB): {}",
+            max_mb,
+            redact_url(url)
+        ),
         format!(
             "S3 response body exceeds limit ({} MB): {}",
             max_mb,
@@ -335,7 +339,7 @@ pub(crate) async fn test_connection(creds: &S3Credentials) -> Result<(), AppErro
     let url = Url::parse(&url_str).map_err(|e| {
         AppError::localized(
             "s3.url.invalid",
-            format!("S3 URL 无效: {e}"),
+            format!("Invalid S3 URL: {e}"),
             format!("Invalid S3 URL: {e}"),
         )
     })?;
@@ -358,7 +362,7 @@ pub(crate) async fn test_connection(creds: &S3Credentials) -> Result<(), AppErro
         .timeout(Duration::from_secs(DEFAULT_TIMEOUT_SECS))
         .send()
         .await
-        .map_err(|e| s3_transport_error("s3.connection_failed", "连接", "connection", &e))?;
+        .map_err(|e| s3_transport_error("s3.connection_failed", "connection", "connection", &e))?;
 
     if resp.status().is_success() {
         return Ok(());
@@ -377,7 +381,7 @@ pub(crate) async fn put_object(
     let url = Url::parse(&url_str).map_err(|e| {
         AppError::localized(
             "s3.url.invalid",
-            format!("S3 URL 无效: {e}"),
+            format!("Invalid S3 URL: {e}"),
             format!("Invalid S3 URL: {e}"),
         )
     })?;
@@ -402,7 +406,7 @@ pub(crate) async fn put_object(
         .body(bytes)
         .send()
         .await
-        .map_err(|e| s3_transport_error("s3.put_failed", "PUT 请求", "PUT request", &e))?;
+        .map_err(|e| s3_transport_error("s3.put_failed", "PUT request", "PUT request", &e))?;
 
     if resp.status().is_success() {
         return Ok(());
@@ -422,7 +426,7 @@ pub(crate) async fn get_object(
     let url = Url::parse(&url_str).map_err(|e| {
         AppError::localized(
             "s3.url.invalid",
-            format!("S3 URL 无效: {e}"),
+            format!("Invalid S3 URL: {e}"),
             format!("Invalid S3 URL: {e}"),
         )
     })?;
@@ -472,7 +476,7 @@ pub(crate) async fn get_object(
         let chunk = chunk.map_err(|e| {
             AppError::localized(
                 "s3.response_read_failed",
-                format!("读取 S3 响应失败: {e}"),
+                format!("Failed to read S3 response: {e}"),
                 format!("Failed to read S3 response: {e}"),
             )
         })?;
@@ -493,7 +497,7 @@ pub(crate) async fn head_object(
     let url = Url::parse(&url_str).map_err(|e| {
         AppError::localized(
             "s3.url.invalid",
-            format!("S3 URL 无效: {e}"),
+            format!("Invalid S3 URL: {e}"),
             format!("Invalid S3 URL: {e}"),
         )
     })?;
@@ -516,7 +520,7 @@ pub(crate) async fn head_object(
         .timeout(Duration::from_secs(DEFAULT_TIMEOUT_SECS))
         .send()
         .await
-        .map_err(|e| s3_transport_error("s3.head_failed", "HEAD 请求", "HEAD request", &e))?;
+        .map_err(|e| s3_transport_error("s3.head_failed", "HEAD request", "HEAD request", &e))?;
 
     if resp.status() == StatusCode::NOT_FOUND {
         return Ok(None);

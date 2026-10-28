@@ -373,6 +373,8 @@ export function useToolManagement() {
     Partial<Record<ToolName, ToolInstallation[]>>
   >({});
   const [isDiagnosingAll, setIsDiagnosingAll] = useState(false);
+  // 正在卸载的那一处安装（入口路径）；卸载期间锁住所有卸载按钮。
+  const [uninstallingPath, setUninstallingPath] = useState<string | null>(null);
   // 每个工具独立锁定，覆盖预检、等待确认、执行与版本刷新。
   // 共享状态同步加锁，避免重复点击或重挂后的页面重复提交同一工具。
   const releaseTools = useCallback((toolNames: ToolName[]) => {
@@ -654,6 +656,57 @@ export function useToolManagement() {
       setIsDiagnosingAll(false);
     }
   }, [t]);
+
+  // 卸载多处安装中的一处：成功后刷新版本并补诊，卡片立即反映剩下的安装。
+  const handleUninstallInstall = useCallback(
+    async (toolName: ToolName, install: ToolInstallation) => {
+      if (toolManagementState.busyTools.has(toolName)) return;
+      setUninstallingPath(install.path);
+      try {
+        await settingsApi.uninstallToolInstallation(toolName, install.path);
+        await refreshToolVersions([toolName], {});
+        await diagnoseToolSilently(toolName);
+        toast.success(t("appsPage.uninstallDone", { path: install.path }), {
+          closeButton: true,
+        });
+      } catch (error) {
+        const detail = extractErrorMessage(error) || String(error);
+        if (detail === "TOOL_ACTION_IN_PROGRESS") {
+          toast.info(t("settings.toolActionInProgress"), {
+            description: t("settings.toolActionInProgressDetail", {
+              tool: TOOL_DISPLAY_NAMES[toolName],
+            }),
+            closeButton: true,
+          });
+        } else {
+          console.error(
+            `[useToolManagement] Failed to uninstall ${toolName} at ${install.path}`,
+            error,
+          );
+          const known = [
+            "UNINSTALL_ONLY_INSTALL",
+            "UNINSTALL_NOT_FOUND",
+            "UNINSTALL_UNSUPPORTED",
+            "UNINSTALL_INCOMPLETE",
+            "UNINSTALL_IN_USE",
+          ].includes(detail);
+          toast.error(t("appsPage.uninstallFailed"), {
+            description: known
+              ? t(`appsPage.uninstallError.${detail}`, {
+                  tool: toolDisplayName(toolName),
+                })
+              : detail || undefined,
+            closeButton: true,
+          });
+          // 状态可能已变（被外部卸载 / 只剩一处），补诊让列表与磁盘一致。
+          void diagnoseToolSilently(toolName);
+        }
+      } finally {
+        setUninstallingPath(null);
+      }
+    },
+    [diagnoseToolSilently, refreshToolVersions, t],
+  );
 
   // 已通过必要的确认后，各工具独立提交、刷新和解锁；安装写入由后端串行调度。
   const executeRun = useCallback(
@@ -1056,6 +1109,8 @@ export function useToolManagement() {
     updatableToolNames,
     toolDiagnostics,
     isDiagnosingAll,
+    uninstallingPath,
+    handleUninstallInstall,
     isAnyBusy,
     lastCheckedAt,
     wslShellByTool,

@@ -90,14 +90,14 @@ pub fn set_mcp_servers_map(
             map.clone()
         } else {
             return Err(AppError::McpValidation(format!(
-                "MCP 服务器 '{id}' 不是对象"
+                "MCP server '{id}' is not an object"
             )));
         };
 
         // 提取 server 字段（如果存在）
         if let Some(server_val) = obj.remove("server") {
             let server_obj = server_val.as_object().cloned().ok_or_else(|| {
-                AppError::McpValidation(format!("MCP 服务器 '{id}' server 字段不是对象"))
+                AppError::McpValidation(format!("MCP server '{id}' server field is not an object"))
             })?;
             obj = server_obj;
         }
@@ -156,9 +156,9 @@ pub fn set_mcp_servers_map(
     }
 
     {
-        let obj = root
-            .as_object_mut()
-            .ok_or_else(|| AppError::Config("~/.gemini/settings.json 根必须是对象".into()))?;
+        let obj = root.as_object_mut().ok_or_else(|| {
+            AppError::Config("~/.gemini/settings.json root must be an object".into())
+        })?;
         obj.insert("mcpServers".into(), Value::Object(out));
     }
 

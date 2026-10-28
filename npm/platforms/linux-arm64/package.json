@@ -1,0 +1,17 @@
+{
+  "name": "@spec-ade/cli-switch-linux-arm64",
+  "version": "4.0.9",
+  "description": "Cli-Switch server binary for linux/arm64",
+  "license": "MIT",
+  "repository": "https://github.com/nullmastermind/cc-switch",
+  "homepage": "https://viber.vn",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "files": [
+    "bin/"
+  ]
+}

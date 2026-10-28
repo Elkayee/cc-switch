@@ -9,6 +9,8 @@ async function openMenu(presentation: CardPresentation) {
   render(
     <ProviderCardActions
       providerName="Kimi"
+      appId="claude"
+      providerId="kimi"
       presentation={presentation}
       onEdit={vi.fn()}
       onDelete={vi.fn()}
@@ -123,6 +125,8 @@ describe("ProviderCardActions — open terminal", () => {
     const onOpenTerminal = vi.fn();
     render(
       <ProviderCardActions
+        appId="claude"
+        providerId="provider-1"
         providerName="Claude Official"
         presentation={{ buttons: [], chips: [] }}
         onEdit={vi.fn()}
@@ -149,6 +153,8 @@ describe("ProviderCardActions — open terminal", () => {
   it("isn't shown for apps without it", () => {
     render(
       <ProviderCardActions
+        appId="claude"
+        providerId="provider-1"
         providerName="Kimi"
         presentation={{ buttons: [], chips: [] }}
         onEdit={vi.fn()}

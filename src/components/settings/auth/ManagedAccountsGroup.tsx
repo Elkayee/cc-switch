@@ -106,7 +106,7 @@ interface ManagedAccountsGroupProps {
 }
 
 const PILL =
-  "inline-flex h-[18px] shrink-0 items-center rounded-full px-1.5 text-badge";
+  "inline-flex h-[18px] shrink-0 items-center rounded-full px-2 text-[12.35px] leading-[1.3]";
 
 /**
  * 授权中心的一个服务（v7 Auth 画板）：标题行（图标、名字、「?」、添加账号），
@@ -220,15 +220,15 @@ export function ManagedAccountsGroup({
       aria-label={name}
       className="auth-group shrink-0 rounded-panel border border-border bg-surface"
     >
-      <div className="flex h-[52px] items-center gap-3 pe-2.5 ps-4">
+      <div className="flex h-[52px] items-center gap-2 pe-2 ps-2">
         <span
           aria-hidden="true"
-          className="flex h-7 w-7 shrink-0 items-center justify-center text-fg-1"
+          className="flex h-7 w-7 shrink-0 items-center justify-center text-foreground"
         >
           <ProviderIcon icon={iconName} name={name} size={20} />
         </span>
         <div className="flex min-w-0 flex-1 items-center gap-0.5">
-          <h2 className="m-0 truncate text-strong font-semibold text-fg-1">
+          <h2 className="m-0 truncate text-ui font-medium font-semibold text-foreground">
             {name}
           </h2>
           <HelpTip
@@ -255,7 +255,7 @@ export function ManagedAccountsGroup({
             }
             onClick={add}
           >
-            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+            <Plus className="h-4 w-4" strokeWidth={2} />
             {t("authCenter.addAccount", { defaultValue: "添加账号" })}
           </Button>
         )}
@@ -269,20 +269,20 @@ export function ManagedAccountsGroup({
       )}
 
       {status === "loading" && (
-        <div className="flex items-center gap-2 border-t border-border py-3.5 pe-3 ps-4 text-caption text-fg-2">
-          <Loader2 className="h-3.5 w-3.5 motion-safe:animate-spin" />
+        <div className="flex items-center gap-2 border-t border-border py-2 pe-2 ps-2 text-ui text-muted-foreground">
+          <Loader2 className="h-4 w-4 motion-safe:animate-spin" />
           {t("authCenter.statusLoading", { defaultValue: "正在加载账号…" })}
         </div>
       )}
 
       {status === "error" && (
-        <div className="flex items-center gap-3 border-t border-border py-3 pe-3 ps-4">
+        <div className="flex items-center gap-2 border-t border-border py-2 pe-2 ps-2">
           <CircleAlert
             aria-hidden="true"
             strokeWidth={1.5}
             className="h-4 w-4 shrink-0 text-danger-text"
           />
-          <span className="min-w-0 flex-1 text-caption text-fg-1">
+          <span className="min-w-0 flex-1 text-ui text-foreground">
             {statusErrorText}
           </span>
           <Button
@@ -291,7 +291,7 @@ export function ManagedAccountsGroup({
             size="compact"
             onClick={onRetryStatus}
           >
-            <RefreshCw className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <RefreshCw className="h-4 w-4" strokeWidth={1.5} />
             {t("authCenter.retry", { defaultValue: "重试" })}
           </Button>
         </div>
@@ -328,15 +328,15 @@ export function ManagedAccountsGroup({
 
       <div role="status">
         {busy && (
-          <div className="mx-3 mb-3 flex flex-col gap-2 rounded-[8px] bg-subtle px-3.5 py-3">
+          <div className="mx-3 mb-2 flex flex-col gap-2 rounded-[8px] bg-subtle px-2 py-2">
             <div className="flex items-center gap-2">
               <Loader2
                 aria-hidden="true"
-                className="h-[15px] w-[15px] shrink-0 text-fg-2 motion-safe:animate-spin"
+                className="h-[15px] w-[15px] shrink-0 text-muted-foreground motion-safe:animate-spin"
               />
               <span
                 id={pendingId}
-                className="min-w-0 flex-1 text-body font-medium text-fg-1"
+                className="min-w-0 flex-1 text-ui font-medium text-foreground"
               >
                 {pendingTitle}
               </span>
@@ -375,13 +375,13 @@ export function ManagedAccountsGroup({
             {login.deviceCode && !login.deviceCode.user_code && login.extra}
             {login.deviceCode?.user_code && (
               <>
-                <div className="flex flex-wrap items-center gap-2 text-caption text-fg-2">
+                <div className="flex flex-wrap items-center gap-2 text-ui text-muted-foreground">
                   <span>
                     {t("authCenter.pending.enterCode", {
                       defaultValue: "在浏览器中输入验证码：",
                     })}
                   </span>
-                  <code className="inline-flex h-7 items-center rounded-control border border-border-strong bg-surface px-2.5 font-mono text-section tracking-[1px] text-fg-1">
+                  <code className="inline-flex h-7 items-center rounded-[4px] border border-border-strong bg-card px-2 font-mono text-ui font-semibold tracking-[1px] text-foreground">
                     {login.deviceCode.user_code}
                   </code>
                   <HoverTip
@@ -398,7 +398,7 @@ export function ManagedAccountsGroup({
                       })}
                       onClick={() => void copyCode()}
                     >
-                      <Copy className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      <Copy className="h-4 w-4" strokeWidth={1.5} />
                     </Button>
                   </HoverTip>
                   <HoverTip
@@ -415,11 +415,11 @@ export function ManagedAccountsGroup({
                       })}
                       onClick={openPage}
                     >
-                      <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      <ExternalLink className="h-4 w-4" strokeWidth={1.5} />
                     </Button>
                   </HoverTip>
                 </div>
-                <span className="text-caption text-fg-2">
+                <span className="text-ui text-muted-foreground">
                   {t("authCenter.pending.note", {
                     defaultValue:
                       "已在浏览器打开授权页面，完成后这里会自动更新。注意 {{service}} 的使用条款。",
@@ -431,7 +431,7 @@ export function ManagedAccountsGroup({
           </div>
         )}
         {!busy && login.pollingState === "error" && login.error && (
-          <div className="mx-3 mb-3">
+          <div className="mx-3 mb-2">
             <Notice
               tone="danger"
               title={t("authCenter.loginFailed", {
@@ -480,7 +480,7 @@ function AccountAvatar({
   return (
     <span
       aria-hidden="true"
-      className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-subtle text-caption font-semibold text-fg-2"
+      className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-subtle text-ui font-semibold text-muted-foreground"
     >
       {avatarUrl && !failed ? (
         <img
@@ -535,13 +535,13 @@ function AccountRow({
   const separator = " · ";
 
   return (
-    <div className="flex min-h-[56px] items-center gap-3 border-t border-border py-2 pe-2.5 ps-4">
+    <div className="flex min-h-[56px] items-center gap-2 border-t border-border py-2 pe-2 ps-2">
       <AccountAvatar login={account.login} avatarUrl={account.avatarUrl} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex min-w-0 items-center gap-1.5">
+        <div className="flex min-w-0 items-center gap-2">
           <span
             title={account.login}
-            className="min-w-0 truncate text-body font-medium text-fg-1"
+            className="min-w-0 truncate text-ui font-medium text-foreground"
           >
             {account.login}
           </span>
@@ -559,7 +559,7 @@ function AccountRow({
         </div>
         <div
           id={subId}
-          className="flex min-w-0 items-center text-caption text-fg-2"
+          className="flex min-w-0 items-center text-ui text-muted-foreground"
         >
           <span className="min-w-0 truncate">
             {account.details.map((part, index) => (
@@ -609,7 +609,7 @@ function AccountRow({
         </HoverTip>
         <DropdownMenuContent
           align="end"
-          className="min-w-[148px] rounded-panel bg-surface p-1 shadow-v7-md"
+          className="min-w-[148px] rounded-[8px] bg-card p-1 shadow-md"
         >
           {canSetDefault && (
             <DropdownMenuItem
@@ -625,13 +625,13 @@ function AccountRow({
             <DropdownMenuItem
               disabled={busy || Boolean(loginBlockedId)}
               onSelect={() => onReauth(account.id)}
-              className="min-h-[30px] flex-col items-start justify-center gap-0 rounded-control px-2.5 text-body data-[disabled]:opacity-100"
+              className="min-h-6 flex-col items-start justify-center gap-0 rounded-[4px] px-2 text-ui data-[disabled]:opacity-100"
             >
               <span className={cn((busy || loginBlockedId) && "text-fg-3")}>
                 {t("authCenter.reauth", { defaultValue: "重新登录" })}
               </span>
               {busy && (
-                <span className="text-caption text-fg-3">
+                <span className="text-ui text-muted-foreground">
                   {t("authCenter.busyHint", {
                     defaultValue: "先完成或取消正在进行的登录",
                   })}

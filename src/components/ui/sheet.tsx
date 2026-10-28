@@ -15,8 +15,9 @@ const Sheet = DialogPrimitive.Root;
 const SheetTrigger = DialogPrimitive.Trigger;
 const SheetClose = DialogPrimitive.Close;
 
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+interface SheetContentProps extends React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Content
+> {
   width?: number;
   /** 右上角关闭按钮的无障碍名字 */
   closeLabel: string;
@@ -50,7 +51,7 @@ const SheetContent = React.forwardRef<
         ref={ref}
         style={{ width, ...style }}
         className={cn(
-          "fixed inset-y-0 end-0 z-50 flex max-w-[100vw] flex-col overflow-hidden rounded-s-dialog border-s border-border bg-surface text-fg-1 shadow-v7-lg outline-none duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-right-4 data-[state=open]:slide-in-from-right-4",
+          "fixed inset-y-0 end-0 z-50 flex max-w-[100vw] flex-col overflow-hidden rounded-s-[8px] border-s border-border bg-surface text-fg-1 shadow-lg outline-none duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-right-4 data-[state=open]:slide-in-from-right-4",
           className,
         )}
         onInteractOutside={(event) => {
@@ -62,7 +63,7 @@ const SheetContent = React.forwardRef<
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          className="absolute end-3 top-3 inline-flex h-7 w-7 items-center justify-center rounded-control text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
+          className="absolute end-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-[4px] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
         >
           <X className="h-4 w-4" strokeWidth={1.5} />
         </DialogPrimitive.Close>
@@ -115,12 +116,7 @@ const SheetPageContent = React.forwardRef<
         }
         leading={
           <DialogPrimitive.Close asChild>
-            <Button
-              variant="quiet"
-              size="icon-compact"
-              className="h-8 w-8"
-              aria-label={closeLabel}
-            >
+            <Button variant="quiet" size="icon-compact" aria-label={closeLabel}>
               <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
             </Button>
           </DialogPrimitive.Close>
@@ -137,7 +133,7 @@ const SheetHeader = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn("shrink-0 space-y-1 pe-12 ps-5 pt-4", className)}
+    className={cn("shrink-0 space-y-1 pe-8 ps-2 pt-2", className)}
     {...props}
   />
 );
@@ -148,7 +144,7 @@ const SheetBody = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "min-h-0 flex-1 overflow-y-auto scroll-stable overscroll-contain px-5 py-4",
+      "min-h-0 flex-1 overflow-y-auto scroll-stable overscroll-contain p-2",
       className,
     )}
     {...props}
@@ -161,7 +157,7 @@ const SheetFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex shrink-0 items-center justify-end gap-2 border-t border-border px-5 py-3",
+      "flex shrink-0 items-center justify-end gap-2 border-t border-border p-2",
       className,
     )}
     {...props}
@@ -174,7 +170,7 @@ const SheetTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-section", className)}
+    className={cn("text-[12.35px] font-semibold leading-[1.3]", className)}
     {...props}
   />
 ));
@@ -186,7 +182,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-caption text-fg-2", className)}
+    className={cn("text-[12.35px] leading-[1.3] text-fg-2", className)}
     {...props}
   />
 ));

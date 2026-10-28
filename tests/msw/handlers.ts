@@ -327,6 +327,8 @@ export const handlers = [
     return success(app === "claude" ? "/default/claude" : "/default/codex");
   }),
 
+  http.post(`${TAURI_ENDPOINT}/get_dir_suffix`, () => success(null)),
+
   http.post(`${TAURI_ENDPOINT}/is_portable_mode`, () => success(false)),
 
   http.post(
@@ -527,6 +529,17 @@ export const handlers = [
       successRate: 0,
       realTotalTokens: 0,
       cacheHitRate: 0,
+    }),
+  ),
+  http.post(`${TAURI_ENDPOINT}/get_provider_direct_token`, () =>
+    success({
+      access_token: "test-access-token",
+      token_type: "Bearer",
+      expires_at: null,
+      expires_in: null,
+      refreshed: false,
+      retry_after: null,
+      account_id: "acc",
     }),
   ),
   http.post(`${TAURI_ENDPOINT}/auth_get_status`, async ({ request }) => {

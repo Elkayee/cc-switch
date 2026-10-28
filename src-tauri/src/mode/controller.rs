@@ -1850,8 +1850,7 @@ async fn drain_legacy_backup(state: &AppState, app: &AppType) -> bool {
             return false;
         }
     };
-    let dir = crate::config::get_home_dir()
-        .join(".cc-switch")
+    let dir = crate::config::device_dir()
         .join("backups")
         .join("proxy-live-backup");
     let stamp = chrono::Utc::now().format("%Y%m%dT%H%M%SZ");
@@ -3053,7 +3052,11 @@ mod mode_tests {
         );
         failpoint::crash_at(None);
         let error = refused.expect_err("refused while unsettled");
-        assert!(error.to_string().contains("补不完"), "{error}");
+        assert!(
+            error.to_string().contains("补不完")
+                || error.to_string().contains("cannot be completed"),
+            "{error}"
+        );
         let b_token = |state: &AppState| {
             state
                 .db
@@ -6719,6 +6722,7 @@ model_provider = "c"
                 AppType::Claude,
                 "Claude",
                 "claude",
+                None,
                 None,
             )
         };

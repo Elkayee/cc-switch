@@ -244,7 +244,7 @@ impl Database {
     pub fn get_rectifier_config(&self) -> Result<crate::proxy::types::RectifierConfig, AppError> {
         match self.get_setting("rectifier_config")? {
             Some(json) => serde_json::from_str(&json)
-                .map_err(|e| AppError::Database(format!("解析整流器配置失败: {e}"))),
+                .map_err(|e| AppError::Database(format!("Failed to parse rectifier config: {e}"))),
             None => Ok(crate::proxy::types::RectifierConfig::default()),
         }
     }
@@ -254,8 +254,9 @@ impl Database {
         &self,
         config: &crate::proxy::types::RectifierConfig,
     ) -> Result<(), AppError> {
-        let json = serde_json::to_string(config)
-            .map_err(|e| AppError::Database(format!("序列化整流器配置失败: {e}")))?;
+        let json = serde_json::to_string(config).map_err(|e| {
+            AppError::Database(format!("Failed to serialize rectifier config: {e}"))
+        })?;
         self.set_setting("rectifier_config", &json)
     }
 
@@ -267,7 +268,7 @@ impl Database {
     pub fn get_optimizer_config(&self) -> Result<crate::proxy::types::OptimizerConfig, AppError> {
         match self.get_setting("optimizer_config")? {
             Some(json) => serde_json::from_str(&json)
-                .map_err(|e| AppError::Database(format!("解析优化器配置失败: {e}"))),
+                .map_err(|e| AppError::Database(format!("Failed to parse optimizer config: {e}"))),
             None => Ok(crate::proxy::types::OptimizerConfig::default()),
         }
     }
@@ -277,8 +278,9 @@ impl Database {
         &self,
         config: &crate::proxy::types::OptimizerConfig,
     ) -> Result<(), AppError> {
-        let json = serde_json::to_string(config)
-            .map_err(|e| AppError::Database(format!("序列化优化器配置失败: {e}")))?;
+        let json = serde_json::to_string(config).map_err(|e| {
+            AppError::Database(format!("Failed to serialize optimizer config: {e}"))
+        })?;
         self.set_setting("optimizer_config", &json)
     }
 
@@ -291,8 +293,9 @@ impl Database {
         &self,
     ) -> Result<crate::proxy::types::CopilotOptimizerConfig, AppError> {
         match self.get_setting("copilot_optimizer_config")? {
-            Some(json) => serde_json::from_str(&json)
-                .map_err(|e| AppError::Database(format!("解析 Copilot 优化器配置失败: {e}"))),
+            Some(json) => serde_json::from_str(&json).map_err(|e| {
+                AppError::Database(format!("Failed to parse Copilot optimizer config: {e}"))
+            }),
             None => Ok(crate::proxy::types::CopilotOptimizerConfig::default()),
         }
     }
@@ -302,8 +305,9 @@ impl Database {
         &self,
         config: &crate::proxy::types::CopilotOptimizerConfig,
     ) -> Result<(), AppError> {
-        let json = serde_json::to_string(config)
-            .map_err(|e| AppError::Database(format!("序列化 Copilot 优化器配置失败: {e}")))?;
+        let json = serde_json::to_string(config).map_err(|e| {
+            AppError::Database(format!("Failed to serialize Copilot optimizer config: {e}"))
+        })?;
         self.set_setting("copilot_optimizer_config", &json)
     }
 
@@ -313,7 +317,7 @@ impl Database {
     pub fn get_log_config(&self) -> Result<crate::proxy::types::LogConfig, AppError> {
         match self.get_setting("log_config")? {
             Some(json) => serde_json::from_str(&json)
-                .map_err(|e| AppError::Database(format!("解析日志配置失败: {e}"))),
+                .map_err(|e| AppError::Database(format!("Failed to parse log config: {e}"))),
             None => Ok(crate::proxy::types::LogConfig::default()),
         }
     }
@@ -321,7 +325,7 @@ impl Database {
     /// 更新日志配置
     pub fn set_log_config(&self, config: &crate::proxy::types::LogConfig) -> Result<(), AppError> {
         let json = serde_json::to_string(config)
-            .map_err(|e| AppError::Database(format!("序列化日志配置失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to serialize log config: {e}")))?;
         self.set_setting("log_config", &json)
     }
 }

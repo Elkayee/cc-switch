@@ -106,8 +106,9 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="ghost"
             role="combobox"
             aria-expanded={open}
             aria-label={t("profiles.switcherAriaLabel", {
@@ -115,9 +116,8 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
             })}
             title={t(`profiles.switcherTooltip.${scope}`)}
             className={cn(
-              "inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium transition-colors",
-              "hover:bg-black/5 dark:hover:bg-white/5",
-              currentProfile ? "text-fg-1" : "text-fg-2",
+              "h-8 min-w-0 px-2",
+              currentProfile ? "text-foreground" : "text-muted-foreground",
             )}
           >
             <FolderOpen className="h-4 w-4 shrink-0 opacity-70" />
@@ -125,7 +125,7 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
               {currentProfile?.name ?? t("profiles.none")}
             </span>
             <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
-          </button>
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           side="bottom"
@@ -157,7 +157,7 @@ export function ProfileSwitcher({ activeApp }: ProfileSwitcherProps) {
                       />
                       <span className="truncate">{profile.name}</span>
                       {!hasScopeSnapshot(profile, scope) && (
-                        <span className="ml-auto shrink-0 pl-2 text-xs text-fg-2">
+                        <span className="ml-auto shrink-0 pl-2 text-[12.35px] leading-[1.3] text-fg-2">
                           {t("profiles.noSnapshotForScope")}
                         </span>
                       )}

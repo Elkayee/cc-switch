@@ -311,7 +311,7 @@ export function QuotaLines({
         aria-hidden
         data-testid={`quota-refresh-${refresh.phase}`}
         className={cn(
-          "h-[11px] w-[11px] shrink-0 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-75",
+          "h-3 w-3 shrink-0 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-75",
           refresh.phase === "failed" ? "text-danger-text" : "text-fg-3",
         )}
         strokeWidth={2}
@@ -321,7 +321,7 @@ export function QuotaLines({
         aria-hidden
         data-testid="quota-refresh-icon"
         className={cn(
-          "h-[11px] w-[11px] shrink-0 text-fg-3 group-hover:text-fg-2",
+          "h-3 w-3 shrink-0 text-fg-3 group-hover:text-fg-2",
           spinning
             ? "motion-safe:animate-spin"
             : quiet
@@ -371,7 +371,7 @@ export function QuotaLines({
       type="button"
       className={cn(
         className,
-        "group rounded-control text-end transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "group rounded-[4px] text-end transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
       title={title}
       {...refreshProps}
@@ -575,7 +575,7 @@ function SplitQuotaColumn({
                     type="button"
                     title={title}
                     aria-label={`${refreshText} · ${t("quota.clickToRefresh")}`}
-                    className="group flex min-w-0 items-center gap-1 rounded-control text-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group flex min-w-0 items-center gap-1 rounded-[4px] text-end focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     {...refreshProps}
                   >
                     {rowIndex === 0 && icon}
@@ -616,7 +616,8 @@ interface QuotaBarsProps {
   className?: string;
 }
 
-const BAR_ROW_CLASS = "flex h-[18px] items-center gap-2 text-caption";
+const BAR_ROW_CLASS =
+  "flex h-4 items-center gap-2 text-[12.35px] leading-[1.3]";
 
 /** 展开的额度条（授权中心、多套餐展开）：条长跟着数值（剩余或已用，见 barPercent） */
 export function QuotaBars({
@@ -636,12 +637,12 @@ export function QuotaBars({
   return (
     <div
       className={cn(
-        "rounded-panel border border-border bg-surface px-3.5 py-2.5",
+        "rounded-[8px] border border-border bg-surface p-2",
         className,
       )}
     >
       {(title || queriedAt || onRefresh) && (
-        <div className="mb-1.5 flex items-center justify-between gap-2 text-caption">
+        <div className="mb-1 flex items-center justify-between gap-2 text-[12.35px] leading-[1.3]">
           <span className="font-medium text-fg-2">{title}</span>
           <span className="flex items-center gap-1 text-fg-3">
             {queriedAt
@@ -655,7 +656,7 @@ export function QuotaBars({
                   type="button"
                   onClick={onRefresh}
                   disabled={loading}
-                  className="rounded-control p-1 text-fg-3 hover:bg-subtle hover:text-fg-1 disabled:opacity-50"
+                  className="rounded-[4px] p-1 text-fg-3 hover:bg-subtle hover:text-fg-1 disabled:opacity-50"
                   aria-label={t("subscription.refresh")}
                 >
                   <RefreshCw

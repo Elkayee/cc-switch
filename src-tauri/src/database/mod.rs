@@ -206,7 +206,7 @@ impl Database {
 
     pub(crate) fn get_auto_vacuum_mode(conn: &Connection) -> Result<i32, AppError> {
         conn.query_row("PRAGMA auto_vacuum;", [], |row| row.get(0))
-            .map_err(|e| AppError::Database(format!("读取 auto_vacuum 失败: {e}")))
+            .map_err(|e| AppError::Database(format!("Failed to read auto_vacuum: {e}")))
     }
 
     /// 回收全部空闲页。`PRAGMA incremental_vacuum` 每释放一页产出一行结果，
@@ -233,7 +233,7 @@ impl Database {
                 [],
                 |row| row.get(0),
             )
-            .map_err(|e| AppError::Database(format!("读取表数量失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to read table count: {e}")))?;
         Ok(count > 0)
     }
 
@@ -247,16 +247,16 @@ impl Database {
 
         let has_tables = Self::has_user_tables(conn)?;
         conn.execute("PRAGMA auto_vacuum = INCREMENTAL;", [])
-            .map_err(|e| AppError::Database(format!("设置 auto_vacuum 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to set auto_vacuum: {e}")))?;
 
         if !has_tables {
             return Ok(false);
         }
 
         conn.execute("VACUUM;", [])
-            .map_err(|e| AppError::Database(format!("执行 VACUUM 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to execute VACUUM: {e}")))?;
         conn.execute("PRAGMA foreign_keys = ON;", [])
-            .map_err(|e| AppError::Database(format!("恢复 foreign_keys 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to restore foreign_keys: {e}")))?;
         Ok(true)
     }
 

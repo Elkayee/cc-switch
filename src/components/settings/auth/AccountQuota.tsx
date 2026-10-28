@@ -128,7 +128,7 @@ export function AccountQuotaColumn({
               {t("quota.failed", { defaultValue: "额度查询失败" })}
             </span>
             <span
-              className="truncate text-caption text-fg-3"
+              className="truncate text-ui text-muted-foreground"
               title={state.reason}
             >
               {state.reason}
@@ -142,12 +142,12 @@ export function AccountQuotaColumn({
           </span>
         )}
         {state.kind === "loading" && (
-          <span className="text-caption text-fg-3">
+          <span className="text-ui text-muted-foreground">
             {t("authCenter.quota.loading", { defaultValue: "正在查询额度…" })}
           </span>
         )}
       </div>
-      <div className="flex w-[84px] shrink-0 items-center justify-end gap-0.5 whitespace-nowrap text-caption text-fg-3">
+      <div className="flex w-[84px] shrink-0 items-center justify-end gap-0.5 whitespace-nowrap text-ui text-muted-foreground">
         <span id={agoId} className="truncate">
           {agoText}
         </span>
@@ -165,7 +165,7 @@ export function AccountQuotaColumn({
             onClick={() => {
               if (!loading) onRefresh();
             }}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-control text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 aria-disabled:opacity-45 aria-disabled:hover:bg-transparent"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-muted-foreground transition-colors hover:bg-subtle hover:text-foreground aria-disabled:opacity-45 aria-disabled:hover:bg-transparent"
           >
             <RefreshCw
               className={cn(
@@ -181,7 +181,7 @@ export function AccountQuotaColumn({
   );
 }
 
-const ROW_CLASS = "flex h-[18px] items-center gap-2 text-caption";
+const ROW_CLASS = "flex h-[18px] items-center gap-2 text-ui";
 
 /** 一行额度：档名 + 额度条（或一句说明）+ 剩余 */
 function QuotaRowCells({
@@ -206,7 +206,7 @@ function QuotaRowCells({
         {label}
       </span>
       {line.caption ? (
-        <span className="flex min-w-0 flex-1 items-center gap-0.5 text-fg-3">
+        <span className="flex min-w-0 flex-1 items-center gap-0.5 text-muted-foreground">
           <span className="truncate">{line.caption}</span>
           {trailing}
         </span>

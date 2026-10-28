@@ -28,6 +28,7 @@ const LANGUAGES: { value: Language; labelKey: string }[] = [
   { value: "en", labelKey: "settings.languageOptionEnglish" },
   { value: "ja", labelKey: "settings.languageOptionJapanese" },
   { value: "tr", labelKey: "settings.languageOptionTurkish" },
+  { value: "vi", labelKey: "settings.languageOptionVietnamese" },
 ];
 
 interface GeneralSectionProps {
@@ -58,7 +59,7 @@ export function GeneralSection({
                 }
               >
                 <SelectTrigger
-                  className="h-8 w-[160px]"
+                  className="w-[160px]"
                   aria-label={t("settings.language")}
                 >
                   <SelectValue />
@@ -138,7 +139,7 @@ export function GeneralSection({
             control={
               <Button variant="quiet" size="compact" onClick={onOpenApps}>
                 {t("settings.general.goToApps")}
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
             }
           />
@@ -267,7 +268,7 @@ export function GeneralSection({
             }}
             control={
               <TerminalSelect
-                className="h-8 w-[160px]"
+                className="w-[160px]"
                 value={settings.preferredTerminal}
                 onChange={(terminal) =>
                   void onAutoSave({ preferredTerminal: terminal })

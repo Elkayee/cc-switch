@@ -37,27 +37,30 @@ export function LiveEditConflictDialog({
         if (!open && !pending) onCancel();
       }}
     >
-      <DialogContent className="max-w-md" zIndex="alert">
-        <DialogHeader className="space-y-3 border-b-0 bg-transparent pb-0">
-          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-            <AlertTriangle className="h-5 w-5 text-warning-text" />
+      <DialogContent
+        className="w-full max-w-[480px] gap-2 rounded-[8px] p-2 text-ui sm:rounded-[8px]"
+        zIndex="alert"
+      >
+        <DialogHeader className="space-y-2 border-b-0 bg-transparent p-0">
+          <DialogTitle className="flex items-center gap-2 text-ui font-semibold">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
             {t("provider.editConflict.title", {
               defaultValue: "配置文件在编辑期间被修改",
             })}
           </DialogTitle>
-          <DialogDescription className="whitespace-pre-line text-sm leading-relaxed">
+          <DialogDescription className="whitespace-pre-line text-ui leading-[1.3]">
             {t("provider.editConflict.message", {
               defaultValue:
                 "打开编辑器之后，下面这些设置被其他程序（比如 Claude Code）改过。要用你的修改覆盖，还是保留外部的修改？其余改动都会照常保存。",
             })}
           </DialogDescription>
         </DialogHeader>
-        <ul className="px-6 pt-2 font-mono text-xs text-fg-2">
+        <ul className="px-2 pt-2 font-mono text-ui text-muted-foreground">
           {(keys ?? []).map((key) => (
             <li key={key}>• {key}</li>
           ))}
         </ul>
-        <DialogFooter className="flex gap-2 border-t-0 bg-transparent pt-2 sm:justify-end">
+        <DialogFooter className="gap-2 border-t-0 bg-transparent p-0 sm:justify-end">
           <Button variant="outline" onClick={onCancel} disabled={pending}>
             {t("common.cancel")}
           </Button>

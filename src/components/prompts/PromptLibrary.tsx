@@ -64,8 +64,8 @@ export function PromptLibrary({
 
   if (filtered.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-panel border border-border bg-surface px-6 py-10 text-center">
-        <span className="text-body text-fg-2">
+      <div className="flex flex-col items-center gap-3 rounded-[8px] border border-border bg-surface px-6 py-10 text-center">
+        <span className="text-[12.35px] leading-[1.3] text-fg-2">
           {t("prompts.noSearchResults", { query: searchQuery.trim() })}
         </span>
         <Button variant="neutral" size="compact" onClick={onClearSearch}>
@@ -78,7 +78,7 @@ export function PromptLibrary({
   return (
     <ul
       aria-label={listLabel}
-      className="m-0 min-h-0 shrink list-none overflow-y-auto scroll-stable rounded-panel border border-border bg-surface p-0"
+      className="m-0 min-h-0 shrink list-none overflow-y-auto scroll-stable rounded-[8px] border border-border bg-surface p-0"
     >
       {filtered.map(([id, prompt], index) => {
         const summary =
@@ -148,16 +148,16 @@ export function PromptEmptyState({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 px-10 pb-10 text-center">
-      <h2 className="m-0 text-section text-fg-1">
+      <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-1">
         {t("prompts.emptyTitle", { app: APP_DISPLAY_NAME[app] })}
       </h2>
-      <p className="m-0 max-w-[460px] text-body text-fg-2">
+      <p className="m-0 max-w-[460px] text-[12.35px] leading-[1.3] text-fg-2">
         {renderSegs(t("prompts.emptyTarget", { path: displayPath }))}
       </p>
       {hasFile ? (
         <div
           id="prompt-empty-file"
-          className="mt-2 flex w-[460px] max-w-full items-start gap-2.5 rounded-panel bg-subtle px-3.5 py-3 text-left"
+          className="mt-2 flex w-[460px] max-w-full items-start gap-2 rounded-[8px] bg-subtle px-3 py-3 text-left"
         >
           <FileText
             aria-hidden="true"
@@ -165,7 +165,7 @@ export function PromptEmptyState({
             className="mt-0.5 h-4 w-4 shrink-0 text-fg-2"
           />
           <div className="flex min-w-0 flex-col">
-            <span className="text-body font-medium text-fg-1">
+            <span className="text-[12.35px] leading-[1.3] font-medium text-fg-1">
               {renderSegs(
                 t("prompts.emptyFile", {
                   path: displayPath,
@@ -175,7 +175,7 @@ export function PromptEmptyState({
             </span>
             <code
               title={peek}
-              className="mt-1 truncate font-mono text-caption text-fg-2"
+              className="mt-1 truncate font-mono text-[12.35px] leading-[1.3] text-fg-2"
             >
               {peek}
             </code>

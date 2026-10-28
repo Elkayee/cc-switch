@@ -68,7 +68,7 @@ export const SessionCodeBlock = memo(function SessionCodeBlock({
       )}
     >
       <div className="flex h-[30px] items-center justify-between border-b border-border pe-1 ps-3">
-        <span className="truncate font-mono text-caption text-fg-2">
+        <span className="truncate font-mono text-[12.35px] leading-[1.3] text-fg-2">
           {label}
         </span>
         <button
@@ -77,7 +77,7 @@ export const SessionCodeBlock = memo(function SessionCodeBlock({
             defaultValue: "复制代码",
           })}
           onClick={() => void handleCopy()}
-          className="h-6 shrink-0 rounded-control px-2 text-caption text-fg-2 transition-colors hover:bg-selected hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-6 shrink-0 rounded-[4px] px-2 text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-selected hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {t("sessionManager.copyShort", { defaultValue: "复制" })}
         </button>
@@ -91,7 +91,7 @@ export const SessionCodeBlock = memo(function SessionCodeBlock({
         })}
         className="overflow-x-auto px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
-        <pre className="m-0 whitespace-pre font-mono text-caption text-fg-1">
+        <pre className="m-0 whitespace-pre font-mono text-[12.35px] leading-[1.3] text-fg-1">
           <code data-language={language || undefined}>{body}</code>
         </pre>
       </div>

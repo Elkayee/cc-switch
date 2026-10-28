@@ -103,7 +103,10 @@ export function renderSegs(text: string): ReactNode {
         );
       }
       return (
-        <code key={index} className="whitespace-nowrap font-mono text-caption">
+        <code
+          key={index}
+          className="whitespace-nowrap font-mono text-[12.35px] leading-[1.3]"
+        >
           {part}
         </code>
       );

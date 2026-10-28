@@ -18,8 +18,8 @@ fn get_macos_app_bundle_path(exe_path: &std::path::Path) -> Option<std::path::Pa
 /// 初始化 AutoLaunch 实例
 fn get_auto_launch() -> Result<AutoLaunch, AppError> {
     let app_name = "CC Switch";
-    let exe_path =
-        std::env::current_exe().map_err(|e| AppError::Message(format!("无法获取应用路径: {e}")))?;
+    let exe_path = std::env::current_exe()
+        .map_err(|e| AppError::Message(format!("Cannot get application path: {e}")))?;
 
     // macOS 需要使用 .app bundle 路径，否则 AppleScript login item 会打开终端
     #[cfg(target_os = "macos")]
@@ -35,7 +35,7 @@ fn get_auto_launch() -> Result<AutoLaunch, AppError> {
         .set_app_name(app_name)
         .set_app_path(&app_path.to_string_lossy())
         .build()
-        .map_err(|e| AppError::Message(format!("创建 AutoLaunch 失败: {e}")))?;
+        .map_err(|e| AppError::Message(format!("Failed to create AutoLaunch: {e}")))?;
 
     Ok(auto_launch)
 }
@@ -45,7 +45,7 @@ pub fn enable_auto_launch() -> Result<(), AppError> {
     let auto_launch = get_auto_launch()?;
     auto_launch
         .enable()
-        .map_err(|e| AppError::Message(format!("启用开机自启失败: {e}")))?;
+        .map_err(|e| AppError::Message(format!("Failed to enable auto-launch: {e}")))?;
     log::info!("已启用开机自启");
     Ok(())
 }
@@ -55,7 +55,7 @@ pub fn disable_auto_launch() -> Result<(), AppError> {
     let auto_launch = get_auto_launch()?;
     auto_launch
         .disable()
-        .map_err(|e| AppError::Message(format!("禁用开机自启失败: {e}")))?;
+        .map_err(|e| AppError::Message(format!("Failed to disable auto-launch: {e}")))?;
     log::info!("已禁用开机自启");
     Ok(())
 }
@@ -65,7 +65,7 @@ pub fn is_auto_launch_enabled() -> Result<bool, AppError> {
     let auto_launch = get_auto_launch()?;
     auto_launch
         .is_enabled()
-        .map_err(|e| AppError::Message(format!("检查开机自启状态失败: {e}")))
+        .map_err(|e| AppError::Message(format!("Failed to check auto-launch status: {e}")))
 }
 
 #[cfg(test)]

@@ -362,15 +362,15 @@ export function UsageTrendChart({
     const point = payload[0]?.payload as UsageTrendChartPoint | undefined;
     const heading = point?.tooltipLabel ?? point?.label ?? "";
     return (
-      <div className="rounded-[8px] border border-border bg-surface px-3 py-2 text-caption text-fg-1 shadow-v7-md">
+      <div className="rounded-[8px] border border-border bg-card px-2 py-2 text-ui text-foreground shadow-md">
         <p className="mb-1 font-semibold">{heading}</p>
         <div className="flex items-center gap-2 tabular-nums">
           <span
             aria-hidden="true"
             className="h-2 w-2 rounded-[2px] bg-chart-usage"
           />
-          <span className="text-fg-2">{metricLabel}</span>
-          <span className="ms-auto ps-3">
+          <span className="text-muted-foreground">{metricLabel}</span>
+          <span className="ms-auto ps-2">
             {formatMetric(point ? point[metric] : payload[0]?.value)}
           </span>
         </div>
@@ -379,7 +379,7 @@ export function UsageTrendChart({
   };
 
   return (
-    <section aria-labelledby="usage-trend-title" className="px-4 pb-2.5 pt-5">
+    <section aria-labelledby="usage-trend-title" className="px-4 pb-2 pt-4">
       <h2
         id="usage-trend-title"
         className="m-0 min-h-7 whitespace-nowrap text-caption font-semibold leading-7 text-fg-2"
@@ -395,7 +395,7 @@ export function UsageTrendChart({
       <div ref={chartBoxRef} className="mt-1 h-[132px] w-full">
         {isLoading ? (
           <div className="flex h-full items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-fg-3" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           </div>
         ) : (
           <Chart

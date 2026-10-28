@@ -68,19 +68,19 @@ const PromptListItem: React.FC<PromptListItemProps> = ({
         <div className="flex min-w-0 items-center gap-1.5">
           <span
             title={prompt.name}
-            className="min-w-0 truncate text-body font-medium text-fg-1"
+            className="min-w-0 truncate text-[12.35px] leading-[1.3] font-medium text-fg-1"
           >
             {prompt.name}
           </span>
           {active ? (
-            <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full bg-success-soft px-[7px] text-badge text-success-text">
+            <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full bg-success-soft px-[7px] text-[12.35px] leading-[1.3] text-success-text">
               {t("prompts.enabled")}
             </span>
           ) : null}
         </div>
         <span
           title={detail}
-          className="min-w-0 truncate text-caption text-fg-2"
+          className="min-w-0 truncate text-[12.35px] leading-[1.3] text-fg-2"
         >
           {detail}
         </span>
@@ -166,7 +166,7 @@ const PromptListItem: React.FC<PromptListItemProps> = ({
             >
               <span>{t("common.delete")}</span>
               {deleteBlockedReason ? (
-                <span className="text-caption text-fg-2">
+                <span className="text-[12.35px] leading-[1.3] text-fg-2">
                   {deleteBlockedReason}
                 </span>
               ) : null}

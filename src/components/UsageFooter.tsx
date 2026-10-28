@@ -150,13 +150,13 @@ const UsageFooter: React.FC<UsageFooterProps> = ({
     }
     return (
       <QuotaBars
-        className="mt-3"
+        className="mt-2"
         title={t("usage.planUsage")}
         rows={[]}
         loading={loading}
         onRefresh={refresh}
         footer={
-          <p className="text-caption">
+          <p className="text-[12.35px] leading-[1.3]">
             <span className="font-medium text-danger-text">
               {t("quota.failed")}
             </span>{" "}
@@ -199,7 +199,7 @@ const UsageFooter: React.FC<UsageFooterProps> = ({
       />
     ) : (
       <QuotaBars
-        className="mt-3"
+        className="mt-2"
         title={planLabel || t("usage.planUsage")}
         rows={rows}
         queriedAt={lastQueriedAt}
@@ -227,7 +227,7 @@ const UsageFooter: React.FC<UsageFooterProps> = ({
 
   return (
     <QuotaBars
-      className="mt-3"
+      className="mt-2"
       title={t("usage.planUsage")}
       rows={usageDataList.flatMap((data, index) => {
         const line = planLine(t, data, index);

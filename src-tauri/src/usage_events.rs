@@ -16,13 +16,15 @@ use std::time::Duration;
 
 use tauri::{AppHandle, Emitter};
 
+use crate::AppRuntime;
+
 /// 前端监听的事件名
 pub const EVENT_USAGE_LOG_RECORDED: &str = "usage-log-recorded";
 
 /// 防抖窗口：合并 200ms 内的多次通知。
 const DEBOUNCE_WINDOW: Duration = Duration::from_millis(200);
 
-static APP_HANDLE: OnceLock<AppHandle> = OnceLock::new();
+static APP_HANDLE: OnceLock<AppHandle<AppRuntime>> = OnceLock::new();
 
 /// 防抖标记：true 表示已有调度任务在等待 emit，后续通知合并到该任务。
 static EMIT_SCHEDULED: AtomicBool = AtomicBool::new(false);
@@ -31,7 +33,7 @@ static EMIT_SCHEDULED: AtomicBool = AtomicBool::new(false);
 ///
 /// 重复调用是无害的（OnceLock 仅首次写入生效），但应用启动期只该被
 /// `lib.rs::run` 调一次。
-pub fn init(handle: AppHandle) {
+pub fn init(handle: AppHandle<AppRuntime>) {
     if APP_HANDLE.set(handle).is_err() {
         log::debug!("usage_events::init 重复调用，已忽略");
     } else {

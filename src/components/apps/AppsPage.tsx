@@ -44,13 +44,17 @@ import {
 } from "lucide-react";
 import type { AppId } from "@/lib/api";
 import { providersApi } from "@/lib/api/providers";
-import type { ToolInstallationReport } from "@/lib/api/settings";
+import type {
+  ToolInstallation,
+  ToolInstallationReport,
+} from "@/lib/api/settings";
 import type { VisibleApps } from "@/types";
 import { DEFAULT_VISIBLE_APPS, orderAppIds } from "@/config/appConfig";
 import { useSettings } from "@/hooks/useSettings";
 import { isUpdateAvailable } from "@/lib/version";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Switch } from "@/components/ui/switch";
 import { HelpTip } from "@/components/ui/help-tip";
 import { HoverTip } from "@/components/ui/hover-tip";
@@ -290,7 +294,6 @@ export function AppsPage() {
 
   const visibilitySwitch = (app: AppId) => (
     <Switch
-      size="sm"
       checked={visibleApps[app]}
       disabled={!settings || (visibleApps[app] && visibleCount <= 1)}
       onCheckedChange={(checked) => setVisible(app, checked)}
@@ -386,13 +389,12 @@ export function AppsPage() {
         }
         actions={
           <>
-            <span className="whitespace-nowrap text-caption text-fg-3">
+            <span className="whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-3">
               {lastChecked}
             </span>
             {(updatableCount > 0 || tools.batchAction) && (
               <Button
                 variant="neutral"
-                size="regular"
                 disabled={tools.isLoadingTools || Boolean(tools.batchAction)}
                 aria-busy={Boolean(tools.batchAction)}
                 onClick={() =>
@@ -404,22 +406,21 @@ export function AppsPage() {
                 }
               >
                 {tools.batchAction === "update" ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  <ArrowUpCircle className="h-3.5 w-3.5" />
+                  <ArrowUpCircle className="h-4 w-4" />
                 )}
                 {t("settings.updateAllTools", { count: updatableCount })}
               </Button>
             )}
             <Button
               variant="neutral"
-              size="regular"
               disabled={tools.isLoadingTools || tools.isAnyBusy}
               onClick={() => void tools.checkForUpdates()}
             >
               <RefreshCw
                 className={cn(
-                  "h-3.5 w-3.5",
+                  "h-4 w-4",
                   tools.isLoadingTools && "animate-spin",
                 )}
               />
@@ -445,7 +446,6 @@ export function AppsPage() {
                   <Button
                     variant="quiet"
                     size="icon-compact"
-                    className="h-8 w-8"
                     aria-label={t("appsPage.moreActions")}
                   >
                     <MoreHorizontal className="h-4 w-4" />
@@ -482,7 +482,7 @@ export function AppsPage() {
         id="main-content"
         className="min-h-0 flex-1 overflow-y-auto scroll-stable"
       >
-        <div ref={tableRef} className="px-6 pb-10 pt-4">
+        <div ref={tableRef} className="px-2 pb-2 pt-2">
           <div
             className={cn(
               APP_ROW_GRID,
@@ -555,32 +555,27 @@ export function AppsPage() {
       </div>
 
       <Dialog open={showCommands} onOpenChange={setShowCommands}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-[480px]">
           <DialogHeader>
             <DialogTitle>{t("settings.manualInstallCommands")}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 px-6">
-            <p className="text-body text-fg-2">
+          <div className="space-y-2">
+            <p className="text-[12.35px] leading-[1.3] text-fg-2">
               {t("settings.oneClickInstallHint")}
             </p>
-            <pre className="max-h-[50vh] overflow-auto rounded-control border border-border bg-subtle px-3 py-2.5 font-mono text-caption">
+            <pre className="max-h-[50vh] overflow-auto rounded-[4px] border border-border bg-subtle px-2 py-2 font-mono text-[12.35px] leading-[1.3]">
               {ONE_CLICK_INSTALL_COMMANDS}
             </pre>
           </div>
           <DialogFooter>
-            <Button
-              variant="neutral"
-              size="regular"
-              onClick={() => setShowCommands(false)}
-            >
+            <Button variant="neutral" onClick={() => setShowCommands(false)}>
               {t("common.close")}
             </Button>
             <Button
               variant="solid"
-              size="regular"
               onClick={() => void tools.handleCopyInstallCommands()}
             >
-              <Copy className="h-3.5 w-3.5" />
+              <Copy className="h-4 w-4" />
               {t("common.copy")}
             </Button>
           </DialogFooter>
@@ -684,14 +679,14 @@ function AppRow({
         <div className="flex justify-end">{visibility}</div>
         <div className="flex justify-end">{menu}</div>
       </div>
-      {footer && <div className="ms-9 mt-2">{footer}</div>}
+      {footer && <div className="ms-7 mt-2">{footer}</div>}
     </div>
   );
 }
 
 function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex h-[18px] shrink-0 items-center rounded-full border border-border-strong px-1.5 text-badge text-fg-2">
+    <span className="inline-flex h-[18px] shrink-0 items-center rounded-full border border-border-strong px-2 text-[12.35px] leading-[1.3] text-fg-2">
       {children}
     </span>
   );
@@ -713,6 +708,8 @@ function ToolRow({
   visibility: React.ReactNode;
 }) {
   const { t } = useTranslation();
+  const [uninstallTarget, setUninstallTarget] =
+    useState<ToolInstallation | null>(null);
   const info = tools.toolVersionByName.get(tool);
   const report: ToolInstallationReport | undefined =
     tools.installReports?.[tool];
@@ -759,38 +756,39 @@ function ToolRow({
     </span>
   ) : info?.version ? (
     <div>
-      <div className="font-mono text-body font-medium tabular-nums text-fg-1">
+      <div className="font-mono text-[12.35px] leading-[1.3] font-medium tabular-nums text-fg-1">
         {info.version}
       </div>
       {isOutdated && info.latest_version && (
-        <div className="text-caption text-fg-2">
+        <div className="text-[12.35px] leading-[1.3] text-fg-2">
           {t("appsPage.newVersion", { version: info.latest_version })}
         </div>
       )}
     </div>
   ) : broken ? (
-    <span className="inline-flex items-center gap-1 text-caption font-medium text-warning-text">
-      <AlertTriangle className="h-3.5 w-3.5" />
+    <span className="inline-flex items-center gap-1 text-[12.35px] leading-[1.3] font-medium text-warning-text">
+      <AlertTriangle className="h-4 w-4" />
       {t("appsPage.notRunnable")}
     </span>
   ) : (
-    <span className="text-caption text-fg-2">{t("common.notInstalled")}</span>
+    <span className="text-[12.35px] leading-[1.3] text-fg-2">
+      {t("common.notInstalled")}
+    </span>
   );
 
   const actionButton = action ? (
     <Button
       variant="neutral"
-      size="compact"
       onClick={() => void tools.handleRunToolAction([tool], action)}
       disabled={isVersionLoading || isBusy}
       aria-busy={isBusy}
     >
       {isBusy && busyAction !== "uninstall" ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : action === "install" ? (
-        <Download className="h-3.5 w-3.5" />
+        <Download className="h-4 w-4" />
       ) : (
-        <ArrowUpCircle className="h-3.5 w-3.5" />
+        <ArrowUpCircle className="h-4 w-4" />
       )}
       {action === "install"
         ? t("settings.toolInstall")
@@ -809,7 +807,7 @@ function ToolRow({
           type="button"
           onClick={onToggleExpanded}
           aria-expanded={expanded}
-          className="inline-flex shrink-0 items-center gap-0.5 font-medium text-warning-text hover:underline"
+          className="inline-flex shrink-0 items-center gap-1 font-medium text-warning-text hover:underline"
         >
           {t("appsPage.otherInstalls", { count: otherInstalls })}
           <ChevronDown
@@ -829,7 +827,7 @@ function ToolRow({
 
   const wslControls =
     info?.env_type === "wsl" ? (
-      <div className="flex items-center gap-2 text-caption text-fg-2">
+      <div className="flex items-center gap-2 text-[12.35px] leading-[1.3] text-fg-2">
         <span>Shell</span>
         <Select
           value={tools.wslShellByTool[tool]?.wslShell || "auto"}
@@ -838,7 +836,7 @@ function ToolRow({
           }
           disabled={isVersionLoading || isBusy}
         >
-          <SelectTrigger className="h-7 w-[82px] text-caption">
+          <SelectTrigger className="w-[82px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -858,7 +856,7 @@ function ToolRow({
           }
           disabled={isVersionLoading || isBusy}
         >
-          <SelectTrigger className="h-7 w-[82px] text-caption">
+          <SelectTrigger className="w-[82px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -892,14 +890,35 @@ function ToolRow({
 
   const conflictList =
     expanded && installs && installs.length > 1 ? (
-      <div className="space-y-1.5 rounded-control bg-warning-soft p-2.5">
-        <div className="text-caption font-medium text-warning-text">
+      <div className="space-y-1 rounded-[8px] bg-warning-soft p-2">
+        <div className="text-[12.35px] leading-[1.3] font-medium text-warning-text">
           {t("appsPage.installsFound", { count: installs.length })}
         </div>
         <ul className="space-y-1">
           {installs.map((install) => (
             <li key={install.path}>
-              <ToolInstallRow inst={install} />
+              <ToolInstallRow
+                inst={install}
+                action={
+                  install.can_uninstall ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-muted-foreground hover:text-destructive"
+                      title={t("appsPage.uninstall")}
+                      aria-label={t("appsPage.uninstall")}
+                      disabled={isBusy || tools.uninstallingPath !== null}
+                      onClick={() => setUninstallTarget(install)}
+                    >
+                      {tools.uninstallingPath === install.path ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  ) : undefined
+                }
+              />
             </li>
           ))}
         </ul>
@@ -913,6 +932,23 @@ function ToolRow({
         {nodeLine}
         {wslControls}
         {conflictList}
+        <ConfirmDialog
+          isOpen={uninstallTarget !== null}
+          title={t("appsPage.uninstallConfirmTitle")}
+          message={t(
+            uninstallTarget?.uninstall_removes_file
+              ? "appsPage.uninstallConfirmDescFile"
+              : "appsPage.uninstallConfirmDesc",
+            { path: uninstallTarget?.path ?? "" },
+          )}
+          confirmText={t("appsPage.uninstallConfirm")}
+          onConfirm={() => {
+            const target = uninstallTarget;
+            setUninstallTarget(null);
+            if (target) void tools.handleUninstallInstall(tool, target);
+          }}
+          onCancel={() => setUninstallTarget(null)}
+        />
       </div>
     ) : undefined;
 

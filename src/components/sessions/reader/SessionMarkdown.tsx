@@ -149,8 +149,7 @@ const localPathTarget = (value: string) => {
 };
 
 type LinkTarget =
-  | { kind: "external"; url: string }
-  | { kind: "path"; path: string };
+  { kind: "external"; url: string } | { kind: "path"; path: string };
 
 const resolveLinkTargetValue = (value: string): LinkTarget | null => {
   const url = safeExternalUrl(value);
@@ -160,8 +159,7 @@ const resolveLinkTargetValue = (value: string): LinkTarget | null => {
 };
 
 type ImageTarget =
-  | { kind: "remote"; src: string }
-  | { kind: "path"; path: string };
+  { kind: "remote"; src: string } | { kind: "path"; path: string };
 
 const resolveImageTargetValue = (value: string): ImageTarget | null => {
   const src = safeRemoteImageUrl(value);
@@ -523,7 +521,7 @@ export const SessionPlainText = memo(function SessionPlainText({
   return (
     <div
       className={cn(
-        "min-w-0 break-words text-body text-fg-1 [overflow-wrap:anywhere]",
+        "min-w-0 break-words text-[12.35px] leading-[1.3] text-fg-1 [overflow-wrap:anywhere]",
         className,
       )}
     >
@@ -723,7 +721,7 @@ const RemoteImage = ({ src, alt, searchQuery }: RemoteImageProps) => {
       title={src}
       aria-label={`${loadLabel}: ${label}`}
       onClick={() => setLoadedSrc(src)}
-      className="my-2 flex max-w-full flex-col items-start rounded-[8px] border border-dashed border-border-strong bg-subtle px-3 py-2 text-left text-caption text-fg-2 transition-colors hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="my-2 flex max-w-full flex-col items-start rounded-[8px] border border-dashed border-border-strong bg-subtle px-3 py-2 text-left text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <span className="max-w-full truncate font-medium">
         {renderText(label, searchQuery)}
@@ -894,7 +892,7 @@ const renderTable = (
 
   return (
     <div className="my-2 max-w-full overflow-x-auto">
-      <table className="w-full border-collapse text-left text-caption">
+      <table className="w-full border-collapse text-left text-[12.35px] leading-[1.3]">
         {header && <thead>{renderNode(header, source, ctx)}</thead>}
         {rows.length > 0 && (
           <tbody>
@@ -924,9 +922,9 @@ const renderTableRow = (
 
 // 标题层级映射到阅读页字号：h1 → title、h2 → section、h3 及以下 → body
 const HEADING_CLASS: Record<number, string> = {
-  1: "mt-4 text-title",
-  2: "mt-3 text-section",
-  3: "mt-3 text-body font-semibold",
+  1: "mt-4 text-[12.35px] leading-[1.3] font-semibold",
+  2: "mt-3 text-[12.35px] leading-[1.3] font-semibold",
+  3: "mt-3 text-[12.35px] leading-[1.3] font-semibold",
 };
 
 const renderNode = (
@@ -941,7 +939,8 @@ const renderNode = (
     const level = Number(node.name.at(-1));
     const className = cn(
       "mb-1.5 tracking-normal text-fg-1 first:mt-0",
-      HEADING_CLASS[level] ?? "mt-2 text-body font-semibold text-fg-2",
+      HEADING_CLASS[level] ??
+        "mt-2 text-[12.35px] leading-[1.3] font-semibold text-fg-2",
     );
     if (level === 1) return <h1 className={className}>{children()}</h1>;
     if (level === 2) return <h2 className={className}>{children()}</h2>;
@@ -1071,8 +1070,8 @@ const renderNode = (
 };
 
 const VARIANT_CLASS = {
-  body: "text-body text-fg-1",
-  note: "text-caption text-fg-2",
+  body: "text-[12.35px] leading-[1.3] text-fg-1",
+  note: "text-[12.35px] leading-[1.3] text-fg-2",
 } as const;
 
 /** 完整 Markdown 渲染（超过 MARKDOWN_PARSE_LIMIT 时退化为 SessionPlainText） */

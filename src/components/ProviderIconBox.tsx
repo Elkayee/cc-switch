@@ -11,6 +11,8 @@ interface ProviderIconBoxProps {
   icon?: string;
   name: string;
   color?: string;
+  /** 框的边长（px），默认 32；fork 的紧凑卡片用 24 */
+  size?: number;
   /** 框的底色、透明度等 */
   className?: string;
   iconClassName?: string;
@@ -28,14 +30,18 @@ export function ProviderIconBox({
   className,
   iconClassName,
   fallbackClassName,
+  size = 32,
 }: ProviderIconBoxProps) {
   // 用户上传的图标在编码时已经按 tile / 透明 logo 留好了白，统一铺满整框
   const tile = isCustomIcon(icon) || isTileIcon(icon);
+  const glyph = tile ? size : Math.round((size * GLYPH_SIZE) / 32);
   return (
     <span
       aria-hidden="true"
+      style={{ width: size, height: size }}
       className={cn(
-        "relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[8px]",
+        "relative flex shrink-0 items-center justify-center overflow-hidden text-[12.35px] leading-[1.3]",
+        size <= 24 ? "rounded-[4px]" : "rounded-[8px]",
         tile
           ? // 描边画在图片上层：白底图标放在白色卡片上也有轮廓
             "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:ring-1 after:ring-inset after:ring-black/10 dark:after:ring-white/10"
@@ -47,7 +53,7 @@ export function ProviderIconBox({
         icon={icon}
         name={name}
         color={color}
-        size={tile ? 32 : GLYPH_SIZE}
+        size={glyph}
         className={cn(iconClassName, tile && "object-cover")}
         fallbackClassName={fallbackClassName}
       />

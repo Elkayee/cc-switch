@@ -185,9 +185,10 @@ describe("HermesFormFields", () => {
     expect(contextLength).toHaveAttribute("type", "text");
     expect(contextLength).toHaveAttribute("inputmode", "numeric");
     expect(screen.getByText("上下文长度")).toHaveClass(
-      "text-xs",
+      "text-[12.35px]",
+      "leading-[1.3]",
       "font-normal",
-      "text-fg-2",
+      "text-muted-foreground",
     );
     expect(contextLength.closest("div.border-l")).toHaveClass(
       "sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.25rem]",
@@ -256,14 +257,11 @@ describe("HermesFormFields", () => {
     const input = screen.getByLabelText("请求间隔（秒）");
     expect(input).toHaveValue(0.5);
     expect(screen.getByText("请求间隔（秒）")).toHaveClass(
-      "text-sm",
+      "text-[12.35px]",
+      "leading-[1.3]",
       "font-medium",
-      "leading-none",
     );
-    expect(input.closest("div.border-l")).toHaveClass(
-      "border-border",
-      "pl-3",
-    );
+    expect(input.closest("div.border-l")).toHaveClass("border-border", "pl-3");
     expect(
       screen.queryByRole("button", { name: "供应商高级选项" }),
     ).not.toBeInTheDocument();

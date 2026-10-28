@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { useReaderT } from "./i18n";
 
 const toolButton =
-  "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[4px] text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
 export interface SessionImageLightboxProps {
   open: boolean;
@@ -77,7 +77,7 @@ export const SessionImageLightbox = memo(function SessionImageLightbox({
         onInteractOutside={() => onOpenChange(false)}
       >
         <div className="flex h-10 shrink-0 items-center gap-1 border-b border-border pe-1.5 ps-4">
-          <DialogTitle className="min-w-0 flex-1 truncate text-body font-medium">
+          <DialogTitle className="min-w-0 flex-1 truncate text-[12.35px] leading-[1.3] font-medium">
             {alt}
           </DialogTitle>
           <DialogDescription className="sr-only">

@@ -90,8 +90,6 @@ export const HermesMemorySaveButton: React.FC = () => {
     >
       <Button
         variant="solid"
-        size="regular"
-        className="px-4"
         disabled={saving}
         onClick={() => void handleSave()}
       >
@@ -152,10 +150,10 @@ const MemoryTabPane: React.FC<MemoryTabPaneProps> = ({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
       <div
         className={cn(
-          "flex h-11 shrink-0 items-center gap-2 rounded-panel pe-3.5 ps-3",
+          "flex h-8 shrink-0 items-center gap-2 rounded-[8px] px-2",
           enabled ? "bg-subtle" : "bg-warning-soft",
         )}
       >
@@ -164,10 +162,9 @@ const MemoryTabPane: React.FC<MemoryTabPaneProps> = ({
           disabled={toggleMutation.isPending}
           aria-label={t("hermes.memory.enableLabel", { name })}
           onCheckedChange={handleToggle}
-          className="me-1"
         />
-        <div className="flex min-w-0 flex-1 items-center gap-0.5">
-          <span className="whitespace-nowrap text-body font-medium text-fg-1">
+        <div className="flex min-w-0 flex-1 items-center gap-1">
+          <span className="whitespace-nowrap text-[12.35px] leading-[1.3] font-medium text-fg-1">
             {t("hermes.memory.enableLabel", { name })}
           </span>
           <HelpTip title={t("hermes.memory.helpTitle", { name })}>
@@ -178,19 +175,19 @@ const MemoryTabPane: React.FC<MemoryTabPaneProps> = ({
           </HelpTip>
         </div>
         {enabled ? (
-          <code className="shrink-0 truncate font-mono text-caption text-fg-2">
+          <code className="shrink-0 truncate font-mono text-[12.35px] leading-[1.3] text-fg-2">
             {memoryFilePath(configDir, meta.file)}
           </code>
         ) : (
-          <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-caption text-warning-text">
-            <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap text-[12.35px] leading-[1.3] text-warning-text">
+            <AlertTriangle className="h-4 w-4" strokeWidth={1.5} />
             {t("hermes.memory.disabledHint")}
           </span>
         )}
       </div>
 
       {isError && !loaded ? (
-        <div className="flex min-h-[200px] flex-1 items-center justify-center rounded-panel border border-border text-body text-danger-text">
+        <div className="flex min-h-[200px] flex-1 items-center justify-center rounded-[8px] border border-border text-[12.35px] leading-[1.3] text-danger-text">
           {t("hermes.memory.loadFailed")}
         </div>
       ) : (
@@ -209,12 +206,12 @@ const MemoryTabPane: React.FC<MemoryTabPaneProps> = ({
           spellCheck={false}
           className={cn(
             fieldClass,
-            "min-h-[200px] flex-1 resize-none px-3.5 py-3 font-mono leading-[21px]",
+            "min-h-[200px] flex-1 resize-none px-2 py-2 font-mono",
           )}
         />
       )}
 
-      <div className="flex h-11 shrink-0 items-center gap-3">
+      <div className="flex h-8 shrink-0 items-center gap-2">
         <span
           role="meter"
           aria-label={t("hermes.memory.meterLabel")}
@@ -233,7 +230,7 @@ const MemoryTabPane: React.FC<MemoryTabPaneProps> = ({
         </span>
         <span
           className={cn(
-            "whitespace-nowrap text-caption tabular-nums",
+            "whitespace-nowrap text-[12.35px] leading-[1.3] tabular-nums",
             isOver
               ? "font-medium text-danger-text"
               : isLow
@@ -285,7 +282,7 @@ const HermesMemoryPanel: React.FC<HermesMemoryPanelProps> = ({
   // 草稿也各存一份，切过去再切回来不会丢掉还没保存的修改；有未保存修改的那份
   // 页签上带一个小圆点。
   return (
-    <div className="flex min-h-full flex-col gap-3 px-6 pb-2 pt-3">
+    <div className="flex min-h-full flex-col gap-2 p-2">
       <PageTabs
         size="sm"
         aria-label={t("hermes.memory.fileTabs")}
@@ -298,7 +295,7 @@ const HermesMemoryPanel: React.FC<HermesMemoryPanelProps> = ({
           label: (
             <>
               <span>{t(KIND_META[kind].nameKey)}</span>
-              <span className="font-mono text-badge font-normal text-fg-3">
+              <span className="font-mono text-[12.35px] leading-[1.3] font-normal text-fg-3">
                 {KIND_META[kind].file}
               </span>
               {isHermesMemoryDirty(drafts, kind) && (
@@ -315,12 +312,11 @@ const HermesMemoryPanel: React.FC<HermesMemoryPanelProps> = ({
         trailing={
           <Button
             variant="quiet"
-            size="compact"
             className="text-fg-2"
             onClick={() => void openWebUI("/config")}
           >
             {t("hermes.memory.openConfig")}
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-4 w-4" />
           </Button>
         }
       />

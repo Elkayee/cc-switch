@@ -175,12 +175,19 @@ function renderForm(
 }
 
 function clickRow(rowName: string) {
-  const matches = screen
-    .getAllByRole("button")
-    .filter(
-      (button) =>
-        button.querySelector("span.truncate")?.textContent === rowName,
-    );
+  const findRows = () =>
+    screen
+      .queryAllByRole("button")
+      .filter(
+        (button) =>
+          button.querySelector("span.truncate")?.textContent === rowName,
+      );
+  let matches = findRows();
+  if (matches.length === 0) {
+    // 非官方预设默认折叠在「非官方」里
+    fireEvent.click(screen.getByRole("button", { name: /unofficial/i }));
+    matches = findRows();
+  }
   expect(matches, `预设按钮「${rowName}」应唯一`).toHaveLength(1);
   fireEvent.click(matches[0]);
 }

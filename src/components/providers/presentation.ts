@@ -17,13 +17,7 @@ import {
 export type CardTone = "direct" | "route" | "stack";
 
 export type ChipTone =
-  | "outline"
-  | "direct"
-  | "route"
-  | "stack"
-  | "success"
-  | "warning"
-  | "danger";
+  "outline" | "direct" | "route" | "stack" | "success" | "warning" | "danger";
 
 export interface CardChip {
   key: string;

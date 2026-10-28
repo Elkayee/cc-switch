@@ -134,22 +134,22 @@ function useMinuteTicker() {
 const LOG_PAGE_SIZE_OPTIONS = LOG_PAGE_SIZES.map(Number);
 
 const menuContentClass =
-  "min-w-[200px] max-w-[320px] rounded-panel border-border bg-surface p-1 shadow-v7-md";
-const menuItemClass = "h-[30px] gap-2 rounded-control px-2 text-body";
+  "min-w-[200px] max-w-[320px] rounded-[8px] border-border bg-card p-1 shadow-md";
+const menuItemClass = "h-6 gap-2 rounded-[4px] px-2 text-ui";
 
 function MenuCheck({ checked }: { checked: boolean }) {
   return (
     <Check
       aria-hidden="true"
       strokeWidth={1.75}
-      className={cn("h-3.5 w-3.5 shrink-0", !checked && "invisible")}
+      className={cn("h-4 w-4 shrink-0", !checked && "invisible")}
     />
   );
 }
 
 function MenuMeta({ children }: { children: React.ReactNode }) {
   return (
-    <span className="ms-auto ps-3 text-caption tabular-nums text-fg-3">
+    <span className="ms-auto ps-2 text-ui tabular-nums text-muted-foreground">
       {children}
     </span>
   );
@@ -574,10 +574,10 @@ export function UsageDashboard({
   );
   const chipClass = (pressed: boolean) =>
     cn(
-      "relative inline-flex h-[26px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[5px] px-2 text-body transition-colors duration-150",
+      "relative inline-flex h-6 shrink-0 items-center gap-2 whitespace-nowrap rounded-[3px] px-2 text-[12.35px] leading-[1.3] transition-colors duration-150",
       pressed
-        ? "font-semibold text-fg-1"
-        : "font-medium text-fg-2 hover:text-fg-1",
+        ? "font-semibold text-foreground"
+        : "font-medium text-muted-foreground hover:text-foreground",
     );
 
   // 范围栏：决定下面所有数据的四个条件放一组、左对齐；时间排第一，图表和指标都跟着它
@@ -619,7 +619,7 @@ export function UsageDashboard({
               aria-label={APP_DISPLAY_NAME[app]}
               className={cn(
                 chipClass(appType === app),
-                "w-[30px] justify-center px-0",
+                "w-7 justify-center px-0",
               )}
               onClick={() => changeAppType(app)}
             >
@@ -808,6 +808,10 @@ export function UsageDashboard({
           </>
         )}
       </div>
+    ) : tab === "providers" || tab === "models" ? (
+      <span className="text-caption text-fg-3">
+        {t("usage.sortedByRequests")}
+      </span>
     ) : null;
 
   const detailPanel = (
@@ -962,7 +966,7 @@ export function UsageDashboard({
   return (
     <div ref={containerRef} className="flex min-h-0 min-w-0 flex-1 flex-col">
       <AppPageHeader
-        icon={<ChartColumn className="h-5 w-5" strokeWidth={1.5} />}
+        icon={<ChartColumn className="h-4 w-4" strokeWidth={1.5} />}
         title={t("nav.usage")}
         titleExtra={
           <HelpTip title={t("nav.usage")}>{t("usage.subtitle")}</HelpTip>

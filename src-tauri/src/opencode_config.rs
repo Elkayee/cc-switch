@@ -47,13 +47,12 @@ fn canonicalize_plugin_name(plugin_name: &str) -> String {
 }
 
 pub fn get_opencode_dir() -> PathBuf {
-    if let Some(override_dir) = get_opencode_override_dir() {
-        return override_dir;
-    }
-
-    crate::config::get_home_dir()
-        .join(".config")
-        .join("opencode")
+    crate::config::resolve_tool_config_dir(
+        get_opencode_override_dir(),
+        crate::config::get_home_dir()
+            .join(".config")
+            .join("opencode"),
+    )
 }
 
 pub fn get_opencode_config_path() -> Result<PathBuf, AppError> {

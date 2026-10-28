@@ -85,8 +85,7 @@ async function mount(headers?: Record<string, string>) {
 }
 
 beforeEach(() => {
-  // All Tauri calls are intercepted fixtures; any unexpected request fails closed.
-  server.listen({ onUnhandledRequest: "error" });
+  // The shared test setup already started the msw server; only add fixtures here.
   server.use(
     http.post("http://tauri.local/get_openclaw_live_provider_ids", () =>
       HttpResponse.json(["fixture-provider"]),

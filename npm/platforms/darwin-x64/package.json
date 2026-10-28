@@ -1,0 +1,17 @@
+{
+  "name": "@spec-ade/cli-switch-darwin-x64",
+  "version": "4.0.9",
+  "description": "Cli-Switch server binary for darwin/x64",
+  "license": "MIT",
+  "repository": "https://github.com/nullmastermind/cc-switch",
+  "homepage": "https://viber.vn",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "bin/"
+  ]
+}

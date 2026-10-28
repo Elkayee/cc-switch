@@ -209,8 +209,8 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
     (allowUnboundSelection && allowUnboundSelectionWithoutStatus)) &&
     onAccountSelect &&
     (mode === "select" || hasAnyAccount || noneOptionLabel) && (
-      <div className="space-y-2.5">
-        <Label className="text-sm font-medium text-fg-1">
+      <div className="space-y-2">
+        <Label className="font-medium text-foreground">
           {selectionLabel ??
             (mode === "select"
               ? t("codexOauth.accountToUse", "使用的账号")
@@ -222,16 +222,16 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
           disabled={nativeLoginOnly}
         >
           <SelectTrigger
-            className="h-10 min-w-0 rounded-lg bg-surface px-3 shadow-sm"
+            className="min-w-0 bg-background/80"
             aria-label={
               selectionLabel ?? t("codexOauth.accountToUse", "使用的账号")
             }
           >
             <span
               className={cn(
-                "min-w-0 flex-1 truncate text-left text-sm font-medium tracking-tight",
+                "min-w-0 flex-1 truncate text-left text-[12.35px] leading-[1.3] font-medium tracking-tight",
                 isAccountSelectionPlaceholder &&
-                  "font-normal tracking-normal text-fg-2",
+                  "font-normal tracking-normal text-muted-foreground",
               )}
               title={selectedAccount?.login}
             >
@@ -241,12 +241,16 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
           <SelectContent className="w-[var(--radix-select-trigger-width)] max-w-[var(--radix-select-content-available-width)]">
             {requireExplicitSelection && !selectedAccountId && (
               <SelectItem value="__official_account_required__" disabled>
-                <span className="text-fg-2">{accountChoicePlaceholder}</span>
+                <span className="text-muted-foreground">
+                  {accountChoicePlaceholder}
+                </span>
               </SelectItem>
             )}
             {!allowUnboundSelection && !selectedAccountId && (
               <SelectItem value="__managed_account_required__" disabled>
-                <span className="text-fg-2">{accountChoicePlaceholder}</span>
+                <span className="text-muted-foreground">
+                  {accountChoicePlaceholder}
+                </span>
               </SelectItem>
             )}
             {!nativeLoginOnly &&
@@ -259,13 +263,13 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
                     <div className="flex min-w-0 items-center gap-2">
                       <span aria-hidden className="h-4 w-4 shrink-0" />
                       <span
-                        className="min-w-0 truncate text-sm font-medium leading-5"
+                        className="min-w-0 truncate text-ui font-medium leading-5"
                         title={account.login}
                       >
                         {account.login}
                       </span>
                       {account.reauth_required && (
-                        <span className="ml-1 inline-flex shrink-0 items-center gap-1 text-xs text-warning-text">
+                        <span className="ml-1 inline-flex shrink-0 items-center gap-1 text-ui text-amber-600 dark:text-amber-400">
                           <AlertTriangle className="h-3 w-3" />
                           {t("codexOauth.reauthBadge", "需要重新登录")}
                         </span>
@@ -283,8 +287,8 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
             {!nativeLoginOnly && onManageAccounts && (
               <SelectItem value="__manage_accounts__" className="py-2 pl-6">
                 <div className="flex items-center gap-2">
-                  <Plus className="h-4 w-4 shrink-0 text-fg-2" />
-                  <span className="truncate text-sm font-medium leading-5">
+                  <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span className="truncate text-ui font-medium leading-5">
                     {t(
                       "codexOauth.addOrManageAccounts",
                       "添加或管理 ChatGPT 账号…",
@@ -305,12 +309,12 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <span aria-hidden className="h-4 w-4 shrink-0" />
-                  <span className="shrink-0 text-sm font-medium leading-5">
+                  <span className="shrink-0 text-ui font-medium leading-5">
                     {noneOptionLabel ??
                       t("codexOauth.useDefaultAccount", "使用默认账号")}
                   </span>
                   {noneOptionDescription && (
-                    <span className="min-w-0 truncate text-sm leading-5 text-fg-2">
+                    <span className="min-w-0 truncate text-ui leading-5 text-muted-foreground">
                       {noneOptionDescription}
                     </span>
                   )}
@@ -325,7 +329,7 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
   const statusErrorBanner = isStatusError && (
     <div
       role="alert"
-      className="flex items-center gap-2 rounded-md border border-transparent bg-danger-soft px-3 py-2 text-sm text-danger-text"
+      className="flex items-center gap-2 rounded-[4px] border border-destructive/40 bg-destructive/5 px-3 py-2 text-ui text-destructive"
     >
       <AlertTriangle className="h-4 w-4 shrink-0" />
       <span className="min-w-0 flex-1">
@@ -337,11 +341,10 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
       <Button
         type="button"
         variant="outline"
-        size="sm"
-        className="h-7 shrink-0"
+        className="shrink-0"
         onClick={() => void refetchStatus()}
       >
-        <RefreshCw className="mr-1 h-3.5 w-3.5" />
+        <RefreshCw className="h-4 w-4" />
         {t("codexOauth.retry", "重试")}
       </Button>
     </div>
@@ -349,11 +352,11 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
 
   if (mode === "select") {
     return (
-      <div className={`space-y-4 ${className || ""}`}>
+      <div className={`space-y-2 ${className || ""}`}>
         {statusErrorBanner}
 
         {!isStatusSuccess && !isStatusError && (
-          <div className="flex items-center gap-2 text-sm text-fg-2">
+          <div className="flex items-center gap-2 text-ui text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             {t("codexOauth.statusLoading", "正在加载...")}
           </div>
@@ -364,33 +367,34 @@ export const CodexOAuthSection: React.FC<CodexOAuthSectionProps> = ({
 
         {/* 所选账号需重新登录的内联提示 */}
         {selectedAccountNeedsReauth && (
-          <div className="flex items-start gap-2 rounded-md border border-transparent bg-warning-soft px-3 py-2 text-xs text-warning-text">
-            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning-text" />
+          <div className="flex items-start gap-2 rounded-[4px] border border-amber-300/70 bg-amber-50 px-3 py-2 text-ui text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-100">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
             <div className="flex-1 leading-relaxed">
               {t(
                 "codexOauth.reauthSelectHint",
                 "该账号需重新登录以启用托管绑定。",
               )}
               {onManageAccounts && (
-                <button
+                <Button
                   type="button"
+                  variant="link"
                   onClick={onManageAccounts}
-                  className="ml-1 font-medium underline underline-offset-2 hover:text-warning-text"
+                  className="ml-1 h-auto min-w-0 px-0"
                 >
                   {t("codexOauth.reauthNow", "立即重新登录")}
-                </button>
+                </Button>
               )}
             </div>
           </div>
         )}
 
         {onFastModeChange && (
-          <div className="flex items-center justify-between rounded-md border bg-subtle p-3">
+          <div className="flex items-center justify-between rounded-[4px] border bg-muted/30 p-3">
             <div className="space-y-1 pr-4">
-              <Label className="text-sm font-medium">
+              <Label className="text-ui font-medium">
                 {t("codexOauth.fastMode", "FAST mode")}
               </Label>
-              <p className="text-xs text-fg-2">
+              <p className="text-ui text-muted-foreground">
                 {t("codexOauth.fastModeDescription", {
                   defaultValue:
                     'Send service_tier="priority" for lower latency. Turn it off if the ChatGPT Codex backend rejects the parameter.',

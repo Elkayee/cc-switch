@@ -42,7 +42,6 @@ interface HermesFormFieldsProps {
   shouldShowApiKeyLink: boolean;
   websiteUrl: string;
   isPartner?: boolean;
-  partnerPromotionKey?: string;
   apiMode: HermesApiMode;
   onApiModeChange: (mode: HermesApiMode) => void;
   models: HermesModel[];
@@ -91,7 +90,6 @@ export function HermesFormFields({
   shouldShowApiKeyLink,
   websiteUrl,
   isPartner,
-  partnerPromotionKey,
   apiMode,
   onApiModeChange,
   models,
@@ -274,22 +272,19 @@ export function HermesFormFields({
         shouldShowLink={shouldShowApiKeyLink}
         websiteUrl={websiteUrl}
         isPartner={isPartner}
-        partnerPromotionKey={partnerPromotionKey}
       />
 
       <div className="space-y-3 border-l border-border pl-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-normal leading-5">
+          <h3 className="text-[12.35px] leading-[1.3] font-normal">
             {t("hermes.form.models", { defaultValue: "模型列表" })}
           </h3>
           <div className="flex gap-1">
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={handleFetchModels}
               disabled={isFetchingModels}
-              className="h-7 gap-1"
             >
               {isFetchingModels ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -298,13 +293,7 @@ export function HermesFormFields({
               )}
               {t("providerForm.fetchModels")}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddModel}
-              className="h-7 gap-1"
-            >
+            <Button type="button" variant="outline" onClick={handleAddModel}>
               <Plus className="h-3.5 w-3.5" />
               {t("hermes.form.addModel", { defaultValue: "添加模型" })}
             </Button>
@@ -312,22 +301,22 @@ export function HermesFormFields({
         </div>
 
         {models.length === 0 ? (
-          <p className="text-sm text-fg-2 py-2">
+          <p className="text-[12.35px] leading-[1.3] text-fg-2 py-2">
             {t("hermes.form.noModels", {
               defaultValue: "暂无模型配置。切换到此供应商时将无默认模型。",
             })}
           </p>
         ) : (
           <div className="space-y-2">
-            <div className="flex items-center gap-2 px-1 text-xs text-fg-2">
-              <span className="w-9" />
+            <div className="flex items-center gap-2 text-ui text-muted-foreground">
+              <span className="w-6" />
               <span className="flex-1">
                 {t("hermes.form.modelId", { defaultValue: "模型 ID" })}
               </span>
               <span className="flex-1">
                 {t("hermes.form.modelName", { defaultValue: "显示名称" })}
               </span>
-              <span className="w-9" />
+              <span className="w-6" />
             </div>
             {models.map((model, index) => {
               const modelKey = modelKeys[index];
@@ -346,7 +335,7 @@ export function HermesFormFields({
                       })}
                       aria-expanded={isExpanded}
                       aria-controls={detailsId}
-                      className="h-9 w-9 shrink-0"
+                      className="shrink-0"
                     >
                       <ChevronRight
                         className={`h-4 w-4 transition-transform motion-reduce:transition-none ${
@@ -403,7 +392,7 @@ export function HermesFormFields({
                         aria-label={t("hermes.form.removeModel", {
                           defaultValue: "移除模型",
                         })}
-                        className="h-9 w-9 shrink-0 text-fg-2 hover:text-destructive"
+                        className="shrink-0 text-muted-foreground hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -413,12 +402,12 @@ export function HermesFormFields({
                   {isExpanded && (
                     <div
                       id={detailsId}
-                      className="ml-9 grid gap-3 border-l border-border pl-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.25rem]"
+                      className="ml-8 grid gap-3 border-l border-border-default pl-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_2.25rem]"
                     >
                       <div className="space-y-1">
                         <Label
                           htmlFor={`hermes-model-context-${modelKey}`}
-                          className="text-xs font-normal text-fg-2"
+                          className="text-ui font-normal text-muted-foreground"
                         >
                           {t("hermes.form.contextLength", {
                             defaultValue: "上下文长度",
@@ -475,7 +464,7 @@ export function HermesFormFields({
           </div>
         )}
 
-        <p className="text-xs text-fg-2">
+        <p className="text-ui text-muted-foreground">
           {t("hermes.form.modelsHint", {
             defaultValue:
               "启用为当前供应商时，第一个模型会设为 Hermes 默认模型。",
@@ -508,7 +497,7 @@ export function HermesFormFields({
           }}
           placeholder="0.5"
         />
-        <p className="text-xs text-fg-2">
+        <p className="text-ui text-muted-foreground">
           {t("hermes.form.rateLimitDelayHint", {
             defaultValue: "连续请求间的最小间隔秒数（可选）。留空表示无限制。",
           })}

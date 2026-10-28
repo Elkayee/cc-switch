@@ -33,7 +33,7 @@ export const CODING_PLAN_PROVIDERS: readonly CodingPlanProviderEntry[] = [
   { id: "kimi", label: "Kimi For Coding", pattern: /api\.kimi\.com\/coding/i },
   {
     id: "zhipu",
-    label: "Zhipu GLM (智谱)",
+    label: "Zhipu GLM",
     pattern: /bigmodel\.cn|api\.z\.ai/i,
   },
   {
@@ -43,7 +43,7 @@ export const CODING_PLAN_PROVIDERS: readonly CodingPlanProviderEntry[] = [
     // 故团队版永不被 injectCodingPlanUsageScript 自动注入（必须用户手动选）。
     // pattern 仅占位（下拉展示用），实际不参与自动检测。
     id: "zhipu_team",
-    label: "Zhipu GLM Team (智谱团队)",
+    label: "Zhipu GLM Team",
     pattern: /bigmodel\.cn/i,
   },
   {
@@ -65,7 +65,7 @@ export const CODING_PLAN_PROVIDERS: readonly CodingPlanProviderEntry[] = [
     // /api/coding[/v3]（Coding Plan）；与后端 detect_provider 的
     // `volces.com/api/plan` / `volces.com/api/coding` 子串判断同效。
     id: "volcengine",
-    label: "火山方舟 (Volcengine)",
+    label: "Volcengine Ark",
     pattern: /volces\.com\/api\/(plan|coding)/i,
   },
   {

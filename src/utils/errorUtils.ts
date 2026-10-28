@@ -96,7 +96,10 @@ export const translateMcpBackendError = (
   const msg = String(message).trim();
 
   // 基础字段与结构校验相关
-  if (msg.includes("MCP 服务器 ID 不能为空")) {
+  if (
+    msg.includes("MCP 服务器 ID 不能为空") ||
+    msg.includes("MCP server ID cannot be empty")
+  ) {
     return t("mcp.error.idRequired");
   }
   if (
@@ -113,18 +116,26 @@ export const translateMcpBackendError = (
     msg.includes("MCP 服务器 homepage 必须为字符串") ||
     msg.includes("MCP 服务器 docs 必须为字符串") ||
     msg.includes("MCP 服务器 tags 必须为字符串数组") ||
-    msg.includes("MCP 服务器 enabled 必须为布尔值")
+    msg.includes("MCP 服务器 enabled 必须为布尔值") ||
+    msg.includes("must be a JSON object") ||
+    msg.includes("Server config must be an object") ||
+    msg.includes("server field is not an object") ||
+    msg.includes("missing the server field")
   ) {
     return t("mcp.error.jsonInvalid");
   }
-  if (msg.includes("MCP 服务器 type 必须是")) {
+  if (
+    msg.includes("MCP 服务器 type 必须是") ||
+    msg.includes("MCP server type must be")
+  ) {
     return t("mcp.error.jsonInvalid");
   }
 
   // 必填字段
   if (
     msg.includes("stdio 类型的 MCP 服务器缺少 command 字段") ||
-    msg.includes("必须包含 command 字段")
+    msg.includes("必须包含 command 字段") ||
+    msg.includes("must include a command field")
   ) {
     return t("mcp.error.commandRequired");
   }
@@ -132,7 +143,9 @@ export const translateMcpBackendError = (
     msg.includes("http 类型的 MCP 服务器缺少 url 字段") ||
     msg.includes("sse 类型的 MCP 服务器缺少 url 字段") ||
     msg.includes("必须包含 url 字段") ||
-    msg === "URL 不能为空"
+    msg === "URL 不能为空" ||
+    msg.includes("must include a url field") ||
+    msg === "URL cannot be empty"
   ) {
     return t("mcp.wizard.urlRequired");
   }
@@ -140,13 +153,20 @@ export const translateMcpBackendError = (
   // 文件解析/序列化
   if (
     msg.includes("解析 ~/.claude.json 失败") ||
+    msg.includes("Failed to parse ~/.claude.json") ||
     msg.includes("解析 config.toml 失败") ||
+    msg.includes("Failed to parse config.toml") ||
     msg.includes("无法识别的 TOML 格式") ||
-    msg.includes("TOML 内容不能为空")
+    msg.includes("Unrecognized TOML format") ||
+    msg.includes("TOML 内容不能为空") ||
+    msg.includes("TOML content cannot be empty")
   ) {
     return t("mcp.error.tomlInvalid");
   }
-  if (msg.includes("序列化 config.toml 失败")) {
+  if (
+    msg.includes("序列化 config.toml 失败") ||
+    msg.includes("Failed to serialize config.toml")
+  ) {
     return t("mcp.error.tomlInvalid");
   }
 

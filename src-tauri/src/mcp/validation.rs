@@ -8,7 +8,7 @@ use crate::error::AppError;
 pub fn validate_server_spec(spec: &Value) -> Result<(), AppError> {
     if !spec.is_object() {
         return Err(AppError::McpValidation(
-            "MCP 服务器连接定义必须为 JSON 对象".into(),
+            "MCP server connection definition must be a JSON object".into(),
         ));
     }
     let t_opt = spec.get("type").and_then(|x| x.as_str());
@@ -19,7 +19,7 @@ pub fn validate_server_spec(spec: &Value) -> Result<(), AppError> {
 
     if !(is_stdio || is_http || is_sse) {
         return Err(AppError::McpValidation(
-            "MCP 服务器 type 必须是 'stdio'、'http' 或 'sse'（或省略表示 stdio）".into(),
+            "MCP server type must be 'stdio', 'http', or 'sse' (omit for stdio)".into(),
         ));
     }
 
@@ -27,7 +27,7 @@ pub fn validate_server_spec(spec: &Value) -> Result<(), AppError> {
         let cmd = spec.get("command").and_then(|x| x.as_str()).unwrap_or("");
         if cmd.trim().is_empty() {
             return Err(AppError::McpValidation(
-                "stdio 类型的 MCP 服务器缺少 command 字段".into(),
+                "stdio MCP server is missing the command field".into(),
             ));
         }
     }
@@ -35,7 +35,7 @@ pub fn validate_server_spec(spec: &Value) -> Result<(), AppError> {
         let url = spec.get("url").and_then(|x| x.as_str()).unwrap_or("");
         if url.trim().is_empty() {
             return Err(AppError::McpValidation(
-                "http 类型的 MCP 服务器缺少 url 字段".into(),
+                "http MCP server is missing the url field".into(),
             ));
         }
     }
@@ -43,7 +43,7 @@ pub fn validate_server_spec(spec: &Value) -> Result<(), AppError> {
         let url = spec.get("url").and_then(|x| x.as_str()).unwrap_or("");
         if url.trim().is_empty() {
             return Err(AppError::McpValidation(
-                "sse 类型的 MCP 服务器缺少 url 字段".into(),
+                "sse MCP server is missing the url field".into(),
             ));
         }
     }
@@ -73,14 +73,14 @@ pub(crate) fn spec_transport_type(spec: &Value) -> &str {
 pub fn extract_server_spec(entry: &Value) -> Result<Value, AppError> {
     let obj = entry
         .as_object()
-        .ok_or_else(|| AppError::McpValidation("MCP 服务器条目必须为 JSON 对象".into()))?;
-    let server = obj
-        .get("server")
-        .ok_or_else(|| AppError::McpValidation("MCP 服务器条目缺少 server 字段".into()))?;
+        .ok_or_else(|| AppError::McpValidation("MCP server entry must be a JSON object".into()))?;
+    let server = obj.get("server").ok_or_else(|| {
+        AppError::McpValidation("MCP server entry is missing the server field".into())
+    })?;
 
     if !server.is_object() {
         return Err(AppError::McpValidation(
-            "MCP 服务器 server 字段必须为 JSON 对象".into(),
+            "MCP server 'server' field must be a JSON object".into(),
         ));
     }
 

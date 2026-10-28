@@ -39,7 +39,7 @@ export function LocalProxyRequestOverridesField({
 
       <div className="grid gap-3 md:grid-cols-2">
         <div className="space-y-2">
-          <FormLabel className="text-xs text-fg-2">
+          <FormLabel className="text-ui text-muted-foreground">
             {t("providerForm.localProxyHeaderOverrides", {
               defaultValue: "Header 覆盖",
             })}
@@ -48,11 +48,11 @@ export function LocalProxyRequestOverridesField({
             value={headersJson}
             onChange={(event) => onHeadersJsonChange(event.target.value)}
             placeholder={'{\n  "X-Provider": "cc-switch"\n}'}
-            className="min-h-[132px] resize-y font-mono text-xs"
+            className="font-mono"
             aria-invalid={Boolean(headerError)}
           />
           {headerError && (
-            <p className="text-xs text-destructive">
+            <p className="text-ui text-destructive">
               {t("providerForm.localProxyHeaderOverridesInvalidDetail", {
                 error: headerError,
                 defaultValue: "Header 覆盖格式错误：{{error}}",
@@ -62,7 +62,7 @@ export function LocalProxyRequestOverridesField({
         </div>
 
         <div className="space-y-2">
-          <FormLabel className="text-xs text-fg-2">
+          <FormLabel className="text-ui text-muted-foreground">
             {t("providerForm.localProxyBodyOverrides", {
               defaultValue: "Body 覆盖",
             })}
@@ -71,11 +71,11 @@ export function LocalProxyRequestOverridesField({
             value={bodyJson}
             onChange={(event) => onBodyJsonChange(event.target.value)}
             placeholder={'{\n  "temperature": 0.2\n}'}
-            className="min-h-[132px] resize-y font-mono text-xs"
+            className="font-mono"
             aria-invalid={Boolean(bodyError)}
           />
           {bodyError && (
-            <p className="text-xs text-destructive">
+            <p className="text-ui text-destructive">
               {t("providerForm.localProxyBodyOverridesInvalidDetail", {
                 error: bodyError,
                 defaultValue: "Body 覆盖格式错误：{{error}}",

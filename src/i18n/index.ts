@@ -4,10 +4,11 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en.json";
 import ja from "./locales/ja.json";
 import tr from "./locales/tr.json";
+import vi from "./locales/vi.json";
 import zh from "./locales/zh.json";
 import zhTW from "./locales/zh-TW.json";
 
-type Language = "zh" | "zh-TW" | "en" | "ja" | "tr";
+type Language = "zh" | "zh-TW" | "en" | "ja" | "tr" | "vi";
 
 const DEFAULT_LANGUAGE: Language = "zh";
 
@@ -16,7 +17,8 @@ const isLanguage = (value: unknown): value is Language =>
   value === "zh-TW" ||
   value === "en" ||
   value === "ja" ||
-  value === "tr";
+  value === "tr" ||
+  value === "vi";
 
 const getInitialLanguage = (): Language => {
   if (typeof window !== "undefined") {
@@ -57,6 +59,10 @@ const getInitialLanguage = (): Language => {
     return "ja";
   }
 
+  if (navigatorLang?.startsWith("vi")) {
+    return "vi";
+  }
+
   if (navigatorLang?.startsWith("tr")) {
     return "tr";
   }
@@ -70,12 +76,17 @@ const getInitialLanguage = (): Language => {
 };
 
 const resources = {
-  tr: { translation: tr },
   en: {
     translation: en,
   },
   ja: {
     translation: ja,
+  },
+  tr: {
+    translation: tr,
+  },
+  vi: {
+    translation: vi,
   },
   zh: {
     translation: zh,
@@ -83,6 +94,22 @@ const resources = {
   "zh-TW": {
     translation: zhTW,
   },
+};
+
+const HTML_LANG: Record<Language, string> = {
+  zh: "zh-CN",
+  "zh-TW": "zh-TW",
+  en: "en",
+  ja: "ja",
+  tr: "tr",
+  vi: "vi",
+};
+
+const applyDocumentMeta = (lng?: string) => {
+  if (typeof document === "undefined") return;
+  document.title = i18n.t("app.title");
+  const resolved: Language = isLanguage(lng) ? lng : "en";
+  document.documentElement.lang = HTML_LANG[resolved];
 };
 
 i18n.use(initReactI18next).init({
@@ -97,6 +124,9 @@ i18n.use(initReactI18next).init({
   // 开发模式下显示调试信息
   debug: false,
 });
+
+applyDocumentMeta(i18n.language);
+i18n.on("languageChanged", applyDocumentMeta);
 
 /**
  * 用后端 settings.json 里保存的语言校正界面语言。

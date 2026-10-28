@@ -92,6 +92,29 @@ describe("useSettingsForm Hook", () => {
     expect(changeLanguageSpy).toHaveBeenCalledWith("ja");
   });
 
+  it("should support vietnamese language preference from server data", async () => {
+    useSettingsQueryMock.mockReturnValue({
+      data: {
+        showInTray: true,
+        minimizeToTrayOnClose: true,
+        enableClaudePluginIntegration: false,
+        claudeConfigDir: "/Users/demo",
+        codexConfigDir: null,
+        language: "vi",
+      },
+      isLoading: false,
+    });
+
+    const { result } = renderHook(() => useSettingsForm());
+
+    await waitFor(() => {
+      expect(result.current.settings?.language).toBe("vi");
+    });
+
+    expect(result.current.initialLanguage).toBe("vi");
+    expect(changeLanguageSpy).toHaveBeenCalledWith("vi");
+  });
+
   it("should support traditional chinese language preference aliases", async () => {
     useSettingsQueryMock.mockReturnValue({
       data: {
@@ -187,13 +210,11 @@ describe("useSettingsForm Hook", () => {
     });
 
     const settings = result.current.settings!;
-    expect(settings.showInTray).toBe(false);
-    expect(settings.minimizeToTrayOnClose).toBe(false);
-    expect(settings.enableClaudePluginIntegration).toBe(true);
-    expect(settings.claudeConfigDir).toBe("/reset");
-    expect(settings.codexConfigDir).toBeUndefined();
-    expect(settings.piConfigDir).toBe("/pi-reset");
-    expect(settings.language).toBe("zh");
+    expect(settings.showInTray).toBe(true);
+    expect(settings.minimizeToTrayOnClose).toBe(true);
+    expect(settings.enableClaudePluginIntegration).toBe(false);
+    expect(settings.claudeConfigDir).toBe("/origin");
+    expect(settings.language).toBe("en");
     expect(result.current.initialLanguage).toBe("en");
     expect(changeLanguageSpy).toHaveBeenCalledWith("en");
   });

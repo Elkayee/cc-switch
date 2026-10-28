@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import en from "@/i18n/locales/en.json";
 import ja from "@/i18n/locales/ja.json";
+import vi from "@/i18n/locales/vi.json";
 import zhTW from "@/i18n/locales/zh-TW.json";
 import zh from "@/i18n/locales/zh.json";
 
@@ -32,6 +33,7 @@ const locales = [
   ["ja", ja],
   ["zh", zh],
   ["zh-TW", zhTW],
+  ["vi", vi],
 ] as const;
 
 function getTranslation(locale: Locale, path: string): unknown {

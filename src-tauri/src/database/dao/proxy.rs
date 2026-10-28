@@ -57,7 +57,7 @@ impl Database {
                 Ok(GlobalProxyConfig {
                     proxy_enabled: false,
                     listen_address: "127.0.0.1".to_string(),
-                    listen_port: 15721,
+                    listen_port: crate::proxy::types::default_listen_port(),
                     enable_logging: true,
                 })
             }
@@ -286,6 +286,12 @@ impl Database {
     /// 使用与 schema.rs seed 相同的 per-app 默认值
     async fn init_proxy_config_rows(&self) -> Result<(), AppError> {
         let conn = lock_conn!(self.conn);
+        let fresh = conn
+            .query_row("SELECT COUNT(*) FROM proxy_config", [], |row| {
+                row.get::<_, i64>(0)
+            })
+            .map_err(|e| AppError::Database(e.to_string()))?
+            == 0;
 
         // 使用与 schema.rs seed 相同的 per-app 默认值
         // claude: 更激进的重试和超时配置
@@ -335,6 +341,10 @@ impl Database {
             [],
         )
         .map_err(|e| AppError::Database(e.to_string()))?;
+
+        if fresh {
+            Self::apply_default_listen_port(&conn)?;
+        }
 
         Ok(())
     }

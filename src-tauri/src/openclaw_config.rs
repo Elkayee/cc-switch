@@ -33,11 +33,10 @@ const OPENCLAW_TOOLS_PROFILES: &[&str] = &["minimal", "coding", "messaging", "fu
 /// 默认路径: `~/.openclaw/`
 /// 可通过 settings.openclaw_config_dir 覆盖
 pub fn get_openclaw_dir() -> PathBuf {
-    if let Some(override_dir) = get_openclaw_override_dir() {
-        return override_dir;
-    }
-
-    crate::config::get_home_dir().join(".openclaw")
+    crate::config::resolve_tool_config_dir(
+        get_openclaw_override_dir(),
+        crate::config::get_home_dir().join(".openclaw"),
+    )
 }
 
 /// 获取 OpenClaw 配置文件路径

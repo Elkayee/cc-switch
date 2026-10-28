@@ -44,7 +44,7 @@ pub async fn export_config_to_file(
         }))
     })
     .await
-    .map_err(|e| format!("导出配置失败: {e}"))?
+    .map_err(|e| format!("Failed to export config: {e}"))?
     .map_err(|e: AppError| e.to_string())
 }
 
@@ -74,7 +74,7 @@ pub async fn import_config_from_file(
         })
     })
     .await
-    .map_err(|e| format!("导入配置失败: {e}"))?
+    .map_err(|e| format!("Failed to import config: {e}"))?
     .map_err(|e: AppError| e.to_string())
 }
 
@@ -90,7 +90,7 @@ pub async fn sync_current_providers_live(state: State<'_, AppState>) -> Result<V
         }))
     })
     .await
-    .map_err(|e| format!("同步当前供应商失败: {e}"))?
+    .map_err(|e| format!("Failed to sync current provider: {e}"))?
     .map_err(|e: AppError| e.to_string())
 }
 

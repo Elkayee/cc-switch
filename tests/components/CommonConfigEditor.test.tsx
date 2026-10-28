@@ -62,6 +62,56 @@ describe("CommonConfigEditor hide attribution toggle", () => {
   });
 });
 
+describe("CommonConfigEditor todo tools toggle", () => {
+  const todoCheckbox = () =>
+    screen.getByRole("checkbox", { name: "claudeConfig.enableTodoTools" });
+
+  it("writes CLAUDE_CODE_ENABLE_TODO_TOOLS through env", () => {
+    const onChange = renderEditor("{}");
+
+    fireEvent.click(todoCheckbox());
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(onChange.mock.calls[0][0])).toEqual({
+      env: {
+        CLAUDE_CODE_ENABLE_TODO_TOOLS: "1",
+      },
+    });
+  });
+
+  it("removes only the CLAUDE_CODE_ENABLE_TODO_TOOLS env entry when unchecked", () => {
+    const onChange = renderEditor(
+      JSON.stringify(
+        {
+          env: {
+            CLAUDE_CODE_ENABLE_TODO_TOOLS: "1",
+            ENABLE_TOOL_SEARCH: "true",
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    fireEvent.click(todoCheckbox());
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(onChange.mock.calls[0][0])).toEqual({
+      env: {
+        ENABLE_TOOL_SEARCH: "true",
+      },
+    });
+  });
+
+  it("treats numeric 1 as checked", () => {
+    renderEditor(
+      JSON.stringify({ env: { CLAUDE_CODE_ENABLE_TODO_TOOLS: 1 } }, null, 2),
+    );
+
+    expect(todoCheckbox()).toBeChecked();
+  });
+});
+
 describe("CommonConfigEditor inactive row fields", () => {
   const timeout: ProviderEditorInactiveField = {
     path: ["env", "API_TIMEOUT_MS"],

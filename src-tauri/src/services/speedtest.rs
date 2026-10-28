@@ -42,7 +42,7 @@ impl SpeedtestService {
                     url: raw_url,
                     latency: None,
                     status: None,
-                    error: Some("URL 不能为空".to_string()),
+                    error: Some("URL cannot be empty".to_string()),
                 });
                 continue;
             }
@@ -54,7 +54,7 @@ impl SpeedtestService {
                         url: trimmed,
                         latency: None,
                         status: None,
-                        error: Some(format!("URL 无效: {err}")),
+                        error: Some(format!("Invalid URL: {err}")),
                     });
                 }
             }
@@ -90,9 +90,9 @@ impl SpeedtestService {
                     Err(err) => {
                         let status = err.status().map(|s| s.as_u16());
                         let error_message = if err.is_timeout() {
-                            "请求超时".to_string()
+                            "Request timed out".to_string()
                         } else if err.is_connect() {
-                            "连接失败".to_string()
+                            "connection failed".to_string()
                         } else {
                             err.to_string()
                         };
@@ -169,12 +169,12 @@ mod tests {
                 .error
                 .as_deref()
                 .unwrap_or_default()
-                .starts_with("URL 无效"),
+                .starts_with("Invalid URL"),
             "invalid url should yield parse error"
         );
         assert_eq!(
             result[1].error.as_deref(),
-            Some("URL 不能为空"),
+            Some("URL cannot be empty"),
             "empty url should report validation error"
         );
     }

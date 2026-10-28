@@ -67,9 +67,9 @@ export function AuthCenterPanel({
   }, [authScrollTarget]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       {showIntro && (
-        <p className="m-0 max-w-[700px] text-caption text-fg-2">
+        <p className="m-0 max-w-[700px] text-ui text-muted-foreground">
           {t("settings.authCenter.description")}
         </p>
       )}

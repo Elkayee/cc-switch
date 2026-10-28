@@ -56,7 +56,7 @@ export const SessionNoteRow = memo(function SessionNoteRow({
             aria-expanded={expanded}
             aria-controls={regionId}
             onClick={() => onToggle(step.id, expanded)}
-            className="mt-0.5 rounded-[2px] text-caption text-fg-3 underline decoration-border-strong underline-offset-[3px] hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="mt-0.5 rounded-[2px] text-[12.35px] leading-[1.3] text-fg-3 underline decoration-border-strong underline-offset-[3px] hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {expanded ? rt("collapseContent") : rt("noteExpand")}
           </button>

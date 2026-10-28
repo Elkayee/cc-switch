@@ -114,7 +114,7 @@ export function PricingEditModal({
       }
     >
       {isNew && (
-        <div className="mb-6 flex items-center gap-2 rounded-panel border border-border bg-subtle px-3 py-2.5">
+        <div className="mb-4 flex items-center gap-2 rounded-panel border border-border bg-subtle px-3 py-2">
           <Button
             type="button"
             variant="neutral"
@@ -122,7 +122,7 @@ export function PricingEditModal({
             onClick={() => setIsPickerOpen(true)}
             className="shrink-0"
           >
-            <Globe className="h-3.5 w-3.5" />
+            <Globe className="h-4 w-4" />
             {t("usage.importFromModelsDev", "从 models.dev 导入")}
           </Button>
           <HelpTip title={t("usage.importFromModelsDev", "从 models.dev 导入")}>
@@ -134,7 +134,7 @@ export function PricingEditModal({
         </div>
       )}
 
-      <form id="pricing-form" onSubmit={handleSubmit} className="space-y-6">
+      <form id="pricing-form" onSubmit={handleSubmit} className="space-y-2">
         {isNew && (
           <div className="space-y-2">
             <Label htmlFor="modelId">{t("usage.modelId", "模型 ID")}</Label>

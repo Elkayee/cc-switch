@@ -452,11 +452,7 @@ export function RequestLogTable({
             title={appDisplayName(log.appType)}
           >
             {isKnownAppId(log.appType) && (
-              <AppGlyph
-                app={log.appType}
-                size={14}
-                badgeClassName="bg-surface"
-              />
+              <AppGlyph app={log.appType} size={14} badgeClassName="bg-card" />
             )}
             <span aria-hidden="true">{appShortName(log.appType)}</span>
             <span className="sr-only">{appDisplayName(log.appType)}</span>
@@ -540,7 +536,7 @@ export function RequestLogTable({
           className={cn(
             usageTable.td,
             "font-medium",
-            unpriced && "font-normal text-fg-3",
+            unpriced && "font-normal text-muted-foreground",
           )}
           title={
             [
@@ -567,7 +563,7 @@ export function RequestLogTable({
             <>
               {estimatedTps != null && "≈"}
               {tps}
-              <span className="ms-0.5 text-badge font-normal text-fg-3">
+              <span className="ms-0.5 text-ui font-normal text-muted-foreground">
                 tok/s
               </span>
             </>

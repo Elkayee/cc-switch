@@ -31,7 +31,7 @@ export const PRESET_FAMILIES = {
     name: "OpenCode",
     planOrder: ["coding", "payg"],
   },
-  qianwen: { name: "千问AI平台" },
+  qianwen: { name: "Qwen AI" },
   qwencloud: { name: "QwenCloud" },
   siliconflow: { name: "SiliconFlow" },
   soruxgpt: {

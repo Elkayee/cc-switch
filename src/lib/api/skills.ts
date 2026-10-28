@@ -113,6 +113,13 @@ export interface SkillUpdateInfo {
   remoteHash: string;
 }
 
+export interface SkillAutoUpdateStatus {
+  lastRunAt?: number | null;
+  running: boolean;
+  updatedCount: number;
+  failures: string[];
+}
+
 /** 没有读到的仓库（发现、检查更新时逐仓库报告） */
 export interface SkillRepoFailure {
   owner: string;
@@ -201,6 +208,11 @@ export const skillsApi = {
     return await invoke("get_installed_skills");
   },
 
+  /** Read SKILL.md for an installed skill, including YAML frontmatter. */
+  async getContent(id: string): Promise<string> {
+    return await invoke("get_skill_content", { id });
+  },
+
   /** 获取可恢复的 Skill 备份列表 */
   async getBackups(): Promise<SkillBackupEntry[]> {
     return await invoke("get_skill_backups");
@@ -267,6 +279,10 @@ export const skillsApi = {
   /** 更新单个 Skill */
   async updateSkill(id: string): Promise<InstalledSkill> {
     return await invoke("update_skill", { id });
+  },
+
+  async getAutoUpdateStatus(): Promise<SkillAutoUpdateStatus> {
+    return await invoke("get_skill_auto_update_status");
   },
 
   /** 迁移 Skill 存储位置 */

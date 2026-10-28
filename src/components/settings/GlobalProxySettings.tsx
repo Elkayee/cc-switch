@@ -142,16 +142,18 @@ export function GlobalProxySettings() {
   // 只在首次加载且无数据时显示加载状态
   if (isLoading && savedUrl === undefined) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-5 w-5 animate-spin text-fg-2" />
+      <div className="flex items-center justify-center p-2">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* 描述 */}
-      <p className="text-sm text-fg-2">{t("settings.globalProxy.hint")}</p>
+      <p className="text-ui text-muted-foreground">
+        {t("settings.globalProxy.hint")}
+      </p>
 
       {/* 代理地址输入框和按钮 */}
       <div className="flex gap-2">
@@ -163,7 +165,7 @@ export function GlobalProxySettings() {
             setDirty(true);
           }}
           onKeyDown={handleKeyDown}
-          className="font-mono text-sm flex-1"
+          className="font-mono flex-1"
         />
         <HoverTip content={t("settings.globalProxy.scan")}>
           <Button
@@ -206,11 +208,7 @@ export function GlobalProxySettings() {
             <X className="h-4 w-4" />
           </Button>
         </HoverTip>
-        <Button
-          onClick={handleSave}
-          disabled={!dirty || setMutation.isPending}
-          size="sm"
-        >
+        <Button onClick={handleSave} disabled={!dirty || setMutation.isPending}>
           {setMutation.isPending && (
             <Loader2 className="h-4 w-4 animate-spin" />
           )}
@@ -228,7 +226,7 @@ export function GlobalProxySettings() {
             setDirty(true);
           }}
           onKeyDown={handleKeyDown}
-          className="font-mono text-sm flex-1"
+          className="font-mono flex-1"
         />
         <div className="relative flex-1">
           <Input
@@ -240,20 +238,20 @@ export function GlobalProxySettings() {
               setDirty(true);
             }}
             onKeyDown={handleKeyDown}
-            className="font-mono text-sm pr-10"
+            className="font-mono pr-8"
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+            className="absolute right-0 top-0 h-6 w-6 hover:bg-transparent"
             onClick={() => setShowPassword(!showPassword)}
             tabIndex={-1}
           >
             {showPassword ? (
-              <EyeOff className="h-4 w-4 text-fg-2" />
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
             ) : (
-              <Eye className="h-4 w-4 text-fg-2" />
+              <Eye className="h-4 w-4 text-muted-foreground" />
             )}
           </Button>
         </div>
@@ -268,7 +266,7 @@ export function GlobalProxySettings() {
               variant="secondary"
               size="sm"
               onClick={() => handleSelect(p.url)}
-              className="font-mono text-xs"
+              className="font-mono"
             >
               {p.url}
             </Button>

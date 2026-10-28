@@ -352,7 +352,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             const isSelected = value === iconName;
 
             return (
-              <button
+              <Button
                 key={iconName}
                 type="button"
                 onClick={() => select(iconName)}
@@ -360,10 +360,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 title={meta?.displayName || iconName}
               >
                 <ProviderIcon icon={iconName} name={iconName} size={32} />
-                <span className="text-xs text-fg-2 truncate w-full text-center">
+                <span className="w-full truncate text-center text-muted-foreground">
                   {meta?.displayName || iconName}
                 </span>
-              </button>
+              </Button>
             );
           })}
         </div>

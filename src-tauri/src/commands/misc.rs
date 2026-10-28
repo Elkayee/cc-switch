@@ -47,12 +47,12 @@ fn validate_external_url(raw: &str) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn open_external(app: AppHandle, url: String) -> Result<bool, String> {
+pub async fn open_external(app: AppHandle<crate::AppRuntime>, url: String) -> Result<bool, String> {
     let url = validate_external_url(&url)?;
 
     app.opener()
         .open_url(&url, None::<String>)
-        .map_err(|e| format!("打开链接失败: {e}"))?;
+        .map_err(|e| format!("Failed to open link: {e}"))?;
 
     Ok(true)
 }
@@ -63,28 +63,14 @@ pub async fn copy_text_to_clipboard(text: String) -> Result<bool, String> {
     // Clipboard access can block on some platforms and may have thread/loop constraints
     tokio::task::spawn_blocking(move || {
         let mut clipboard =
-            arboard::Clipboard::new().map_err(|e| format!("访问系统剪贴板失败: {e}"))?;
+            arboard::Clipboard::new().map_err(|e| format!("Failed to access clipboard: {e}"))?;
         clipboard
             .set_text(text)
-            .map_err(|e| format!("写入系统剪贴板失败: {e}"))?;
+            .map_err(|e| format!("Failed to write clipboard: {e}"))?;
         Ok(true)
     })
     .await
-    .map_err(|e| format!("剪贴板任务执行失败: {e}"))?
-}
-
-/// 检查更新
-#[tauri::command]
-pub async fn check_for_updates(handle: AppHandle) -> Result<bool, String> {
-    handle
-        .opener()
-        .open_url(
-            "https://github.com/farion1231/cc-switch/releases/latest",
-            None::<String>,
-        )
-        .map_err(|e| format!("打开更新页面失败: {e}"))?;
-
-    Ok(true)
+    .map_err(|e| format!("Clipboard task failed: {e}"))?
 }
 
 /// 便携版新版本压缩包的下载地址，命名与 release.yml 的「Prepare Windows Assets」一致：
@@ -124,7 +110,8 @@ pub async fn open_portable_update_download(
 /// 判断是否为便携版（绿色版）运行
 #[tauri::command]
 pub async fn is_portable_mode() -> Result<bool, String> {
-    let exe_path = std::env::current_exe().map_err(|e| format!("获取可执行路径失败: {e}"))?;
+    let exe_path =
+        std::env::current_exe().map_err(|e| format!("Failed to get executable path: {e}"))?;
     if let Some(dir) = exe_path.parent() {
         Ok(dir.join("portable.ini").is_file())
     } else {
@@ -399,7 +386,9 @@ fn run_tool_lifecycle_silently(command_line: &str, _label: &str) -> Result<(), S
         let inherited = std::env::var("PATH").unwrap_or_default();
         cmd.env("PATH", merge_path_segments(&login_path, &inherited));
     }
-    let output = cmd.output().map_err(|e| format!("启动安装进程失败: {e}"))?;
+    let output = cmd
+        .output()
+        .map_err(|e| format!("Failed to start installer: {e}"))?;
     finish_lifecycle_output(&output)
 }
 
@@ -417,7 +406,7 @@ fn run_tool_lifecycle_silently(command_line: &str, label: &str) -> Result<(), St
 
     let output = windows_lifecycle_command(&bat_file, &effective_path_string()).output();
 
-    finish_lifecycle_output(&output.map_err(|e| format!("启动安装进程失败: {e}"))?)
+    finish_lifecycle_output(&output.map_err(|e| format!("Failed to start installer: {e}"))?)
 }
 
 #[cfg(target_os = "windows")]
@@ -448,7 +437,7 @@ fn finish_lifecycle_output(output: &std::process::Output) -> Result<(), String> 
     };
     let detail = last_lines(raw, 8);
     Err(if detail.is_empty() {
-        format!("命令执行失败 (exit code: {:?})", output.status.code())
+        format!("Command failed (exit code: {:?})", output.status.code())
     } else {
         detail
     })
@@ -2978,6 +2967,12 @@ pub struct ToolInstallation {
     source: String,
     /// 是否为 PATH 解析到的那处（= 命令行默认，也是升级会作用的目标）。
     is_path_default: bool,
+    /// 能否由 cc-switch 卸载这一处：只有认得出包管理器（npm/volta/bun/pnpm/brew）的安装才有
+    /// 卸载命令；原生安装器等无法安全卸载的为 false，前端据此隐藏卸载按钮。
+    can_uninstall: bool,
+    /// `can_uninstall` 为 true 但没有包管理器可调用（如 Cherry Studio 自带的二进制）时，
+    /// 卸载 = 只删这个可执行文件。前端据此换一段更明确的确认文案。
+    uninstall_removes_file: bool,
     /// canonicalize 解析后的真身路径(brew 形如 `Cellar/<formula>/...`、claude 原生形如
     /// `~/.local/share/claude/versions/...`),用于 `anchored_command_from_paths` 的真身
     /// 判定。`enumerate_tool_installations` 已经为去重算过一次,这里复用避免上游
@@ -3357,6 +3352,11 @@ fn enumerate_tool_installations(tool: &str) -> Vec<ToolInstallation> {
             let is_path_default = path_default.as_ref() == Some(&real);
             let path_str = tool_path.display().to_string();
             let source = infer_install_source_for_install(&tool_path, &real);
+            let has_manager_uninstall =
+                uninstall_command_from_paths(tool, &path_str, &real.to_string_lossy()).is_some();
+            let uninstall_removes_file =
+                !has_manager_uninstall && is_removable_user_file(&tool_path);
+            let can_uninstall = has_manager_uninstall || uninstall_removes_file;
 
             installs.push(ToolInstallation {
                 path: path_str,
@@ -3366,6 +3366,8 @@ fn enumerate_tool_installations(tool: &str) -> Vec<ToolInstallation> {
                 exited_with_error,
                 source: source.to_string(),
                 is_path_default,
+                can_uninstall,
+                uninstall_removes_file,
                 // 复用上面 line ~1357 已 canonicalize 的真身,避免下游
                 // installs_anchored_command 再 canonicalize 一遍同一文件。
                 real: real.clone(),
@@ -4093,6 +4095,196 @@ fn anchored_command_from_paths(tool: &str, bin_path: &str, real_target: &str) ->
         });
     }
     package_command
+}
+
+/// 卸载某一处安装的命令：与 `anchored_command_from_paths` 同样锚定到该处所属的包管理器，
+/// 只删这一处、不碰另一处。认不出包管理器（原生安装器、pip、scoop、未知来源）返回 None——
+/// 宁可不给卸载按钮，也不猜一条可能误删别处的命令。纯函数（不碰 FS），便于单测。
+#[cfg(not(target_os = "windows"))]
+fn uninstall_command_from_paths(tool: &str, bin_path: &str, real_target: &str) -> Option<String> {
+    if let Some(cask) = brew_cask_from_path(real_target) {
+        let brew = sibling_bin(bin_path, "brew")?;
+        return Some(format!(
+            "{} uninstall --cask {cask}",
+            quote_path_if_spaced(&brew)
+        ));
+    }
+    if let Some(formula) = brew_formula_from_path(real_target) {
+        let brew = sibling_bin(bin_path, "brew")?;
+        return Some(format!(
+            "{} uninstall {formula}",
+            quote_path_if_spaced(&brew)
+        ));
+    }
+    let pkg = npm_package_for(tool)?;
+    match infer_install_source(Path::new(bin_path)) {
+        "volta" => {
+            let volta = sibling_bin(bin_path, "volta")?;
+            Some(format!("{} uninstall {pkg}", quote_path_if_spaced(&volta)))
+        }
+        "bun" => {
+            let bun = sibling_bin(bin_path, "bun")?;
+            Some(format!("{} remove -g {pkg}", quote_path_if_spaced(&bun)))
+        }
+        "pnpm" => {
+            let pnpm = sibling_bin(bin_path, "pnpm")?;
+            Some(format!("{} remove -g {pkg}", quote_path_if_spaced(&pnpm)))
+        }
+        "nvm" | "fnm" | "mise" | "homebrew" => {
+            anchored_npm_command(bin_path, &format!("uninstall -g {pkg}"))
+        }
+        _ => None,
+    }
+}
+
+/// Windows 版：npm 类（含 `%APPDATA%\npm` 下的 system 安装）走同目录 `npm.cmd`，
+/// 与 `package_manager_anchored_command_from_paths` 的兜底一致；碰 FS 探扩展名。
+#[cfg(target_os = "windows")]
+fn uninstall_command_from_paths(tool: &str, bin_path: &str, _real_target: &str) -> Option<String> {
+    let pkg = npm_package_for(tool)?;
+    match infer_install_source(Path::new(bin_path)) {
+        "volta" => {
+            let volta = sibling_bin_with_ext(bin_path, "volta", &["exe", "cmd"])?;
+            Some(format!(
+                "{} uninstall {pkg}",
+                win_quote_path_for_batch(&volta)
+            ))
+        }
+        "bun" => {
+            let bun = sibling_bin_with_ext(bin_path, "bun", &["exe", "cmd"])?;
+            Some(format!(
+                "{} remove -g {pkg}",
+                win_quote_path_for_batch(&bun)
+            ))
+        }
+        "pnpm" => {
+            let pnpm = sibling_bin_with_ext(bin_path, "pnpm", &["cmd", "exe"])?;
+            Some(format!(
+                "{} remove -g {pkg}",
+                win_quote_path_for_batch(&pnpm)
+            ))
+        }
+        // scoop / pip 由各自的包管理器拥有，npm 卸载够不着。
+        "scoop" | "pip" => None,
+        _ => {
+            if let Some(npm) = sibling_bin_with_ext(bin_path, "npm", &["cmd", "exe"]) {
+                return Some(format!(
+                    "{} uninstall -g {pkg}",
+                    win_quote_path_for_batch(&npm)
+                ));
+            }
+            // npm default global prefix `%APPDATA%\npm` holds only package shims, not npm itself
+            // (npm lives in `Program Files\nodejs`); bare `npm` writes back to that same prefix.
+            let lower = bin_path.replace('/', "\\").to_ascii_lowercase();
+            lower
+                .contains(r"\appdata\roaming\npm\")
+                .then(|| format!("npm uninstall -g {pkg}"))
+        }
+    }
+}
+
+/// 把单条卸载命令包成 `run_tool_lifecycle_silently` 接受的脚本（POSIX bash / Windows .bat）。
+fn uninstall_script(command: &str) -> String {
+    #[cfg(target_os = "windows")]
+    {
+        [
+            "@chcp 65001>nul".to_string(),
+            "@echo off".to_string(),
+            format!("call {command}"),
+            "if errorlevel 1 exit /b %errorlevel%".to_string(),
+        ]
+        .join("\r\n")
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        format!("set -e\n{command}\n")
+    }
+}
+
+/// 卸载工具的某一处安装。只在确有多处安装时可用（卸掉唯一一处等于删掉工具），
+/// 且 `path` 必须是后端自己枚举出来的入口之一——不信任前端传来的任意路径或命令。
+fn uninstall_tool_installation_blocking(tool: &str, path: &str) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    if wsl_distro_for_tool(tool).is_some() {
+        return Err("UNINSTALL_UNSUPPORTED".to_string());
+    }
+    let installs = enumerate_tool_installations(tool);
+    if installs.len() < 2 {
+        return Err("UNINSTALL_ONLY_INSTALL".to_string());
+    }
+    let inst = installs
+        .iter()
+        .find(|i| i.path == path)
+        .ok_or_else(|| "UNINSTALL_NOT_FOUND".to_string())?;
+    if let Some(command) =
+        uninstall_command_from_paths(tool, &inst.path, &inst.real.to_string_lossy())
+    {
+        let managed = run_tool_lifecycle_silently(&uninstall_script(&command), "tool_uninstall");
+        return finish_managed_uninstall(Path::new(&inst.path), managed);
+    }
+    // 没有包管理器认领这一处（如 Cherry Studio 自带的二进制）：只删这个可执行文件。
+    let file = Path::new(&inst.path);
+    if !is_removable_user_file(file) {
+        return Err("UNINSTALL_UNSUPPORTED".to_string());
+    }
+    std::fs::remove_file(file).map_err(|e| delete_error(&inst.path, &e))
+}
+
+/// 删除失败的错误码：Windows 上正在运行的 exe 删不掉（拒绝访问 / 共享冲突），
+/// 给前端一个稳定码提示"先关掉正在运行的它"，而不是一句原始 os error。
+fn delete_error(path: &str, e: &std::io::Error) -> String {
+    let in_use = e.kind() == std::io::ErrorKind::PermissionDenied
+        || matches!(e.raw_os_error(), Some(5) | Some(32));
+    if in_use {
+        "UNINSTALL_IN_USE".to_string()
+    } else {
+        format!("Failed to delete {path}: {e}")
+    }
+}
+
+/// 包管理器卸载后收尾：Windows 上 `bun remove -g` 会留下 `<name>.exe` + `<name>.bunx` 垫片，
+/// 指向已删除的包，探测时就成了"无法运行"的残留。入口还在就补删（含 `.bunx`）；
+/// 包管理器报错但入口已经没了也算成功（目标状态已达成）。
+fn finish_managed_uninstall(entry: &Path, managed: Result<(), String>) -> Result<(), String> {
+    if std::fs::symlink_metadata(entry).is_err() {
+        return Ok(());
+    }
+    if !is_removable_user_file(entry) {
+        return managed.and(Err("UNINSTALL_INCOMPLETE".to_string()));
+    }
+    std::fs::remove_file(entry).map_err(|e| delete_error(&entry.display().to_string(), &e))?;
+    let bunx = entry.with_extension("bunx");
+    if bunx.is_file() {
+        let _ = std::fs::remove_file(&bunx);
+    }
+    Ok(())
+}
+
+/// 允许"直接删文件"的范围：必须是用户主目录下的普通文件或符号链接（不是目录，不在
+/// Program Files / /usr 等系统位置）。路径来自 `enumerate_tool_installations`，不是前端传入。
+fn is_removable_user_file(path: &Path) -> bool {
+    let Some(home) = dirs::home_dir() else {
+        return false;
+    };
+    if !path.starts_with(&home) {
+        return false;
+    }
+    std::fs::symlink_metadata(path)
+        .map(|m| m.is_file() || m.file_type().is_symlink())
+        .unwrap_or(false)
+}
+
+#[tauri::command]
+pub async fn uninstall_tool_installation(tool: String, path: String) -> Result<(), String> {
+    let requested = normalize_requested_tools(std::slice::from_ref(&tool));
+    if requested.is_empty() {
+        return Err("No supported tools selected".to_string());
+    }
+    TOOL_LIFECYCLE
+        .run(requested, move |tools| {
+            uninstall_tool_installation_blocking(tools[0], &path)
+        })
+        .await
 }
 
 /// 从枚举结果里取"命令行实际命中的那处"：优先 `is_path_default`；否则（解析不到
@@ -5003,11 +5195,11 @@ pub async fn open_provider_terminal(
 
     // 获取提供商配置
     let providers = ProviderService::list(state.inner(), app_type.clone())
-        .map_err(|e| format!("获取提供商列表失败: {e}"))?;
+        .map_err(|e| format!("Failed to get provider list: {e}"))?;
 
     let provider = providers
         .get(&providerId)
-        .ok_or_else(|| format!("提供商 {providerId} 不存在"))?;
+        .ok_or_else(|| format!("Provider {providerId} not found"))?;
 
     let launch = match app_type {
         AppType::Agy => {
@@ -5103,17 +5295,21 @@ fn resolve_launch_cwd(cwd: Option<String>) -> Result<Option<PathBuf>, String> {
     };
 
     if raw_path.contains('\n') || raw_path.contains('\r') {
-        return Err("目录路径包含非法换行符".to_string());
+        return Err("Directory path contains an illegal newline".to_string());
     }
 
     let path = Path::new(&raw_path);
     if !path.exists() {
-        return Err(format!("目录不存在: {raw_path}"));
+        return Err(format!("Directory not found: {raw_path}"));
     }
 
-    let resolved = std::fs::canonicalize(path).map_err(|e| format!("解析目录失败: {e}"))?;
+    let resolved =
+        std::fs::canonicalize(path).map_err(|e| format!("Failed to resolve directory: {e}"))?;
     if !resolved.is_dir() {
-        return Err(format!("选择的路径不是文件夹: {}", resolved.display()));
+        return Err(format!(
+            "Selected path is not a directory: {}",
+            resolved.display()
+        ));
     }
 
     #[cfg(target_os = "windows")]
@@ -5531,8 +5727,8 @@ fn write_claude_config(
 
     config_obj.insert("env".to_string(), serde_json::Value::Object(env_obj));
 
-    let config_json =
-        serde_json::to_string_pretty(&config_obj).map_err(|e| format!("序列化配置失败: {e}"))?;
+    let config_json = serde_json::to_string_pretty(&config_obj)
+        .map_err(|e| format!("Failed to serialize config: {e}"))?;
 
     crate::config::atomic_write_private(config_file, config_json.as_bytes())
         .map_err(|e| format!("写入配置文件失败: {e}"))
@@ -5627,12 +5823,12 @@ fn run_terminal_osascript(applescript: &str, terminal_label: &str) -> Result<(),
         .arg("-e")
         .arg(applescript)
         .output()
-        .map_err(|e| format!("执行 osascript 失败: {e}"))?;
+        .map_err(|e| format!("Failed to run osascript: {e}"))?;
 
     if !output.status.success() {
         let stderr = decode_command_output(&output.stderr);
         return Err(format!(
-            "{terminal_label} 执行失败 (exit code: {:?}): {}",
+            "{terminal_label} failed (exit code: {:?}): {}",
             output.status.code(),
             stderr
         ));
@@ -5655,14 +5851,14 @@ fn launch_macos_otty(script_file: &std::path::Path) -> Result<(), String> {
     use std::process::Command;
 
     let otty_cli = find_macos_otty_cli().ok_or_else(|| {
-        "未找到 Otty CLI。请将 Otty 安装到 /Applications 或 ~/Applications。".to_string()
+        "Otty CLI not found. Install Otty to /Applications or ~/Applications.".to_string()
     })?;
 
     let command = build_macos_dash_c_command(script_file);
     let tab_result = Command::new(&otty_cli)
         .args(["tab", "new", "--window", "0", "--command", &command])
         .output()
-        .map_err(|e| format!("启动 Otty CLI 失败: {e}"))?;
+        .map_err(|e| format!("Failed to start Otty CLI: {e}"))?;
 
     if tab_result.status.success() {
         return Ok(());
@@ -5676,13 +5872,13 @@ fn launch_macos_otty(script_file: &std::path::Path) -> Result<(), String> {
     let window_result = Command::new(&otty_cli)
         .args(["open", "--command", &command])
         .output()
-        .map_err(|e| format!("启动 Otty CLI 失败: {e}"))?;
+        .map_err(|e| format!("Failed to start Otty CLI: {e}"))?;
 
     if window_result.status.success() {
         Ok(())
     } else {
         Err(format!(
-            "Otty 新建窗口失败 (exit code: {:?}): {}",
+            "Otty failed to open a new window (exit code: {:?}): {}",
             window_result.status.code(),
             decode_command_output(&window_result.stderr)
         ))
@@ -5830,12 +6026,12 @@ fn launch_macos_open_app(
 
     let output = cmd
         .output()
-        .map_err(|e| format!("启动 {app_name} 失败: {e}"))?;
+        .map_err(|e| format!("Failed to start {app_name}: {e}"))?;
 
     if !output.status.success() {
         let stderr = decode_command_output(&output.stderr);
         return Err(format!(
-            "{} 启动失败 (exit code: {:?}): {}",
+            "{} failed to start (exit code: {:?}): {}",
             app_name,
             output.status.code(),
             stderr
@@ -5883,11 +6079,13 @@ fn launch_macos_warp(script_file: &std::path::Path) -> Result<(), String> {
     let warp_url = warp_url.to_string();
     cmd.arg(warp_url);
 
-    let output = cmd.output().map_err(|e| format!("启动 Warp 失败: {e}"))?;
+    let output = cmd
+        .output()
+        .map_err(|e| format!("Failed to start Warp: {e}"))?;
     if !output.status.success() {
         let stderr = decode_command_output(&output.stderr);
         return Err(format!(
-            "Warp 启动失败 (exit code: {:?}): {}",
+            "Warp failed to start (exit code: {:?}): {}",
             output.status.code(),
             stderr
         ));
@@ -5939,7 +6137,7 @@ fn launch_linux_terminal(script_file: &std::path::Path) -> Result<(), String> {
             .collect()
     };
 
-    let mut last_error = String::from("未找到可用的终端");
+    let mut last_error = String::from("No available terminal found");
 
     for (terminal, args) in terminals_to_try {
         // Check if terminal exists in common paths
@@ -5958,7 +6156,7 @@ fn launch_linux_terminal(script_file: &std::path::Path) -> Result<(), String> {
             match result {
                 Ok(_) => return Ok(()),
                 Err(e) => {
-                    last_error = format!("执行 {} 失败: {}", terminal, e);
+                    last_error = format!("Failed to execute {}: {}", terminal, e);
                 }
             }
         }
@@ -6015,7 +6213,7 @@ fn launch_windows_terminal(launch: &ProviderLaunch, cwd: Option<&Path>) -> Resul
         command = launch.batch_command,
     );
 
-    std::fs::write(&bat_file, &content).map_err(|e| format!("写入批处理文件失败: {e}"))?;
+    std::fs::write(&bat_file, &content).map_err(|e| format!("Failed to write batch file: {e}"))?;
 
     let bat_path = bat_file.to_string_lossy();
     let ps_cmd = format!("& '{}'", bat_path);
@@ -6235,9 +6433,9 @@ read -r _
         use std::os::unix::fs::PermissionsExt;
 
         std::fs::write(&script_file, &script_content)
-            .map_err(|e| format!("写入启动脚本失败: {e}"))?;
+            .map_err(|e| format!("Failed to write startup script: {e}"))?;
         std::fs::set_permissions(&script_file, std::fs::Permissions::from_mode(0o755))
-            .map_err(|e| format!("设置脚本权限失败: {e}"))?;
+            .map_err(|e| format!("Failed to set script permissions: {e}"))?;
 
         let preferred = crate::settings::get_preferred_terminal();
         let terminal = preferred.as_deref().unwrap_or("terminal");
@@ -6271,9 +6469,9 @@ read -r _
         use std::process::Command;
 
         std::fs::write(&script_file, &script_content)
-            .map_err(|e| format!("写入启动脚本失败: {e}"))?;
+            .map_err(|e| format!("Failed to write startup script: {e}"))?;
         std::fs::set_permissions(&script_file, std::fs::Permissions::from_mode(0o755))
-            .map_err(|e| format!("设置脚本权限失败: {e}"))?;
+            .map_err(|e| format!("Failed to set script permissions: {e}"))?;
 
         let preferred = crate::settings::get_preferred_terminal();
         let default_terminals = [
@@ -6307,7 +6505,7 @@ read -r _
                 .collect()
         };
 
-        let mut last_error = String::from("未找到可用的终端");
+        let mut last_error = String::from("No available terminal found");
 
         for (terminal, args) in terminals_to_try {
             let terminal_exists = which_command(terminal)
@@ -6324,7 +6522,7 @@ read -r _
                 match spawn_result {
                     Ok(_) => return Ok(()),
                     Err(e) => {
-                        last_error = format!("执行 {} 失败: {}", terminal, e);
+                        last_error = format!("Failed to execute {}: {}", terminal, e);
                     }
                 }
             }
@@ -6345,7 +6543,8 @@ read -r _
             label = label,
             cmd = command_line,
         );
-        std::fs::write(&bat_file, &content).map_err(|e| format!("写入批处理文件失败: {e}"))?;
+        std::fs::write(&bat_file, &content)
+            .map_err(|e| format!("Failed to write batch file: {e}"))?;
 
         let bat_path = bat_file.to_string_lossy();
         let ps_cmd = format!("& '{}'", bat_path);
@@ -6382,14 +6581,17 @@ read -r _
     #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
     {
         let _ = (temp_dir, pid, command_line, label);
-        Err("不支持的操作系统".to_string())
+        Err("Unsupported operating system".to_string())
     }
 }
 
 /// 设置窗口主题（Windows/macOS 标题栏颜色）
 /// theme: "dark" | "light" | "system"
 #[tauri::command]
-pub async fn set_window_theme(window: tauri::Window, theme: String) -> Result<(), String> {
+pub async fn set_window_theme(
+    window: tauri::Window<crate::AppRuntime>,
+    theme: String,
+) -> Result<(), String> {
     use tauri::Theme;
 
     let tauri_theme = match theme.as_str() {
@@ -7603,6 +7805,8 @@ mod tests {
             exited_with_error: false,
             source: infer_install_source(Path::new(&entry)).to_string(),
             is_path_default: false,
+            can_uninstall: false,
+            uninstall_removes_file: false,
             real: PathBuf::from(&entry),
         }];
         assert_eq!(
@@ -7899,6 +8103,8 @@ mod tests {
                 exited_with_error: false,
                 source: infer_install_source(&path).to_string(),
                 is_path_default: is_default,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 real: path,
             }
         }
@@ -8704,6 +8910,8 @@ mod tests {
                 exited_with_error: false,
                 source: infer_install_source(Path::new(path)).to_string(),
                 is_path_default: is_default,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 // 测试场景下不需要走 fs canonicalize——POSIX 锚定测试关心的是
                 // path/real 都被传给 anchored_command_from_paths 的纯字符串判定,
                 // 已有用例(brew_formula_extraction / claude_native_*)是直接
@@ -9599,6 +9807,8 @@ mod tests {
                 exited_with_error: true,
                 source: "homebrew".to_string(),
                 is_path_default: true,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 real: std::path::PathBuf::from("/opt/homebrew/Cellar/codex/1.2.3/bin/codex"),
             };
             assert_eq!(
@@ -9620,6 +9830,8 @@ mod tests {
                 exited_with_error: true,
                 source: "homebrew".to_string(),
                 is_path_default: true,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 real: std::path::PathBuf::from("/opt/homebrew/Caskroom/codex/0.146.0/bin/codex"),
             };
             assert_eq!(
@@ -9708,6 +9920,8 @@ mod tests {
                 exited_with_error: true,
                 source: "system".to_string(),
                 is_path_default: true,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 real: std::path::PathBuf::from(
                     "/Users/me/.codex/packages/standalone/releases/0.157.0-aarch64-apple-darwin/bin/codex",
                 ),
@@ -9734,6 +9948,8 @@ mod tests {
                     exited_with_error: true,
                     source: infer_install_source(Path::new(bin)).to_string(),
                     is_path_default: true,
+                    can_uninstall: false,
+                    uninstall_removes_file: false,
                     real: std::path::PathBuf::from(
                         "/Users/me/.codex/packages/standalone/releases/0.157.0-aarch64-apple-darwin/bin/codex",
                     ),
@@ -9814,6 +10030,8 @@ mod tests {
                 exited_with_error: false,
                 source: "nvm".to_string(),
                 is_path_default: false,
+                can_uninstall: false,
+                uninstall_removes_file: false,
                 real: std::path::PathBuf::from("/x"),
             };
             // 单处 → 不冲突。
@@ -10733,7 +10951,7 @@ mod tests {
         let error = resolve_launch_cwd(Some(missing.to_string_lossy().into_owned()))
             .expect_err("missing directory should fail");
 
-        assert!(error.contains("目录不存在"));
+        assert!(error.contains("Directory not found"));
     }
 
     #[cfg(target_os = "macos")]
@@ -10967,4 +11185,179 @@ mod tests {
         assert!(unc_command.starts_with("pushd \"%CC_SWITCH_INTERNAL_CWD%\" || exit /b 1\r\n"));
         assert_eq!(unc_env.as_deref(), Some(r"\\server\共享\repo"));
     }
+}
+
+#[cfg(test)]
+mod uninstall_tests {
+    use super::*;
+
+    #[cfg(not(target_os = "windows"))]
+    #[test]
+    fn uninstall_anchors_to_each_package_manager() {
+        assert_eq!(
+            uninstall_command_from_paths("opencode", "/Users/me/.bun/bin/opencode", "/x/opencode")
+                .as_deref(),
+            Some("/Users/me/.bun/bin/bun remove -g opencode-ai")
+        );
+        assert_eq!(
+            uninstall_command_from_paths("codex", "/Users/me/.volta/bin/codex", "/x/codex")
+                .as_deref(),
+            Some("/Users/me/.volta/bin/volta uninstall @openai/codex")
+        );
+        assert_eq!(
+            uninstall_command_from_paths(
+                "gemini",
+                "/opt/homebrew/bin/gemini",
+                "/opt/homebrew/Cellar/gemini-cli/0.13.0/bin/gemini"
+            )
+            .as_deref(),
+            Some("/opt/homebrew/bin/brew uninstall gemini-cli")
+        );
+        assert_eq!(
+            uninstall_command_from_paths(
+                "codex",
+                "/usr/local/bin/codex",
+                "/usr/local/Caskroom/codex/0.146.0/codex"
+            )
+            .as_deref(),
+            Some("/usr/local/bin/brew uninstall --cask codex")
+        );
+        let nvm = uninstall_command_from_paths(
+            "gemini",
+            "/Users/me/.nvm/versions/node/v22/bin/gemini",
+            "/x/gemini",
+        )
+        .unwrap();
+        assert!(nvm
+            .ends_with("/Users/me/.nvm/versions/node/v22/bin/npm uninstall -g @google/gemini-cli"));
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    #[test]
+    fn uninstall_refuses_unknown_or_native_installs() {
+        // native claude installer / system without sibling npm / hermes have no safe uninstall
+        assert!(uninstall_command_from_paths(
+            "claude",
+            "/Users/me/.local/bin/claude",
+            "/Users/me/.local/share/claude/versions/2.1.0"
+        )
+        .is_none());
+        assert!(
+            uninstall_command_from_paths("codex", "/usr/bin/codex", "/usr/bin/codex").is_none()
+        );
+        assert!(
+            uninstall_command_from_paths("hermes", "/Users/me/.bun/bin/hermes", "/x").is_none()
+        );
+    }
+
+    #[cfg(target_os = "windows")]
+    #[test]
+    fn uninstall_windows_uses_sibling_npm_cmd_and_bun() {
+        let dir = tempfile::tempdir().unwrap();
+        let npm_dir = dir.path().join("Roaming").join("npm");
+        let bun_dir = dir.path().join(".bun").join("bin");
+        std::fs::create_dir_all(&npm_dir).unwrap();
+        std::fs::create_dir_all(&bun_dir).unwrap();
+        std::fs::write(npm_dir.join("opencode.cmd"), "").unwrap();
+        std::fs::write(npm_dir.join("npm.cmd"), "").unwrap();
+        std::fs::write(bun_dir.join("opencode.exe"), "").unwrap();
+        std::fs::write(bun_dir.join("bun.exe"), "").unwrap();
+
+        let npm_bin = npm_dir.join("opencode.cmd").to_string_lossy().to_string();
+        let cmd = uninstall_command_from_paths("opencode", &npm_bin, &npm_bin).unwrap();
+        assert!(
+            cmd.contains("npm.cmd") && cmd.ends_with("uninstall -g opencode-ai"),
+            "{cmd}"
+        );
+
+        let bun_bin = bun_dir.join("opencode.exe").to_string_lossy().to_string();
+        let cmd = uninstall_command_from_paths("opencode", &bun_bin, &bun_bin).unwrap();
+        assert!(
+            cmd.contains("bun.exe") && cmd.ends_with("remove -g opencode-ai"),
+            "{cmd}"
+        );
+
+        // default npm prefix holds only package shims; bare npm writes back to it
+        let roaming = dir.path().join("AppData").join("Roaming").join("npm");
+        std::fs::create_dir_all(&roaming).unwrap();
+        std::fs::write(roaming.join("codex.cmd"), "").unwrap();
+        let shim = roaming.join("codex.cmd").to_string_lossy().to_string();
+        assert_eq!(
+            uninstall_command_from_paths("codex", &shim, &shim).as_deref(),
+            Some("npm uninstall -g @openai/codex")
+        );
+
+        // no sibling package manager (native installer) -> no uninstall
+        let native = dir.path().join(".local").join("bin");
+        std::fs::create_dir_all(&native).unwrap();
+        std::fs::write(native.join("claude.exe"), "").unwrap();
+        let native_bin = native.join("claude.exe").to_string_lossy().to_string();
+        assert!(uninstall_command_from_paths("claude", &native_bin, &native_bin).is_none());
+    }
+
+    #[test]
+    fn removable_user_file_is_limited_to_home_regular_files() {
+        let home = dirs::home_dir().expect("home dir");
+        let dir = tempfile::tempdir_in(&home).unwrap();
+        let file = dir.path().join("tool.exe");
+        std::fs::write(&file, "").unwrap();
+        assert!(is_removable_user_file(&file));
+        // directories and missing paths are never removable
+        assert!(!is_removable_user_file(dir.path()));
+        assert!(!is_removable_user_file(&dir.path().join("missing.exe")));
+        // outside the home directory (system locations) is refused
+        #[cfg(target_os = "windows")]
+        assert!(!is_removable_user_file(Path::new(
+            r"C:\Windows\System32\cmd.exe"
+        )));
+        #[cfg(not(target_os = "windows"))]
+        assert!(!is_removable_user_file(Path::new("/bin/sh")));
+    }
+
+    #[test]
+    fn managed_uninstall_removes_stale_shim_left_behind() {
+        let home = dirs::home_dir().expect("home dir");
+        let dir = tempfile::tempdir_in(&home).unwrap();
+        let exe = dir.path().join("opencode.exe");
+        let bunx = dir.path().join("opencode.bunx");
+        std::fs::write(&exe, "").unwrap();
+        std::fs::write(&bunx, "").unwrap();
+        // manager succeeded but left the shim: remove it and its .bunx
+        assert!(finish_managed_uninstall(&exe, Ok(())).is_ok());
+        assert!(!exe.exists() && !bunx.exists());
+        // manager failed but the entry is gone: target state reached
+        assert!(finish_managed_uninstall(&exe, Err("boom".into())).is_ok());
+    }
+
+    #[test]
+    fn delete_error_maps_locked_files_to_in_use() {
+        let denied = std::io::Error::from_raw_os_error(5);
+        assert_eq!(delete_error("x", &denied), "UNINSTALL_IN_USE");
+        let other = std::io::Error::new(std::io::ErrorKind::NotFound, "gone");
+        assert!(delete_error("x", &other).starts_with("Failed to delete x"));
+    }
+
+    #[test]
+    fn uninstall_script_wraps_single_command() {
+        let script = uninstall_script("pm remove x");
+        assert!(script.contains("pm remove x"));
+        #[cfg(not(target_os = "windows"))]
+        assert!(script.starts_with("set -e\n"));
+        #[cfg(target_os = "windows")]
+        assert!(script.contains("call pm remove x\r\nif errorlevel 1"));
+    }
+}
+
+/// Check for updates by opening the releases page.
+#[tauri::command]
+pub async fn check_for_updates(handle: AppHandle) -> Result<bool, String> {
+    handle
+        .opener()
+        .open_url(
+            "https://github.com/farion1231/cc-switch/releases/latest",
+            None::<String>,
+        )
+        .map_err(|e| format!("打开更新页面失败: {e}"))?;
+
+    Ok(true)
 }

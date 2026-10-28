@@ -1,0 +1,3 @@
+# CI places the prebuilt `server.exe` and the `dist/` frontend build here
+# before `npm publish`. The server resolves `dist/` as a sibling of the
+# executable, so both must live in this directory.

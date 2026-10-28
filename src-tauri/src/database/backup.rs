@@ -141,7 +141,7 @@ impl Database {
     pub fn import_sql(&self, source_path: &Path) -> Result<String, AppError> {
         if !source_path.exists() {
             return Err(AppError::InvalidInput(format!(
-                "SQL 文件不存在: {}",
+                "SQL file not found: {}",
                 source_path.display()
             )));
         }
@@ -184,7 +184,7 @@ impl Database {
 
         // 在临时数据库执行导入，确保失败不会污染主库
         let temp_file = NamedTempFile::new().map_err(|e| AppError::IoContext {
-            context: "创建临时数据库文件失败".to_string(),
+            context: "Failed to create temporary database file".to_string(),
             source: e,
         })?;
         let temp_path = temp_file.path().to_path_buf();
@@ -195,7 +195,7 @@ impl Database {
         // SQL import cannot downgrade the main DB from incremental vacuum to NONE.
         temp_conn
             .execute("PRAGMA auto_vacuum = INCREMENTAL;", [])
-            .map_err(|e| AppError::Database(format!("设置暂存库 auto_vacuum 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to set staging auto_vacuum: {e}")))?;
 
         // authorizer 只覆盖外部 SQL，执行完立刻摘掉：紧随其后的
         // `create_tables_on_conn` / `apply_schema_migrations_on_conn` 是本程序自己的
@@ -205,12 +205,13 @@ impl Database {
         temp_conn.authorizer(
             None::<fn(rusqlite::hooks::AuthContext<'_>) -> rusqlite::hooks::Authorization>,
         );
-        batch_result.map_err(|e| AppError::Database(format!("执行 SQL 导入失败: {e}")))?;
+        batch_result
+            .map_err(|e| AppError::Database(format!("Failed to execute SQL import: {e}")))?;
         if !temp_conn.is_autocommit() {
             let _ = temp_conn.execute_batch("ROLLBACK;");
             return Err(AppError::localized(
                 "backup.sql.incomplete_transaction",
-                "SQL 备份事务未完成，文件可能已截断。",
+                "The SQL backup transaction is incomplete; the file may be truncated.",
                 "The SQL backup transaction is incomplete; the file may be truncated.",
             ));
         }
@@ -239,7 +240,7 @@ impl Database {
             }
             let backup = Backup::new(&temp_conn, &mut main_conn)
                 .map_err(|e| AppError::Database(e.to_string()))?;
-            Self::complete_backup(&backup, "替换主数据库")?;
+            Self::complete_backup(&backup, "Replace main database")?;
             backup_path
         };
 
@@ -259,7 +260,7 @@ impl Database {
         {
             let backup =
                 Backup::new(&conn, &mut snapshot).map_err(|e| AppError::Database(e.to_string()))?;
-            Self::complete_backup(&backup, "创建内存数据库快照")?;
+            Self::complete_backup(&backup, "Create in-memory database snapshot")?;
         }
 
         Ok(snapshot)
@@ -268,14 +269,14 @@ impl Database {
     fn complete_backup(backup: &Backup<'_, '_>, context: &str) -> Result<(), AppError> {
         let result = backup
             .step(-1)
-            .map_err(|e| AppError::Database(format!("{context}失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("{context} failed: {e}")))?;
         match result {
             StepResult::Done => Ok(()),
             StepResult::More | StepResult::Busy | StepResult::Locked => Err(AppError::Database(
-                format!("{context}未完成: SQLite Backup 返回 {result:?}"),
+                format!("{context} incomplete: SQLite Backup returned {result:?}"),
             )),
             _ => Err(AppError::Database(format!(
-                "{context}未完成: SQLite Backup 返回未知状态"
+                "{context} incomplete: SQLite Backup returned unknown status"
             ))),
         }
     }
@@ -288,8 +289,8 @@ impl Database {
 
         Err(AppError::localized(
             "backup.sql.invalid_format",
-            "仅支持导入由 CC Switch 导出的 SQL 备份文件。",
-            "Only SQL backups exported by CC Switch are supported.",
+            "Only SQL backups exported by Cli-Switch are supported.",
+            "Only SQL backups exported by Cli-Switch are supported.",
         ))
     }
 
@@ -304,7 +305,7 @@ impl Database {
         // 也不会留下“半张表”的中间状态。
         let tx = target_conn
             .unchecked_transaction()
-            .map_err(|e| AppError::Database(format!("开启恢复事务失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to begin restore transaction: {e}")))?;
 
         for table in tables {
             if !Self::table_exists(source_conn, table)? || !Self::table_exists(&tx, table)? {
@@ -324,7 +325,7 @@ impl Database {
                 .join(", ");
 
             tx.execute(&format!("DELETE FROM {quoted_table}"), [])
-                .map_err(|e| AppError::Database(format!("清空表 {table} 失败: {e}")))?;
+                .map_err(|e| AppError::Database(format!("Failed to clear table {table}: {e}")))?;
 
             let placeholders = (1..=columns.len())
                 .map(|idx| format!("?{idx}"))
@@ -334,16 +335,16 @@ impl Database {
                 format!("INSERT INTO {quoted_table} ({quoted_columns}) VALUES ({placeholders})");
 
             // INSERT 语句每表只 prepare 一次，不再逐行重复解析。
-            let mut insert_stmt = tx
-                .prepare(&insert_sql)
-                .map_err(|e| AppError::Database(format!("准备表 {table} 插入语句失败: {e}")))?;
+            let mut insert_stmt = tx.prepare(&insert_sql).map_err(|e| {
+                AppError::Database(format!("Failed to prepare insert for table {table}: {e}"))
+            })?;
 
             let mut stmt = source_conn
                 .prepare(&format!("SELECT {quoted_columns} FROM {quoted_table}"))
-                .map_err(|e| AppError::Database(format!("读取表 {table} 失败: {e}")))?;
-            let mut rows = stmt
-                .query([])
-                .map_err(|e| AppError::Database(format!("查询表 {table} 数据失败: {e}")))?;
+                .map_err(|e| AppError::Database(format!("Failed to read table {table}: {e}")))?;
+            let mut rows = stmt.query([]).map_err(|e| {
+                AppError::Database(format!("Failed to query data from table {table}: {e}"))
+            })?;
 
             while let Some(row) = rows.next().map_err(|e| AppError::Database(e.to_string()))? {
                 let mut values = Vec::with_capacity(columns.len());
@@ -356,14 +357,17 @@ impl Database {
 
                 insert_stmt
                     .execute(rusqlite::params_from_iter(values.iter()))
-                    .map_err(|e| AppError::Database(format!("恢复表 {table} 数据失败: {e}")))?;
+                    .map_err(|e| {
+                        AppError::Database(format!("Failed to restore data for table {table}: {e}"))
+                    })?;
             }
         }
 
         Self::restore_sqlite_sequences(source_conn, &tx, tables)?;
 
-        tx.commit()
-            .map_err(|e| AppError::Database(format!("提交恢复事务失败: {e}")))?;
+        tx.commit().map_err(|e| {
+            AppError::Database(format!("Failed to commit restore transaction: {e}"))
+        })?;
         Ok(())
     }
 
@@ -383,28 +387,34 @@ impl Database {
                 "SELECT seq FROM sqlite_sequence
                  WHERE name = ?1 ORDER BY rowid DESC LIMIT 1",
             )
-            .map_err(|e| AppError::Database(format!("读取 AUTOINCREMENT 序列失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to read AUTOINCREMENT sequence: {e}"))
+            })?;
         for table in tables {
             target_conn
                 .execute("DELETE FROM sqlite_sequence WHERE name = ?1", [*table])
                 .map_err(|e| {
-                    AppError::Database(format!("清理表 {table} 的 AUTOINCREMENT 序列失败: {e}"))
+                    AppError::Database(format!(
+                        "Failed to clean AUTOINCREMENT sequence for table {table}: {e}"
+                    ))
                 })?;
 
-            let mut rows = source_stmt
-                .query([*table])
-                .map_err(|e| AppError::Database(format!("查询表 {table} 序列失败: {e}")))?;
+            let mut rows = source_stmt.query([*table]).map_err(|e| {
+                AppError::Database(format!("Failed to query sequence for table {table}: {e}"))
+            })?;
             if let Some(row) = rows.next().map_err(|e| AppError::Database(e.to_string()))? {
-                let sequence = row
-                    .get::<_, rusqlite::types::Value>(0)
-                    .map_err(|e| AppError::Database(format!("解析表 {table} 序列失败: {e}")))?;
+                let sequence = row.get::<_, rusqlite::types::Value>(0).map_err(|e| {
+                    AppError::Database(format!("Failed to parse sequence for table {table}: {e}"))
+                })?;
                 target_conn
                     .execute(
                         "INSERT INTO sqlite_sequence (name, seq) VALUES (?1, ?2)",
                         rusqlite::params![table, sequence],
                     )
                     .map_err(|e| {
-                        AppError::Database(format!("恢复表 {table} 的 AUTOINCREMENT 序列失败: {e}"))
+                        AppError::Database(format!(
+                            "Failed to restore AUTOINCREMENT sequence for table {table}: {e}"
+                        ))
                     })?;
             }
         }
@@ -519,7 +529,7 @@ impl Database {
 
         let backup_dir = db_path
             .parent()
-            .ok_or_else(|| AppError::Config("无效的数据库路径".to_string()))?
+            .ok_or_else(|| AppError::Config("Invalid database path".to_string()))?
             .join("backups");
 
         fs::create_dir_all(&backup_dir).map_err(|e| AppError::io(&backup_dir, e))?;
@@ -543,12 +553,12 @@ impl Database {
             Connection::open(temp_db_path).map_err(|e| AppError::Database(e.to_string()))?;
         let backup = Backup::new(source_conn, &mut dest_conn)
             .map_err(|e| AppError::Database(e.to_string()))?;
-        Self::complete_backup(&backup, "创建数据库安全备份")?;
+        Self::complete_backup(&backup, "Create database safety backup")?;
         drop(backup);
         Self::validate_sqlite_integrity(&dest_conn)?;
-        dest_conn
-            .close()
-            .map_err(|(_, e)| AppError::Database(format!("关闭数据库安全备份失败: {e}")))?;
+        dest_conn.close().map_err(|(_, e)| {
+            AppError::Database(format!("Failed to close database safety backup: {e}"))
+        })?;
         before_publish(temp_db_path, &backup_path)?;
 
         loop {
@@ -650,12 +660,12 @@ impl Database {
     fn validate_sqlite_integrity(conn: &Connection) -> Result<(), AppError> {
         let mut stmt = conn
             .prepare("PRAGMA quick_check;")
-            .map_err(|e| AppError::Database(format!("检查数据库完整性失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to check database integrity: {e}")))?;
         let results = stmt
             .query_map([], |row| row.get::<_, String>(0))
-            .map_err(|e| AppError::Database(format!("检查数据库完整性失败: {e}")))?
+            .map_err(|e| AppError::Database(format!("Failed to check database integrity: {e}")))?
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|e| AppError::Database(format!("检查数据库完整性失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to check database integrity: {e}")))?;
 
         if results.len() == 1 && results[0].eq_ignore_ascii_case("ok") {
             return Ok(());
@@ -663,7 +673,10 @@ impl Database {
 
         Err(AppError::localized(
             "backup.db.integrity_failed",
-            format!("数据库备份完整性检查失败: {}", results.join("; ")),
+            format!(
+                "Database backup integrity check failed: {}",
+                results.join("; ")
+            ),
             format!(
                 "Database backup integrity check failed: {}",
                 results.join("; ")
@@ -698,7 +711,7 @@ impl Database {
             let names = missing.join(", ");
             return Err(AppError::localized(
                 "backup.sql.invalid_schema",
-                format!("导入的 SQL 缺少 CC Switch 必需表：{names}"),
+                format!("Imported SQL is missing required CC Switch tables: {names}"),
                 format!("The imported SQL is missing required CC Switch tables: {names}"),
             ));
         }
@@ -853,21 +866,23 @@ impl Database {
 
         let mut stmt = conn
             .prepare("SELECT name, seq FROM sqlite_sequence ORDER BY name")
-            .map_err(|e| AppError::Database(format!("读取 AUTOINCREMENT 序列失败: {e}")))?;
-        let mut rows = stmt
-            .query([])
-            .map_err(|e| AppError::Database(format!("查询 AUTOINCREMENT 序列失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to read AUTOINCREMENT sequence: {e}"))
+            })?;
+        let mut rows = stmt.query([]).map_err(|e| {
+            AppError::Database(format!("Failed to query AUTOINCREMENT sequence: {e}"))
+        })?;
         let mut values = Vec::new();
         while let Some(row) = rows.next().map_err(|e| AppError::Database(e.to_string()))? {
-            let table: String = row
-                .get(0)
-                .map_err(|e| AppError::Database(format!("解析 AUTOINCREMENT 表名失败: {e}")))?;
+            let table: String = row.get(0).map_err(|e| {
+                AppError::Database(format!("Failed to parse AUTOINCREMENT table name: {e}"))
+            })?;
             if skip_tables.iter().any(|skipped| *skipped == table) {
                 continue;
             }
-            let sequence = row
-                .get_ref(1)
-                .map_err(|e| AppError::Database(format!("解析表 {table} 序列失败: {e}")))?;
+            let sequence = row.get_ref(1).map_err(|e| {
+                AppError::Database(format!("Failed to parse sequence for table {table}: {e}"))
+            })?;
             values.push(format!(
                 "({}, {})",
                 Self::format_sql_value(ValueRef::Text(table.as_bytes()))?,
@@ -1046,7 +1061,7 @@ impl Database {
         // connection. A corrupt/future-schema backup or failed migration must
         // leave the current database unchanged.
         let temp_file = NamedTempFile::new().map_err(|e| AppError::IoContext {
-            context: "创建数据库恢复暂存文件失败".to_string(),
+            context: "Failed to create database restore staging file".to_string(),
             source: e,
         })?;
         let mut staging_conn =
@@ -1054,7 +1069,7 @@ impl Database {
         {
             let backup = Backup::new(&source_conn, &mut staging_conn)
                 .map_err(|e| AppError::Database(e.to_string()))?;
-            Self::complete_backup(&backup, "读取数据库备份")?;
+            Self::complete_backup(&backup, "Read database backup")?;
         }
         drop(source_conn);
 
@@ -1078,7 +1093,7 @@ impl Database {
             before_replace(safety_backup.as_deref())?;
             let backup = Backup::new(&staging_conn, &mut main_conn)
                 .map_err(|e| AppError::Database(e.to_string()))?;
-            Self::complete_backup(&backup, "恢复主数据库")?;
+            Self::complete_backup(&backup, "Restore main database")?;
             safety_backup
         };
         let safety_id = safety_backup
@@ -1458,7 +1473,7 @@ mod tests {
             .expect_err("缺少原始 schema 的文件必须被拒绝");
         assert!(
             error.to_string().contains("required CC Switch tables")
-                || error.to_string().contains("CC Switch 必需表"),
+                || error.to_string().contains("required CC Switch tables"),
             "应由原始 schema 校验拒绝，实际错误: {error}"
         );
 
@@ -3062,8 +3077,8 @@ mod tests {
             .expect_err("future-schema backup must be rejected");
         assert!(
             error.to_string().contains("newer")
-                || error.to_string().contains("过新")
-                || error.to_string().contains("版本"),
+                || error.to_string().contains("too new")
+                || error.to_string().contains("version"),
             "unexpected error: {error}"
         );
 

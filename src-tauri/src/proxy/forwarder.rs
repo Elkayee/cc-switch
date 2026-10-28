@@ -179,12 +179,12 @@ fn validate_codex_official_authorization(
         .map(str::trim);
     match authorization {
         None | Some("") => Err(ProxyError::AuthError(
-            "Codex 官方登录不可用，请先在 Codex 中完成 ChatGPT 登录".to_string(),
+            "Official Codex login is unavailable; complete ChatGPT login in Codex first".to_string(),
         )),
         // 带占位 Key 的请求有两种来源：没重载配置的 Codex 进程；或切换前用第三方供应商建的
         // 旧会话（Codex 按会话记下的 provider 走休眠的 custom 表，重启也还是它）。
         Some(value) if value.contains(PROXY_AUTH_PLACEHOLDER) => Err(ProxyError::AuthError(
-            "已切换到 OpenAI 官方供应商，但这个请求仍按第三方供应商的配置发出。如果这是切换前用第三方供应商创建的旧会话，它会一直沿用原供应商，重启也无效，请新建会话继续；否则请重启 Codex 以加载官方登录配置".to_string(),
+            "Switched to the official OpenAI provider, but this request was still sent with the third-party provider's configuration. If this is an older session created with a third-party provider before the switch, it keeps using the original provider and restarting will not help; start a new session to continue. Otherwise restart Codex to load the official login config".to_string(),
         )),
         Some(_) => {
             let managed_account_id = provider
@@ -203,7 +203,7 @@ fn validate_codex_official_authorization(
                     || managed_session_matches != Some(true)
                 {
                     return Err(ProxyError::AuthError(
-                        "当前 Codex 会话未加载所选 ChatGPT 账号，请重启 Codex 或新建会话后重试"
+                        "This Codex session has not loaded the selected ChatGPT account; restart Codex or start a new session and retry"
                             .to_string(),
                     ));
                 }
@@ -349,7 +349,7 @@ pub struct RequestForwarder {
     /// 故障转移切换管理器
     failover_manager: Arc<FailoverSwitchManager>,
     /// AppHandle，用于发射事件和更新托盘
-    app_handle: Option<tauri::AppHandle>,
+    app_handle: Option<tauri::AppHandle<crate::AppRuntime>>,
     /// 请求开始时的"当前供应商 ID"（用于判断是否需要同步 UI/托盘）
     current_provider_id_at_start: String,
     /// 代理会话 ID（用于 Gemini Native shadow replay）
@@ -375,6 +375,8 @@ pub struct RequestForwarder {
     /// Stack 模型的请求（`mode::stack`）：挂在结构体上，整流器重试再次调用 `forward()` 时照样
     /// 生效。见 [`Self::routing_state_enabled`]。
     stack_request: bool,
+    /// Provider id in the path. Does not write In Use, but still records circuit results.
+    pinned_request: bool,
 }
 
 impl RequestForwarder {
@@ -456,7 +458,7 @@ impl RequestForwarder {
         gemini_shadow: Arc<GeminiShadowStore>,
         codex_chat_history: Arc<CodexChatHistoryStore>,
         failover_manager: Arc<FailoverSwitchManager>,
-        app_handle: Option<tauri::AppHandle>,
+        app_handle: Option<tauri::AppHandle<crate::AppRuntime>>,
         current_provider_id_at_start: String,
         session_id: String,
         session_client_provided: bool,
@@ -490,6 +492,7 @@ impl RequestForwarder {
             ),
             max_attempts,
             stack_request: false,
+            pinned_request: false,
         }
     }
 
@@ -499,10 +502,19 @@ impl RequestForwarder {
         self
     }
 
+    pub fn pinned_request(mut self, pinned_request: bool) -> Self {
+        self.pinned_request = pinned_request;
+        self
+    }
+
     /// 这个请求读写路由状态吗：熔断器（许可、结果、健康度）、「正在使用」、代理统计
     /// （总数、成功率、故障转移次数、最近错误、活跃连接）、故障转移切换。Stack 模型的请求
     /// 和普通路由完全分开，一律不碰；只有用量日志照常按供应商记。以后新增路由状态也先问它。
     fn routing_state_enabled(&self) -> bool {
+        !self.stack_request && !self.pinned_request
+    }
+
+    fn records_circuit(&self) -> bool {
         !self.stack_request
     }
 
@@ -629,14 +641,13 @@ impl RequestForwarder {
             outbound_model,
             connection_guard: None,
         };
+        if self.records_circuit() {
+            self.record_success_result(&provider.id, app_type_str, used_half_open_permit)
+                .await;
+        }
         if !self.routing_state_enabled() {
             return result;
         }
-
-        // 普通闭合熔断状态异步记录，避免阻塞流式首包返回；
-        // HalfOpen 探测仍同步等待，保证 permit 与熔断状态及时释放。
-        self.record_success_result(&provider.id, app_type_str, used_half_open_permit)
-            .await;
 
         {
             let mut current_providers = self.current_providers.write().await;
@@ -677,20 +688,21 @@ impl RequestForwarder {
         error: &ProxyError,
         last_error: String,
     ) {
-        if !self.routing_state_enabled() {
-            return;
+        if self.records_circuit() {
+            let _ = self
+                .router
+                .record_result(
+                    &provider.id,
+                    app_type_str,
+                    used_half_open_permit,
+                    false,
+                    Some(error.to_string()),
+                )
+                .await;
         }
-        let _ = self
-            .router
-            .record_result(
-                &provider.id,
-                app_type_str,
-                used_half_open_permit,
-                false,
-                Some(error.to_string()),
-            )
-            .await;
-        self.status.write().await.last_error = Some(last_error);
+        if self.routing_state_enabled() {
+            self.status.write().await.last_error = Some(last_error);
+        }
     }
 
     /// 不计入熔断的失败（客户端错误、整流后仍被拒）：只释放 HalfOpen 名额，这个请求记为失败。
@@ -1422,7 +1434,9 @@ impl RequestForwarder {
             {
                 Some(local_account_id) => {
                     let app_handle = self.app_handle.as_ref().ok_or_else(|| {
-                        ProxyError::AuthError("Codex OAuth 认证不可用（无 AppHandle）".to_string())
+                        ProxyError::AuthError(
+                            "Codex OAuth is unavailable (no AppHandle)".to_string(),
+                        )
                     })?;
                     let codex_state = app_handle.state::<CodexOAuthState>();
                     let chatgpt_account_id = codex_state
@@ -1430,7 +1444,9 @@ impl RequestForwarder {
                         .chatgpt_account_id_for_account(&local_account_id)
                         .await
                         .map_err(|error| {
-                            ProxyError::AuthError(format!("Codex OAuth 账号解析失败: {error}"))
+                            ProxyError::AuthError(format!(
+                                "Failed to Codex OAuth account parse: {error}"
+                            ))
                         })?;
                     let session_matches = match codex_bearer_access_token(headers) {
                         Some(access_token) => {
@@ -1439,7 +1455,9 @@ impl RequestForwarder {
                                 access_token,
                             )
                             .map_err(|error| {
-                                ProxyError::AuthError(format!("Codex OAuth 会话校验失败: {error}"))
+                                ProxyError::AuthError(format!(
+                                    "Codex OAuth session validation failed: {error}"
+                                ))
                             })?
                         }
                         None => false,
@@ -2136,18 +2154,18 @@ impl RequestForwarder {
                         }
                         Err(e) => {
                             log::error!(
-                                "[Copilot] 获取 Copilot token 失败 (account={}): {e}",
+                                "Failed to [Copilot] get Copilot token (account={}): {e}",
                                 account_id.as_deref().unwrap_or("default")
                             );
                             return Err(ProxyError::AuthError(format!(
-                                "GitHub Copilot 认证失败: {e}"
+                                "Failed to GitHub Copilot auth: {e}"
                             )));
                         }
                     }
                 } else {
                     log::error!("[Copilot] AppHandle 不可用");
                     return Err(ProxyError::AuthError(
-                        "GitHub Copilot 认证不可用（无 AppHandle）".to_string(),
+                        "GitHub Copilot auth is unavailable (no AppHandle)".to_string(),
                     ));
                 }
             }
@@ -2176,7 +2194,7 @@ impl RequestForwarder {
                         }
                         None => {
                             return Err(ProxyError::AuthError(
-                                "Codex OAuth 认证失败: 无可用的 ChatGPT 账号".to_string(),
+                                "Codex OAuth failed: no ChatGPT account available".to_string(),
                             ));
                         }
                     };
@@ -2193,7 +2211,7 @@ impl RequestForwarder {
                                         .await
                                         .map_err(|e| {
                                             ProxyError::AuthError(format!(
-                                                "Codex OAuth 账号解析失败: {e}"
+                                                "Failed to Codex OAuth account parse: {e}"
                                             ))
                                         })?,
                                 ),
@@ -2207,14 +2225,14 @@ impl RequestForwarder {
                         Err(e) => {
                             log::error!("[CodexOAuth] 获取 access_token 失败: {e}");
                             return Err(ProxyError::AuthError(format!(
-                                "Codex OAuth 认证失败: {e}"
+                                "Failed to Codex OAuth auth: {e}"
                             )));
                         }
                     }
                 } else {
                     log::error!("[CodexOAuth] AppHandle 不可用");
                     return Err(ProxyError::AuthError(
-                        "Codex OAuth 认证不可用（无 AppHandle）".to_string(),
+                        "Codex OAuth is unavailable (no AppHandle)".to_string(),
                     ));
                 }
             }
@@ -2227,10 +2245,14 @@ impl RequestForwarder {
                     let xai_state = app_handle.state::<XaiOAuthState>();
                     let xai_auth: tokio::sync::RwLockReadGuard<'_, XaiOAuthManager> =
                         xai_state.0.read().await;
-                    let account_id = provider
-                        .meta
-                        .as_ref()
-                        .and_then(|meta| meta.managed_account_id_for("xai_oauth"));
+                    let account_id = xai_auth
+                        .account_id_for_provider(
+                            provider
+                                .meta
+                                .as_ref()
+                                .and_then(|meta| meta.managed_account_id_for("xai_oauth")),
+                        )
+                        .await;
                     let token_result = match &account_id {
                         Some(id) => xai_auth.get_valid_token_for_account(id).await,
                         None => xai_auth.get_valid_token().await,
@@ -2246,13 +2268,13 @@ impl RequestForwarder {
                         Err(error) => {
                             log::error!("[XaiOAuth] 获取 access_token 失败: {error}");
                             return Err(ProxyError::AuthError(format!(
-                                "xAI OAuth 认证失败: {error}"
+                                "Failed to xAI OAuth auth: {error}"
                             )));
                         }
                     }
                 } else {
                     return Err(ProxyError::AuthError(
-                        "xAI OAuth 认证不可用（无 AppHandle）".to_string(),
+                        "xAI OAuth is unavailable (no AppHandle)".to_string(),
                     ));
                 }
             }
@@ -2771,7 +2793,7 @@ impl RequestForwarder {
                     .await
                     .map_err(|_| {
                         ProxyError::Timeout(format!(
-                            "流式响应首包超时: {}s（上游未返回响应头）",
+                            "Stream first-byte timeout: {}s (upstream sent no headers)",
                             header_timeout.as_secs()
                         ))
                     })?
@@ -2896,7 +2918,7 @@ impl RequestForwarder {
         .await
         .map_err(|_| {
             ProxyError::Timeout(format!(
-                "响应体读取超时: {}s（上游发完响应头后 body 未到达）",
+                "Response body read timed out: {}s (headers received, body never arrived)",
                 body_timeout.as_secs()
             ))
         })??;
@@ -3120,19 +3142,20 @@ impl RequestForwarder {
             .await
             .map_err(|_| {
                 ProxyError::Timeout(format!(
-                    "流式响应首包超时: {}s（上游已返回响应头但未返回数据）",
+                    "Stream first-byte timeout: {}s (headers received, no data)",
                     timeout.as_secs()
                 ))
             })?;
 
         let Some(first) = first else {
             return Err(ProxyError::ForwardFailed(
-                "流式响应在首包到达前结束".to_string(),
+                "Stream ended before the first byte arrived".to_string(),
             ));
         };
 
-        let first =
-            first.map_err(|e| ProxyError::ForwardFailed(format!("读取流式响应首包失败: {e}")))?;
+        let first = first.map_err(|e| {
+            ProxyError::ForwardFailed(format!("Failed to read first stream chunk: {e}"))
+        })?;
 
         let replay = futures::stream::once(async move { Ok(first) }).chain(stream);
         Ok(ProxyResponse::streamed(status, headers, replay))
@@ -3390,13 +3413,13 @@ fn build_retryable_failure_log(
     if total_providers <= 1 {
         (
             log_fwd::SINGLE_PROVIDER_FAILED,
-            format!("Provider {provider_name} 请求失败: {error_summary}"),
+            format!("Provider {provider_name} request failed: {error_summary}"),
         )
     } else {
         (
             log_fwd::PROVIDER_FAILED_RETRY,
             format!(
-                "Provider {provider_name} 失败，继续尝试下一个 ({attempted_providers}/{total_providers}): {error_summary}"
+                "Provider {provider_name} failed, trying next ({attempted_providers}/{total_providers}): {error_summary}"
             ),
         )
     }
@@ -3413,12 +3436,12 @@ fn build_terminal_failure_log(
 
     let error_summary = last_error
         .map(summarize_proxy_error)
-        .unwrap_or_else(|| "未知错误".to_string());
+        .unwrap_or_else(|| "unknown error".to_string());
 
     Some((
         log_fwd::ALL_PROVIDERS_FAILED,
         format!(
-            "已尝试 {attempted_providers}/{total_providers} 个 Provider，均失败。最后错误: {error_summary}"
+            "Tried {attempted_providers}/{total_providers} providers; all failed. Last error: {error_summary}"
         ),
     ))
 }
@@ -3432,24 +3455,36 @@ fn summarize_proxy_error(error: &ProxyError) -> String {
                 .filter(|summary| !summary.is_empty());
 
             match body_summary {
-                Some(summary) => format!("上游 HTTP {status}: {summary}"),
-                None => format!("上游 HTTP {status}"),
+                Some(summary) => format!("upstream HTTP {status}: {summary}"),
+                None => format!("upstream HTTP {status}"),
             }
         }
         ProxyError::Timeout(message) => {
-            format!("请求超时: {}", summarize_text_for_log(message, 180))
+            format!(
+                "Request timed out: {}",
+                summarize_text_for_log(message, 180)
+            )
         }
         ProxyError::ForwardFailed(message) => {
-            format!("请求转发失败: {}", summarize_text_for_log(message, 180))
+            format!(
+                "Request forward failed: {}",
+                summarize_text_for_log(message, 180)
+            )
         }
         ProxyError::TransformError(message) => {
-            format!("响应转换失败: {}", summarize_text_for_log(message, 180))
+            format!(
+                "Response transform failed: {}",
+                summarize_text_for_log(message, 180)
+            )
         }
         ProxyError::ConfigError(message) => {
-            format!("配置错误: {}", summarize_text_for_log(message, 180))
+            format!("Config error: {}", summarize_text_for_log(message, 180))
         }
         ProxyError::AuthError(message) => {
-            format!("认证失败: {}", summarize_text_for_log(message, 180))
+            format!(
+                "Authentication failed: {}",
+                summarize_text_for_log(message, 180)
+            )
         }
         _ => summarize_text_for_log(&error.to_string(), 180),
     }
@@ -4761,6 +4796,7 @@ mod tests {
             streaming_first_byte_timeout,
             max_attempts: 1,
             stack_request: false,
+            pinned_request: false,
         }
     }
 
@@ -4813,11 +4849,11 @@ mod tests {
         let (code, message) = build_retryable_failure_log("PackyCode-response", 1, 1, &error);
 
         assert_eq!(code, log_fwd::SINGLE_PROVIDER_FAILED);
-        assert!(message.contains("Provider PackyCode-response 请求失败"));
-        assert!(message.contains("上游 HTTP 429"));
-        // 上游错误消息保留(截断)，用于诊断失败原因。
+        assert!(message.contains("Provider PackyCode-response request failed"));
+        assert!(message.contains("upstream HTTP 429"));
+        // Keep the upstream error text (truncated) for diagnosis.
         assert!(message.contains("rate limit exceeded"));
-        assert!(!message.contains("切换下一个"));
+        assert!(!message.contains("trying next"));
     }
 
     #[test]
@@ -4827,8 +4863,8 @@ mod tests {
         let (code, message) = build_retryable_failure_log("primary", 1, 3, &error);
 
         assert_eq!(code, log_fwd::PROVIDER_FAILED_RETRY);
-        assert!(message.contains("继续尝试下一个 (1/3)"));
-        assert!(message.contains("请求超时"));
+        assert!(message.contains("trying next (1/3)"));
+        assert!(message.contains("Request timed out"));
     }
 
     #[test]
@@ -4844,7 +4880,7 @@ mod tests {
             build_terminal_failure_log(2, 2, Some(&error)).expect("expected terminal log");
 
         assert_eq!(code, log_fwd::ALL_PROVIDERS_FAILED);
-        assert!(message.contains("已尝试 2/2 个 Provider，均失败"));
+        assert!(message.contains("Tried 2/2 providers; all failed"));
         assert!(message.contains("connection reset by peer"));
     }
 
@@ -5599,7 +5635,7 @@ mod tests {
         // 本地取 token 失败 = 账号级问题（需重新登录），failover 无济于事
         assert_eq!(
             forwarder.categorize_proxy_error(
-                &ProxyError::AuthError("xAI OAuth 认证失败".to_string()),
+                &ProxyError::AuthError("xAI OAuth authentication failed".to_string()),
                 &provider,
             ),
             ErrorCategory::NonRetryable
@@ -5632,7 +5668,7 @@ mod tests {
         assert!(matches!(
             error,
             ProxyError::AuthError(message)
-                if message.contains("重启 Codex") && message.contains("新建会话")
+                if message.contains("restart Codex") && message.contains("new session")
         ));
     }
 
@@ -5663,7 +5699,9 @@ mod tests {
             Some(false),
         )
         .expect_err("another user's bearer in the same workspace must be rejected");
-        assert!(matches!(error, ProxyError::AuthError(message) if message.contains("重启 Codex")));
+        assert!(
+            matches!(error, ProxyError::AuthError(message) if message.contains("restart Codex"))
+        );
 
         validate_codex_official_authorization(
             &headers,

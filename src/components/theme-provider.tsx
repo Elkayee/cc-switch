@@ -8,6 +8,7 @@ import React, {
 import { invoke } from "@tauri-apps/api/core";
 
 type Theme = "light" | "dark" | "system";
+type AdeTheme = "light" | "dark";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -25,28 +26,81 @@ const ThemeProviderContext = createContext<ThemeContextValue | undefined>(
 );
 
 /**
- * 切换 html 上的 light / dark。切换期间暂停所有过渡（`.theme-switching`），
- * 否则各处的 transition-colors 会让颜色一块块慢慢变过去。
+ * Apply Spec ADE / app resolved theme classes on <html>.
+ * Keeps `.dark`/`.light` (Tailwind) and `.ade-theme-*` (ADE bridge) in sync.
  */
-function applyColorScheme(isDark: boolean) {
-  const root = window.document.documentElement;
+export function applyAdeTheme(theme: AdeTheme) {
+  if (theme !== "light" && theme !== "dark") return;
+  if (typeof document === "undefined") return;
+
+  const root = document.documentElement;
+  const adeClass = theme === "light" ? "ade-theme-light" : "ade-theme-dark";
   if (
-    root.classList.contains("dark") === isDark &&
-    root.classList.contains("light") === !isDark
+    root.classList.contains(theme) &&
+    root.classList.contains(adeClass) &&
+    !root.classList.contains(theme === "light" ? "dark" : "light")
   ) {
     return;
   }
+
+  // 切换期间暂停所有过渡（`.theme-switching`），否则各处的 transition-colors
+  // 会让颜色一块块慢慢变过去。
   root.classList.add("theme-switching");
-  root.classList.toggle("dark", isDark);
-  root.classList.toggle("light", !isDark);
+  root.classList.remove("light", "dark", "ade-theme-dark", "ade-theme-light");
+  root.classList.add(theme);
+  root.classList.add(adeClass);
   // 强制重排一次，让不带过渡的新颜色先落定，再在第二帧恢复过渡。
-  void window.document.body?.offsetHeight;
-  window.requestAnimationFrame(() => {
+  void document.body?.offsetHeight;
+  if (typeof window !== "undefined" && window.requestAnimationFrame) {
     window.requestAnimationFrame(() => {
-      root.classList.remove("theme-switching");
+      window.requestAnimationFrame(() => {
+        root.classList.remove("theme-switching");
+      });
     });
-  });
+  } else {
+    root.classList.remove("theme-switching");
+  }
 }
+
+function resolveSystemTheme(): AdeTheme {
+  if (typeof window === "undefined" || !window.matchMedia) {
+    return "dark";
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function readAdeThemeQuery(): AdeTheme | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const param = new URLSearchParams(window.location.search).get("ade-theme");
+    if (param === "light" || param === "dark") return param;
+  } catch {
+    // ignore malformed URL
+  }
+  return null;
+}
+
+/** First-paint boot: honor ?ade-theme= or an existing ADE class before React mounts. */
+export function bootAdeTheme() {
+  if (typeof document === "undefined") return;
+
+  const root = document.documentElement;
+  const fromQuery = readAdeThemeQuery();
+  const theme: AdeTheme | null =
+    fromQuery ??
+    (root.classList.contains("ade-theme-light")
+      ? "light"
+      : root.classList.contains("ade-theme-dark")
+        ? "dark"
+        : null);
+
+  if (theme) applyAdeTheme(theme);
+}
+
+// Run once at module load for first paint / embed boot.
+bootAdeTheme();
 
 export function ThemeProvider({
   children,
@@ -57,6 +111,10 @@ export function ThemeProvider({
     if (typeof window === "undefined") {
       return defaultTheme;
     }
+
+    // Host/query ADE theme wins over stored preference for embed first paint.
+    const adeQuery = readAdeThemeQuery();
+    if (adeQuery) return adeQuery;
 
     const stored = window.localStorage.getItem(storageKey) as Theme | null;
     if (stored === "light" || stored === "dark" || stored === "system") {
@@ -76,19 +134,21 @@ export function ThemeProvider({
     window.localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
+  // Resolve app theme → ADE/Tailwind classes
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    const isDark =
-      theme === "system"
-        ? window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches
-        : theme === "dark";
-    applyColorScheme(isDark);
+    if (theme === "system") {
+      applyAdeTheme(resolveSystemTheme());
+      return;
+    }
+
+    applyAdeTheme(theme);
   }, [theme]);
 
+  // Follow OS theme when preference is "system"
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
@@ -99,8 +159,7 @@ export function ThemeProvider({
       if (theme !== "system") {
         return;
       }
-
-      applyColorScheme(mediaQuery.matches);
+      applyAdeTheme(mediaQuery.matches ? "dark" : "light");
     };
 
     if (theme === "system") {
@@ -110,6 +169,29 @@ export function ThemeProvider({
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);
+
+  // Spec ADE host theme messages (iframe embed live switch)
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const onMessage = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || data.source !== "spec-ade" || data.type !== "ade:theme") {
+        return;
+      }
+      if (data.theme !== "light" && data.theme !== "dark") {
+        return;
+      }
+      // Host theme is authoritative while embedded — pin to explicit light/dark.
+      setThemeState(data.theme);
+      applyAdeTheme(data.theme);
+    };
+
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
 
   // Sync native window theme (Windows/macOS title bar)
   useEffect(() => {

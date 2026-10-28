@@ -49,7 +49,7 @@ export const GeminiEnvSection: React.FC<GeminiEnvSectionProps> = ({
     <div className="space-y-2">
       <label
         htmlFor="geminiEnv"
-        className="block text-sm font-medium text-fg-1"
+        className="block text-ui font-medium text-foreground"
       >
         {isAgy
           ? t("provider.form.agy.envFile")
@@ -68,10 +68,12 @@ GEMINI_MODEL=gemini-3.6-flash`}
         language="javascript"
       />
 
-      {error && <p className="text-xs text-danger-text">{error}</p>}
+      {error && (
+        <p className="text-ui text-red-500 dark:text-red-400">{error}</p>
+      )}
 
       {!error && (
-        <p className="text-xs text-fg-2">
+        <p className="text-ui text-muted-foreground">
           {isAgy
             ? t("provider.form.agy.envFileHint")
             : t("geminiConfig.envFileHint", {
@@ -121,7 +123,7 @@ export const GeminiConfigSection: React.FC<GeminiConfigSectionProps> = ({
     <div className="space-y-2">
       <label
         htmlFor="geminiConfig"
-        className="block text-sm font-medium text-fg-1"
+        className="block text-ui font-medium text-foreground"
       >
         {isAgy
           ? t("provider.form.agy.configJson")
@@ -147,10 +149,12 @@ export const GeminiConfigSection: React.FC<GeminiConfigSectionProps> = ({
         language="json"
       />
 
-      {configError && <p className="text-xs text-danger-text">{configError}</p>}
+      {configError && (
+        <p className="text-ui text-red-500 dark:text-red-400">{configError}</p>
+      )}
 
       {!configError && (
-        <p className="text-xs text-fg-2">
+        <p className="text-ui text-muted-foreground">
           {isAgy
             ? t("provider.form.agy.configJsonHint")
             : t("geminiConfig.configJsonHint", {

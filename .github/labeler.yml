@@ -34,8 +34,7 @@ dependencies:
   - changed-files:
       - any-glob-to-any-file:
           - "package.json"
-          - "pnpm-lock.yaml"
-          - "pnpm-workspace.yaml"
+          - "bun.lock"
           - "src-tauri/Cargo.toml"
           - "src-tauri/Cargo.lock"
 

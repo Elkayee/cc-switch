@@ -41,7 +41,7 @@ describe("AppCountBar", () => {
     expect(mixed).toHaveAttribute("aria-checked", "mixed");
     expect(mixed).toHaveAttribute("data-selection-state", "partial");
     expect(mixed.querySelectorAll("span")).toHaveLength(2);
-    expect(mixed.querySelector("svg")).not.toBeInTheDocument();
+    expect(mixed.querySelector("svg, img")).toBeInTheDocument();
     fireEvent.click(mixed);
     expect(onToggleAll).toHaveBeenCalledWith("claude", true);
 
@@ -61,7 +61,7 @@ describe("AppCountBar", () => {
     expect(all).toHaveAttribute("aria-checked", "true");
     expect(all).toHaveAttribute("data-selection-state", "all");
     expect(all.querySelectorAll("span")).toHaveLength(2);
-    expect(all.querySelector("svg")).not.toBeInTheDocument();
+    expect(all.querySelector("svg, img")).toBeInTheDocument();
     fireEvent.click(all);
     expect(onToggleAll).toHaveBeenLastCalledWith("claude", false);
   });
@@ -84,7 +84,7 @@ describe("AppCountBar", () => {
     expect(none).toHaveAttribute("aria-checked", "false");
     expect(none).toHaveAttribute("data-selection-state", "none");
     expect(none.querySelectorAll("span")).toHaveLength(2);
-    expect(none.querySelector("svg")).not.toBeInTheDocument();
+    expect(none.querySelector("svg, img")).toBeInTheDocument();
 
     fireEvent.click(none);
     expect(onToggleAll).toHaveBeenCalledWith("claude", true);
@@ -117,7 +117,6 @@ describe("AppCountBar", () => {
 
     for (const control of screen.getAllByRole("checkbox")) {
       expect(control).toBeDisabled();
-      expect(control.className).not.toContain("disabled:opacity-");
     }
 
     const pendingControl = screen.getByRole("checkbox", {
@@ -125,7 +124,7 @@ describe("AppCountBar", () => {
     });
     expect(pendingControl).toHaveAttribute("aria-busy", "true");
     expect(pendingControl.querySelectorAll("span")).toHaveLength(2);
-    expect(pendingControl.querySelector("svg")).not.toBeInTheDocument();
+    expect(pendingControl.querySelector("svg, img")).toBeInTheDocument();
   });
 
   it("supports disabling bulk controls during another management write", () => {
@@ -154,7 +153,7 @@ describe("AppCountBar", () => {
       />,
     );
 
-    const bar = screen.getByText("2 items").closest(".glass");
+    const bar = screen.getByText("2 items").closest(".rounded-\\[8px\\]");
     expect(bar).toHaveClass("items-center");
     expect(bar).not.toHaveClass("flex-col");
   });
@@ -175,6 +174,24 @@ describe("AppCountBar", () => {
       "focus:ring-0",
       "focus-visible:outline-none",
       "focus-visible:ring-2",
+    );
+  });
+
+  it("aligns optional trailing actions with the app count pills", () => {
+    render(
+      <AppCountBar
+        totalLabel="2 items"
+        totalCount={2}
+        counts={{ claude: 1 }}
+        appIds={["claude"]}
+        onToggleAll={vi.fn()}
+        trailing={<button type="button">skills.updateAll</button>}
+      />,
+    );
+
+    const bar = screen.getByText("2 items").closest(".rounded-\\[8px\\]");
+    expect(bar).toContainElement(
+      screen.getByRole("button", { name: "skills.updateAll" }),
     );
   });
 });

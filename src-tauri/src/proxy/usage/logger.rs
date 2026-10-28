@@ -153,7 +153,7 @@ impl<'a> UsageLogger<'a> {
                         return Ok(());
                     }
                     return Err(AppError::Database(format!(
-                        "usage collision fallback 主键发生 SHA-256 冲突: {fallback}"
+                        "usage collision fallback SHA-256 primary-key conflict: {fallback}"
                     )));
                 }
                 (fallback, false, true)
@@ -206,7 +206,7 @@ impl<'a> UsageLogger<'a> {
                     created_at,
                 ],
             )
-            .map_err(|e| AppError::Database(format!("记录请求日志失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to write request log: {e}")))?;
 
         if affected_rows > 0 {
             if collision {
@@ -249,7 +249,7 @@ impl<'a> UsageLogger<'a> {
             },
         )
         .optional()
-        .map_err(|error| AppError::Database(format!("查询 usage request_id 失败: {error}")))
+        .map_err(|error| AppError::Database(format!("Failed to query usage request_id: {error}")))
     }
 
     /// 记录失败的请求
@@ -339,7 +339,7 @@ impl<'a> UsageLogger<'a> {
             Some((input, output, cache_read, cache_creation)) => {
                 ModelPricing::from_strings(&input, &output, &cache_read, &cache_creation)
                     .map(Some)
-                    .map_err(|e| AppError::Database(format!("解析定价数据失败: {e}")))
+                    .map_err(|e| AppError::Database(format!("Failed to parse pricing data: {e}")))
             }
             None => Ok(None),
         }

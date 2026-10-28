@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type * as React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -6,6 +7,7 @@ import {
   ChevronRight,
   CircleDot,
   ListMinus,
+  Link2,
   ListPlus,
   Loader2,
   Minus,
@@ -20,6 +22,7 @@ import {
   SquareTerminal,
   type LucideIcon,
 } from "lucide-react";
+import type { UpstreamInfo } from "@/lib/upstreamInfo";
 import { Button } from "@/components/ui/button";
 import { DisabledReason } from "@/components/ui/help-tip";
 import { HoverTip } from "@/components/ui/hover-tip";
@@ -42,6 +45,7 @@ import type {
   CardPresentation,
   CardTone,
 } from "./presentation";
+import { ProxyConnectDialog } from "./ProxyConnectDialog";
 
 const DOT: Record<CardTone | "muted", string> = {
   direct: "bg-direct",
@@ -66,6 +70,8 @@ const BUTTON_ICON: Record<string, LucideIcon> = {
 
 interface ProviderCardActionsProps {
   providerName: string;
+  appId: string;
+  providerId: string;
   presentation: CardPresentation;
   onEdit: () => void;
   onDelete: () => void;
@@ -76,6 +82,10 @@ interface ProviderCardActionsProps {
   onOpenTerminal?: () => void;
   /** 这张卡打开的终端是否与 CC Switch 的切换隔离（见 terminalIsIsolated），决定提示里带不带「环境隔离」 */
   openTerminalIsolated?: boolean;
+  /** Pinned proxy base URL (fork). Absent means the copy button is not rendered. */
+  copyProxyUrl?: string;
+  /** Direct-connect values shown next to the proxy URL in the connect popup. */
+  upstream?: UpstreamInfo;
 }
 
 /**
@@ -86,6 +96,8 @@ interface ProviderCardActionsProps {
  */
 export function ProviderCardActions({
   providerName,
+  appId,
+  providerId,
   presentation,
   onEdit,
   onDelete,
@@ -95,8 +107,11 @@ export function ProviderCardActions({
   onConfigureUsage,
   onOpenTerminal,
   openTerminalIsolated,
+  copyProxyUrl,
+  upstream,
 }: ProviderCardActionsProps) {
   const { t } = useTranslation();
+  const [connectOpen, setConnectOpen] = useState(false);
   const { status, buttons, move, menuItems = [] } = presentation;
 
   return (
@@ -105,7 +120,7 @@ export function ProviderCardActions({
           切换后左边的用量会被推开、跟其他卡片对不齐。按最长的常见状态留宽，靠右对齐 */}
       <div className="flex min-w-20 items-center justify-end gap-1">
         {status && (
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap px-1 text-body font-medium text-fg-1">
+          <span className="inline-flex items-center gap-1 whitespace-nowrap px-1 text-ui font-medium text-fg-1">
             <span
               aria-hidden="true"
               className={cn("h-1.5 w-1.5 rounded-full", DOT[status.dot])}
@@ -174,6 +189,30 @@ export function ProviderCardActions({
         </HoverTip>
       )}
 
+      {copyProxyUrl && upstream && (
+        <>
+          <HoverTip content={t("provider.copyProxyUrl")}>
+            <Button
+              variant="quiet"
+              size="icon-compact"
+              aria-label={t("provider.copyProxyUrl")}
+              onClick={() => setConnectOpen(true)}
+            >
+              <Link2 className="h-4 w-4" strokeWidth={1.5} />
+            </Button>
+          </HoverTip>
+          <ProxyConnectDialog
+            open={connectOpen}
+            onOpenChange={setConnectOpen}
+            providerName={providerName}
+            appId={appId}
+            providerId={providerId}
+            proxyUrl={copyProxyUrl}
+            upstream={upstream}
+          />
+        </>
+      )}
+
       <IconAction
         tip={t("common.edit")}
         disabledReason={presentation.editDisabledReason}
@@ -214,7 +253,7 @@ export function ProviderCardActions({
           )}
           {onTest && (
             <DropdownMenuItem disabled={isTesting} onSelect={onTest}>
-              {isTesting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isTesting && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("provider.connectivityCheck")}
             </DropdownMenuItem>
           )}
@@ -233,7 +272,7 @@ export function ProviderCardActions({
           >
             {t("common.delete")}
             {presentation.deleteDisabledReason && (
-              <span className="text-caption text-fg-3">
+              <span className="text-ui text-fg-3">
                 {presentation.deleteDisabledReason}
               </span>
             )}

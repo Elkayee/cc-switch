@@ -61,7 +61,7 @@ export function McpConfirmation({
     value: string;
     risk?: RiskKind | null;
   }) => (
-    <div className="grid grid-cols-[4rem_1fr] gap-2 text-xs">
+    <div className="grid grid-cols-[4rem_1fr] gap-2 text-[12.35px] leading-[1.3]">
       <span className="text-fg-2 shrink-0">{label}</span>
       <span
         className={`font-mono break-all ${
@@ -76,17 +76,19 @@ export function McpConfirmation({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">{t("deeplink.mcp.title")}</h3>
+      <h3 className="text-[12.35px] leading-[1.3] font-semibold">
+        {t("deeplink.mcp.title")}
+      </h3>
 
       <div>
-        <label className="block text-sm font-medium text-fg-2">
+        <label className="block text-[12.35px] leading-[1.3] font-medium text-fg-2">
           {t("deeplink.mcp.targetApps")}
         </label>
         <div className="mt-1 flex gap-2 flex-wrap">
           {targetApps.map((app) => (
             <span
               key={app}
-              className="px-2 py-1 bg-primary/10 text-primary text-xs rounded capitalize"
+              className="px-2 py-1 bg-primary/10 text-primary text-[12.35px] leading-[1.3] rounded capitalize"
             >
               {app.trim()}
             </span>
@@ -95,7 +97,7 @@ export function McpConfirmation({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-fg-2">
+        <label className="block text-[12.35px] leading-[1.3] font-medium text-fg-2">
           {t("deeplink.mcp.serverCount", { count: serverCount })}
         </label>
         <div className="mt-1 space-y-2 max-h-64 overflow-auto border rounded p-2 bg-subtle">
@@ -109,7 +111,9 @@ export function McpConfirmation({
 
               return (
                 <div key={id} className="p-2 bg-surface rounded border">
-                  <div className="font-semibold text-sm mb-1">{id}</div>
+                  <div className="font-semibold text-[12.35px] leading-[1.3] mb-1">
+                    {id}
+                  </div>
                   <div className="space-y-1">
                     {spec?.command && (
                       <Row
@@ -155,7 +159,7 @@ export function McpConfirmation({
           {risks.map((kind) => (
             <div
               key={kind}
-              className="text-warning-text text-sm flex items-start gap-2"
+              className="text-warning-text text-[12.35px] leading-[1.3] flex items-start gap-2"
             >
               <span aria-hidden="true">⚠️</span>
               <span>{t(riskI18nKey(kind))}</span>
@@ -173,7 +177,7 @@ export function McpConfirmation({
         挂条件的后果是：恶意链接省略 `enabled` 就能让这条警告消失，而写入行为
         一模一样——把提示变成了可被攻击者关掉的开关。
       */}
-      <div className="text-warning-text text-sm flex items-center gap-2">
+      <div className="text-warning-text text-[12.35px] leading-[1.3] flex items-center gap-2">
         <span>⚠️</span>
         <span>{t("deeplink.mcp.enabledWarning")}</span>
       </div>

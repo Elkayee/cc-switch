@@ -4,7 +4,7 @@ import { HelpTip } from "@/components/ui/help-tip";
 import { cn } from "@/lib/utils";
 
 /**
- * 设置页的版式（v7）：分节标题 15/600 → 带边框的卡片 → 一行一项，左边名称、右边控件。
+ * 设置页的版式（v7，fork 紧凑样式）：分节标题 → 带边框的卡片 → 一行一项，左边名称、右边控件。
  */
 export function SettingsBlock({
   id,
@@ -24,10 +24,14 @@ export function SettingsBlock({
   className?: string;
 }) {
   return (
-    <section id={id} className={cn("space-y-3", className)}>
+    <section id={id} className={cn("space-y-2", className)}>
       {(title || actions) && (
-        <div className="flex min-h-7 items-center gap-2">
-          {title && <h2 className="m-0 text-section text-fg-1">{title}</h2>}
+        <div className="flex min-h-6 items-center gap-2">
+          {title && (
+            <h2 className="m-0 text-ui font-semibold text-foreground">
+              {title}
+            </h2>
+          )}
           {help && <HelpTip title={help.title}>{help.body}</HelpTip>}
           {actions && (
             <div className="ms-auto flex items-center gap-2">{actions}</div>
@@ -50,7 +54,7 @@ export function SettingsCard({
   return (
     <div
       className={cn(
-        "divide-y divide-border overflow-hidden rounded-panel border border-border bg-surface",
+        "divide-y divide-border overflow-hidden rounded-[8px] border border-border bg-card",
         className,
       )}
     >
@@ -80,20 +84,20 @@ export function SettingsRow({
 }) {
   const Label = htmlFor ? "label" : "div";
   return (
-    <div className={cn("px-4 py-3", className)}>
-      <div className="flex min-h-[28px] items-center gap-4">
+    <div className={cn("p-2", className)}>
+      <div className="flex min-h-6 items-center gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1">
             <Label
               htmlFor={htmlFor}
-              className="text-body font-medium text-fg-1"
+              className="text-ui font-medium text-foreground"
             >
               {label}
             </Label>
             {help && <HelpTip title={help.title}>{help.body}</HelpTip>}
           </div>
           {description && (
-            <div className="mt-0.5 break-all text-caption text-fg-2">
+            <div className="mt-1 break-all text-ui text-muted-foreground">
               {description}
             </div>
           )}
@@ -102,7 +106,7 @@ export function SettingsRow({
           <div className="flex shrink-0 items-center gap-2">{control}</div>
         )}
       </div>
-      {children && <div className="mt-2.5">{children}</div>}
+      {children && <div className="mt-2">{children}</div>}
     </div>
   );
 }
@@ -139,10 +143,10 @@ export function SettingsSwitchRow({
   );
 }
 
-/** 设置页正文：最大宽度 760，左右 24 的内边距，分节间距 28。 */
+/** 设置页正文：最大宽度 760，紧凑内边距与分节间距。 */
 export function SettingsBody({ children }: { children: ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-[760px] space-y-7 px-6 pb-10 pt-6">
+    <div className="mx-auto w-full max-w-[760px] space-y-2 p-2 pb-4">
       {children}
     </div>
   );

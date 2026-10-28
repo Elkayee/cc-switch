@@ -14,6 +14,17 @@ struct LegacySkillMigrationRow {
 }
 
 impl Database {
+    /// Point freshly seeded proxy rows at the session's default port (dev sessions only).
+    pub(crate) fn apply_default_listen_port(conn: &Connection) -> Result<(), AppError> {
+        let port = crate::proxy::types::default_listen_port();
+        if port == crate::proxy::types::DEFAULT_LISTEN_PORT {
+            return Ok(());
+        }
+        conn.execute("UPDATE proxy_config SET listen_port = ?1", [port])
+            .map_err(|e| AppError::Database(e.to_string()))?;
+        Ok(())
+    }
+
     /// 创建所有数据库表
     pub(crate) fn create_tables(&self) -> Result<(), AppError> {
         let conn = lock_conn!(self.conn);
@@ -135,7 +146,7 @@ impl Database {
         // 8. Proxy Config 表（三行结构，app_type 主键）
         conn.execute("CREATE TABLE IF NOT EXISTS proxy_config (
             app_type TEXT PRIMARY KEY CHECK (app_type IN ('claude','codex','gemini','grokbuild')),
-            proxy_enabled INTEGER NOT NULL DEFAULT 0, listen_address TEXT NOT NULL DEFAULT '127.0.0.1',
+            proxy_enabled INTEGER NOT NULL DEFAULT 1, listen_address TEXT NOT NULL DEFAULT '127.0.0.1',
             listen_port INTEGER NOT NULL DEFAULT 15721, enable_logging INTEGER NOT NULL DEFAULT 1,
             enabled INTEGER NOT NULL DEFAULT 0, auto_failover_enabled INTEGER NOT NULL DEFAULT 0,
             max_retries INTEGER NOT NULL DEFAULT 3, streaming_first_byte_timeout INTEGER NOT NULL DEFAULT 60,
@@ -154,6 +165,12 @@ impl Database {
         // - 老版本 proxy_config 是单例表（没有 app_type 列），此时不能执行三行 seed insert；
         // - 旧表会在 apply_schema_migrations() 中迁移为三行结构后再插入。
         if Self::has_column(conn, "proxy_config", "app_type")? {
+            let fresh = conn
+                .query_row("SELECT COUNT(*) FROM proxy_config", [], |row| {
+                    row.get::<_, i64>(0)
+                })
+                .map_err(|e| AppError::Database(e.to_string()))?
+                == 0;
             conn.execute(
                 "INSERT OR IGNORE INTO proxy_config (app_type, max_retries,
                 streaming_first_byte_timeout, streaming_idle_timeout, non_streaming_timeout,
@@ -190,6 +207,9 @@ impl Database {
                 [],
             )
             .map_err(|e| AppError::Database(e.to_string()))?;
+            if fresh {
+                Self::apply_default_listen_port(conn)?;
+            }
         }
 
         // 9. Provider Health 表
@@ -452,7 +472,7 @@ impl Database {
     /// 在指定连接上应用 Schema 迁移
     pub(crate) fn apply_schema_migrations_on_conn(conn: &Connection) -> Result<(), AppError> {
         conn.execute("SAVEPOINT schema_migration;", [])
-            .map_err(|e| AppError::Database(format!("开启迁移 savepoint 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to begin migrate savepoint: {e}")))?;
 
         let mut version = Self::get_user_version(conn)?;
 
@@ -460,7 +480,7 @@ impl Database {
             conn.execute("ROLLBACK TO schema_migration;", []).ok();
             conn.execute("RELEASE schema_migration;", []).ok();
             return Err(AppError::Database(format!(
-                "数据库版本过新（{version}），当前应用仅支持 {SCHEMA_VERSION}，请升级应用后再尝试。"
+                "Database version is too new ({version}); this app only supports {SCHEMA_VERSION}. Please upgrade the app and try again."
             )));
         }
 
@@ -637,7 +657,7 @@ impl Database {
                     }
                     _ => {
                         return Err(AppError::Database(format!(
-                            "未知的数据库版本 {version}，无法迁移到 {SCHEMA_VERSION}"
+                            "Unknown database version {version}; cannot migrate to {SCHEMA_VERSION}"
                         )));
                     }
                 }
@@ -648,8 +668,9 @@ impl Database {
 
         match result {
             Ok(_) => {
-                conn.execute("RELEASE schema_migration;", [])
-                    .map_err(|e| AppError::Database(format!("提交迁移 savepoint 失败: {e}")))?;
+                conn.execute("RELEASE schema_migration;", []).map_err(|e| {
+                    AppError::Database(format!("Failed to commit migrate savepoint: {e}"))
+                })?;
                 Ok(())
             }
             Err(e) => {
@@ -789,9 +810,11 @@ impl Database {
 
         // 删除旧的 failover_queue 表（如果存在）
         conn.execute("DROP INDEX IF EXISTS idx_failover_queue_order", [])
-            .map_err(|e| AppError::Database(format!("删除 failover_queue 索引失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to drop failover_queue index: {e}")))?;
         conn.execute("DROP TABLE IF EXISTS failover_queue", [])
-            .map_err(|e| AppError::Database(format!("删除 failover_queue 表失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to delete failover_queue table: {e}"))
+            })?;
 
         // 创建 failover 索引
         conn.execute(
@@ -799,7 +822,7 @@ impl Database {
              ON providers(app_type, in_failover_queue, sort_index)",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建 failover 索引失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create failover index: {e}")))?;
 
         // proxy_request_logs 表
         conn.execute("CREATE TABLE IF NOT EXISTS proxy_request_logs (
@@ -846,7 +869,7 @@ impl Database {
 
         // 清空并重新插入模型定价
         conn.execute("DELETE FROM model_pricing", [])
-            .map_err(|e| AppError::Database(format!("清空模型定价失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to clear model pricing: {e}")))?;
         Self::seed_model_pricing(conn)?;
 
         // 重构 skills 表（添加 app_type 字段）
@@ -992,7 +1015,7 @@ impl Database {
                 rusqlite::params![app, old_config.0, old_config.1, old_config.3,
                     if takeover { 1 } else { 0 }, if failover { 1 } else { 0 },
                     retries, fb, idle, old_config.6, cb_f, cb_s, cb_t, cb_r, cb_m]
-            ).map_err(|e| AppError::Database(format!("插入 {app} 配置失败: {e}")))?;
+            ).map_err(|e| AppError::Database(format!("Failed to insert {app} config: {e}")))?;
         }
 
         // 替换表并清理
@@ -1032,7 +1055,7 @@ impl Database {
 
         // 1. 重命名旧表
         conn.execute("ALTER TABLE skills RENAME TO skills_old", [])
-            .map_err(|e| AppError::Database(format!("重命名旧 skills 表失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to rename old skills table: {e}")))?;
 
         // 2. 创建新表
         conn.execute(
@@ -1045,13 +1068,13 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建新 skills 表失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create new skills table: {e}")))?;
 
         // 3. 迁移数据：解析 key 格式（如 "claude:my-skill" 或 "codex:foo"）
         //    旧数据如果没有前缀，默认为 claude
         let mut stmt = conn
             .prepare("SELECT key, installed, installed_at FROM skills_old")
-            .map_err(|e| AppError::Database(format!("查询旧 skills 数据失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to query old skills data: {e}")))?;
 
         let old_skills: Vec<(String, bool, i64)> = stmt
             .query_map([], |row| {
@@ -1061,9 +1084,9 @@ impl Database {
                     row.get::<_, i64>(2)?,
                 ))
             })
-            .map_err(|e| AppError::Database(format!("读取旧 skills 数据失败: {e}")))?
+            .map_err(|e| AppError::Database(format!("Failed to read old skills data: {e}")))?
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|e| AppError::Database(format!("解析旧 skills 数据失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to parse old skills data: {e}")))?;
 
         let count = old_skills.len();
 
@@ -1081,13 +1104,13 @@ impl Database {
                 rusqlite::params![directory, app_type, installed, installed_at],
             )
             .map_err(|e| {
-                AppError::Database(format!("迁移 skill {key} 到新表失败: {e}"))
+                AppError::Database(format!("Failed to migrate skill {key} to the new table: {e}"))
             })?;
         }
 
         // 4. 删除旧表
         conn.execute("DROP TABLE skills_old", [])
-            .map_err(|e| AppError::Database(format!("删除旧 skills 表失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to delete old skills table: {e}")))?;
 
         log::info!("skills 表迁移完成，共迁移 {count} 条记录");
         Ok(())
@@ -1121,7 +1144,7 @@ impl Database {
                 "SELECT directory, app_type FROM skills
                  WHERE installed = 1",
             )
-            .map_err(|e| AppError::Database(format!("查询旧 skills 快照失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to query old skills snapshot: {e}")))?;
         let snapshot_rows: Vec<LegacySkillMigrationRow> = stmt
             .query_map([], |row| {
                 Ok(LegacySkillMigrationRow {
@@ -1129,11 +1152,12 @@ impl Database {
                     app_type: row.get(1)?,
                 })
             })
-            .map_err(|e| AppError::Database(format!("读取旧 skills 快照失败: {e}")))?
+            .map_err(|e| AppError::Database(format!("Failed to read old skills snapshot: {e}")))?
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|e| AppError::Database(format!("解析旧 skills 快照失败: {e}")))?;
-        let snapshot_json = serde_json::to_string(&snapshot_rows)
-            .map_err(|e| AppError::Database(format!("序列化旧 skills 快照失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to parse old skills snapshot: {e}")))?;
+        let snapshot_json = serde_json::to_string(&snapshot_rows).map_err(|e| {
+            AppError::Database(format!("Failed to serialize old skills snapshot: {e}"))
+        })?;
 
         // 标记：需要在启动后从文件系统扫描并重建 Skills 数据
         // 说明：v3 结构将 Skills 的 SSOT 迁移到 ~/.cc-switch/skills/，
@@ -1149,7 +1173,7 @@ impl Database {
 
         // 2. 删除旧表
         conn.execute("DROP TABLE IF EXISTS skills", [])
-            .map_err(|e| AppError::Database(format!("删除旧 skills 表失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to delete old skills table: {e}")))?;
 
         // 3. 创建新表
         conn.execute(
@@ -1169,7 +1193,7 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建新 skills 表失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create new skills table: {e}")))?;
 
         log::info!(
             "skills 表已迁移到 v3 结构。\n\
@@ -1248,7 +1272,9 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建 usage_daily_rollups 表失败: {e}")))?;
+        .map_err(|e| {
+            AppError::Database(format!("Failed to create usage_daily_rollups table: {e}"))
+        })?;
 
         // 2. 统一 Copilot 模板类型为 github_copilot
         let mut stmt = conn
@@ -1340,7 +1366,7 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建 session_log_sync 表失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create session_log_sync table: {e}")))?;
 
         // 3. 修正国产模型定价：之前误将 CNY 值存为 USD 字段，统一转换为 USD
         if Self::table_exists(conn, "model_pricing")? {
@@ -1369,7 +1395,11 @@ impl Database {
                      WHERE model_id = ?1",
                     rusqlite::params![model_id, input, output, cache_read, cache_creation],
                 )
-                .map_err(|e| AppError::Database(format!("更新模型 {model_id} 定价失败: {e}")))?;
+                .map_err(|e| {
+                    AppError::Database(format!(
+                        "Failed to update pricing for model {model_id}: {e}"
+                    ))
+                })?;
             }
         }
 
@@ -1388,9 +1418,9 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建 model_pricing 表失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to create model_pricing table: {e}")))?;
         conn.execute("DELETE FROM model_pricing", [])
-            .map_err(|e| AppError::Database(format!("清空模型定价失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to clear model pricing: {e}")))?;
         Self::seed_model_pricing(conn)?;
         log::info!("v8 -> v9 迁移完成：已刷新全部模型定价数据");
         Ok(())
@@ -1467,7 +1497,9 @@ impl Database {
              DROP TABLE usage_daily_rollups_v10;",
         )
         .map_err(|e| {
-            AppError::Database(format!("v10 -> v11 重建 usage_daily_rollups 失败: {e}"))
+            AppError::Database(format!(
+                "Failed to rebuild usage_daily_rollups for v10 -> v11: {e}"
+            ))
         })?;
 
         log::info!(
@@ -1490,7 +1522,9 @@ impl Database {
             )",
             [],
         )
-        .map_err(|e| AppError::Database(format!("v11 -> v12 创建 profiles 表失败: {e}")))?;
+        .map_err(|e| {
+            AppError::Database(format!("Failed to v11 -> v12 create profiles table: {e}"))
+        })?;
         Ok(())
     }
 
@@ -1660,7 +1694,11 @@ impl Database {
              CREATE INDEX IF NOT EXISTS idx_session_usage_dedup_semantic
              ON session_usage_dedup(data_source, semantic_id, has_entry_id);",
         )
-        .map_err(|error| AppError::Database(format!("创建会话用量去重账本失败: {error}")))
+        .map_err(|error| {
+            AppError::Database(format!(
+                "Failed to create session-usage dedup ledger: {error}"
+            ))
+        })
     }
 
     /// v17 -> v18: Claude 会话日志的字节游标列与尾部指纹列。
@@ -2973,7 +3011,9 @@ impl Database {
                     cache_read_cost_per_million, cache_creation_cost_per_million
                 ) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
             )
-            .map_err(|e| AppError::Database(format!("准备模型定价语句失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to prepare model pricing statement: {e}"))
+            })?;
         for (model_id, display_name, input, output, cache_read, cache_creation) in pricing_data {
             stmt.execute(rusqlite::params![
                 model_id,
@@ -2983,7 +3023,7 @@ impl Database {
                 cache_read,
                 cache_creation
             ])
-            .map_err(|e| AppError::Database(format!("插入模型定价失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to insert model pricing: {e}")))?;
         }
 
         log::info!("已插入 {} 条默认模型定价数据", pricing_data.len());
@@ -3739,7 +3779,11 @@ impl Database {
                     old_cache_creation
                 ],
             )
-            .map_err(|e| AppError::Database(format!("修复模型 {model_id} 定价失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!(
+                    "Failed to repair pricing for model {model_id}: {e}"
+                ))
+            })?;
         }
 
         Ok(())
@@ -3761,16 +3805,18 @@ impl Database {
 
     pub(crate) fn get_user_version(conn: &Connection) -> Result<i32, AppError> {
         conn.query_row("PRAGMA user_version;", [], |row| row.get(0))
-            .map_err(|e| AppError::Database(format!("读取 user_version 失败: {e}")))
+            .map_err(|e| AppError::Database(format!("Failed to read user_version: {e}")))
     }
 
     pub(crate) fn set_user_version(conn: &Connection, version: i32) -> Result<(), AppError> {
         if version < 0 {
-            return Err(AppError::Database("user_version 不能为负数".to_string()));
+            return Err(AppError::Database(
+                "user_version cannot be negative".to_string(),
+            ));
         }
         let sql = format!("PRAGMA user_version = {version};");
         conn.execute(&sql, [])
-            .map_err(|e| AppError::Database(format!("写入 user_version 失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to write user_version: {e}")))?;
         Ok(())
     }
 
@@ -3787,7 +3833,9 @@ impl Database {
                  ON proxy_request_logs(app_type, created_at DESC)",
                 [],
             )
-            .map_err(|e| AppError::Database(format!("创建使用量应用时间索引失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to create usage app-time index: {e}"))
+            })?;
         }
 
         let required_columns = [
@@ -3806,7 +3854,9 @@ impl Database {
         }
 
         conn.execute("DROP INDEX IF EXISTS idx_request_logs_dedup_lookup", [])
-            .map_err(|e| AppError::Database(format!("删除旧使用量去重索引失败: {e}")))?;
+            .map_err(|e| {
+                AppError::Database(format!("Failed to drop old usage dedup index: {e}"))
+            })?;
 
         // 查询层为了兼容历史 NULL data_source 行，会使用
         // COALESCE(data_source, 'proxy')。普通 data_source 索引无法匹配该表达式，
@@ -3818,17 +3868,21 @@ impl Database {
                                    cache_creation_tokens)",
             [],
         )
-        .map_err(|e| AppError::Database(format!("创建使用量去重表达式索引失败: {e}")))?;
+        .map_err(|e| {
+            AppError::Database(format!(
+                "Failed to create usage dedup expression index: {e}"
+            ))
+        })?;
         Ok(())
     }
 
     fn validate_identifier(s: &str, kind: &str) -> Result<(), AppError> {
         if s.is_empty() {
-            return Err(AppError::Database(format!("{kind} 不能为空")));
+            return Err(AppError::Database(format!("{kind} cannot be empty")));
         }
         if !s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
             return Err(AppError::Database(format!(
-                "非法{kind}: {s}，仅允许字母、数字和下划线"
+                "Invalid {kind}: {s}; only letters, digits, and underscores are allowed"
             )));
         }
         Ok(())
@@ -3839,14 +3893,14 @@ impl Database {
 
         let mut stmt = conn
             .prepare("SELECT name FROM sqlite_master WHERE type='table'")
-            .map_err(|e| AppError::Database(format!("读取表名失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to read table name: {e}")))?;
         let mut rows = stmt
             .query([])
-            .map_err(|e| AppError::Database(format!("查询表名失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to query table name: {e}")))?;
         while let Some(row) = rows.next().map_err(|e| AppError::Database(e.to_string()))? {
             let name: String = row
                 .get(0)
-                .map_err(|e| AppError::Database(format!("解析表名失败: {e}")))?;
+                .map_err(|e| AppError::Database(format!("Failed to parse table name: {e}")))?;
             if name.eq_ignore_ascii_case(table) {
                 return Ok(true);
             }
@@ -3865,14 +3919,14 @@ impl Database {
         let sql = format!("PRAGMA table_info(\"{table}\");");
         let mut stmt = conn
             .prepare(&sql)
-            .map_err(|e| AppError::Database(format!("读取表结构失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to read table schema: {e}")))?;
         let mut rows = stmt
             .query([])
-            .map_err(|e| AppError::Database(format!("查询表结构失败: {e}")))?;
+            .map_err(|e| AppError::Database(format!("Failed to query table schema: {e}")))?;
         while let Some(row) = rows.next().map_err(|e| AppError::Database(e.to_string()))? {
             let name: String = row
                 .get(1)
-                .map_err(|e| AppError::Database(format!("读取列名失败: {e}")))?;
+                .map_err(|e| AppError::Database(format!("Failed to read column name: {e}")))?;
             if name.eq_ignore_ascii_case(column) {
                 return Ok(true);
             }
@@ -3891,7 +3945,7 @@ impl Database {
 
         if !Self::table_exists(conn, table)? {
             return Err(AppError::Database(format!(
-                "表 {table} 不存在，无法添加列 {column}"
+                "Table {table} does not exist; cannot add column {column}"
             )));
         }
         if Self::has_column(conn, table, column)? {
@@ -3899,8 +3953,11 @@ impl Database {
         }
 
         let sql = format!("ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {definition};");
-        conn.execute(&sql, [])
-            .map_err(|e| AppError::Database(format!("为表 {table} 添加列 {column} 失败: {e}")))?;
+        conn.execute(&sql, []).map_err(|e| {
+            AppError::Database(format!(
+                "Failed to add column {column} to table {table}: {e}"
+            ))
+        })?;
         log::info!("已为表 {table} 添加缺失列 {column}");
         Ok(true)
     }

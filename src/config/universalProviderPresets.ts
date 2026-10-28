@@ -72,10 +72,10 @@ export const universalProviderPresets: UniversalProviderPreset[] = [
     icon: "newapi",
     iconColor: "#00A67E",
     description:
-      "NewAPI 是一个可自部署的 API 网关，支持 Anthropic、OpenAI、Gemini 等多种协议",
+      "NewAPI is a self-hostable API gateway supporting Anthropic, OpenAI, Gemini, and more",
   },
   {
-    name: "自定义网关",
+    name: "Custom gateway",
     providerType: "custom_gateway",
     defaultApps: {
       claude: true,
@@ -85,7 +85,7 @@ export const universalProviderPresets: UniversalProviderPreset[] = [
     defaultModels: NEWAPI_DEFAULT_MODELS,
     icon: "openai",
     iconColor: "#6366F1",
-    description: "自定义配置的 API 网关",
+    description: "Custom API gateway",
     isCustomTemplate: true,
   },
 ];

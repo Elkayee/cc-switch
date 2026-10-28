@@ -1088,7 +1088,7 @@ impl ProviderAdapter for CodexAdapter {
         }
 
         Err(ProxyError::ConfigError(
-            "Codex Provider 缺少 base_url 配置".to_string(),
+            "Codex provider is missing base_url".to_string(),
         ))
     }
 

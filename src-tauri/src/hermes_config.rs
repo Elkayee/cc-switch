@@ -51,19 +51,20 @@ use std::sync::{Mutex, OnceLock};
 ///   2. `HERMES_HOME` 环境变量(trim 后非空;按原样,不展开 `~`,与 Hermes `Path(val)` 一致)
 ///   3. 平台默认(Windows: `%LOCALAPPDATA%\hermes`,Mac/Linux: `~/.hermes`)
 pub fn get_hermes_dir() -> PathBuf {
-    if let Some(override_dir) = get_hermes_override_dir() {
-        return override_dir;
-    }
-
-    if let Some(raw) = std::env::var_os("HERMES_HOME") {
+    let base = if let Some(override_dir) = get_hermes_override_dir() {
+        override_dir
+    } else if let Some(raw) = std::env::var_os("HERMES_HOME") {
         let value = raw.to_string_lossy();
         let trimmed = value.trim();
         if !trimmed.is_empty() {
-            return PathBuf::from(trimmed);
+            PathBuf::from(trimmed)
+        } else {
+            default_hermes_dir()
         }
-    }
-
-    default_hermes_dir()
+    } else {
+        default_hermes_dir()
+    };
+    crate::config::apply_dir_suffix(base)
 }
 
 /// 平台默认 Hermes 目录(Windows):对齐 Hermes `_get_platform_default_hermes_home()`——

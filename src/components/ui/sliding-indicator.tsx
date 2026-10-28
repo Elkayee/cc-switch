@@ -90,7 +90,7 @@ export function SegmentThumb({
     <span
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute bg-surface shadow-v7-sm",
+        "pointer-events-none absolute bg-surface shadow-sm",
         animate && THUMB_MOTION,
         className,
       )}

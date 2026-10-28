@@ -24,7 +24,7 @@ impl From<Profile> for ProfileDto {
         // 单条 payload 损坏不应拖垮整个列表：降级为默认值并记日志
         let payload = serde_json::from_str(&profile.payload).unwrap_or_else(|e| {
             log::warn!(
-                "解析 profile '{}' payload 失败，使用默认值: {e}",
+                "Failed to parse profile '{}' payload, using defaults: {e}",
                 profile.id
             );
             ProfilePayload::default()
@@ -61,7 +61,7 @@ pub struct ProfilesResponse {
 /// 共用此函数，保证事件 payload 形状一致（前端 App.tsx 的
 /// provider-switched 监听依赖该形状）。
 pub fn emit_profile_apply_events(
-    app: &tauri::AppHandle,
+    app: &tauri::AppHandle<crate::AppRuntime>,
     state: &AppState,
     profile_id: &str,
     scope: ProfileScope,
@@ -169,7 +169,7 @@ pub fn clear_current_profile(state: State<'_, AppState>, scope: String) -> Resul
 /// 内部使用 block_on 获取切换锁，放进 async 命令会在运行时线程上 panic。
 #[tauri::command]
 pub fn apply_profile(
-    app: tauri::AppHandle,
+    app: tauri::AppHandle<crate::AppRuntime>,
     state: State<'_, AppState>,
     id: String,
     scope: String,

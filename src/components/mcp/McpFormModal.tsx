@@ -663,7 +663,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         type="button"
                         aria-pressed={template === preset.id}
                         onClick={() => pickTemplate(preset.id)}
-                        className="h-7 whitespace-nowrap rounded-full border border-border-strong bg-surface px-3 text-body transition-colors hover:bg-subtle aria-pressed:bg-selected aria-pressed:font-medium"
+                        className="h-7 whitespace-nowrap rounded-full border border-border-strong bg-surface px-3 text-[12.35px] leading-[1.3] transition-colors hover:bg-subtle aria-pressed:bg-selected aria-pressed:font-medium"
                       >
                         {t(`mcpPage.templateLabels.${preset.id}`, {
                           defaultValue: preset.id,
@@ -688,13 +688,13 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                   rows={3}
                   className={cn(
                     MONO_FIELD_CLASS,
-                    "h-16 resize-none py-2 leading-[18px] placeholder:font-sans placeholder:text-body",
+                    "h-16 resize-none py-2 leading-[18px] placeholder:font-sans placeholder:text-[12.35px] leading-[1.3]",
                   )}
                 />
                 {paste?.ok === true && (
                   <span
                     id="mcp-paste-hint"
-                    className="flex items-start gap-1 text-caption text-success-text"
+                    className="flex items-start gap-1 text-[12.35px] leading-[1.3] text-success-text"
                   >
                     <Check
                       aria-hidden="true"
@@ -733,7 +733,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
               <div className="flex items-center gap-3">
                 <h3
                   id="mcp-batch-title"
-                  className="m-0 flex-1 text-body font-semibold text-fg-1"
+                  className="m-0 flex-1 text-[12.35px] leading-[1.3] font-semibold text-fg-1"
                 >
                   {t("mcpPage.drawer.batchTitle", {
                     count: batch.items.length,
@@ -747,12 +747,12 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                     setPaste(null);
                     setBatchError(false);
                   }}
-                  className="text-caption font-medium text-fg-2 underline underline-offset-[3px] hover:text-fg-1"
+                  className="text-[12.35px] leading-[1.3] font-medium text-fg-2 underline underline-offset-[3px] hover:text-fg-1"
                 >
                   {t("mcpPage.drawer.batchClear")}
                 </button>
               </div>
-              <ul className="m-0 list-none rounded-panel border border-border p-0">
+              <ul className="m-0 list-none rounded-[8px] border border-border p-0">
                 {batch.items.map((item, index) => {
                   const inputId = `mcp-batch-${index}`;
                   const statusId = `${inputId}-status`;
@@ -771,7 +771,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                     <li
                       key={`${item.name}-${index}`}
                       className={cn(
-                        "flex min-h-12 items-center gap-2.5 py-1.5 pe-2.5 ps-3.5",
+                        "flex min-h-12 items-center gap-2 py-1.5 pe-2 ps-3",
                         index > 0 && "border-t border-border",
                       )}
                     >
@@ -788,7 +788,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       />
                       <label
                         htmlFor={inputId}
-                        className="min-w-0 truncate text-body font-medium"
+                        className="min-w-0 truncate text-[12.35px] leading-[1.3] font-medium"
                       >
                         {item.name}
                       </label>
@@ -798,7 +798,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       <span className="flex-1" />
                       <span
                         id={statusId}
-                        className="shrink-0 whitespace-nowrap text-caption text-fg-2"
+                        className="shrink-0 whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-2"
                       >
                         {item.exists
                           ? t("mcpPage.drawer.batchExists")
@@ -884,13 +884,13 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                 <div data-unsaved-ignore className="flex items-center gap-3">
                   <h3
                     id="mcp-conn-title"
-                    className="m-0 flex-1 text-body font-semibold text-fg-1"
+                    className="m-0 flex-1 text-[12.35px] leading-[1.3] font-semibold text-fg-1"
                   >
                     {t("mcpPage.drawer.connection")}
                   </h3>
                   <SegmentedControl
                     aria-label={t("mcpPage.drawer.editMode")}
-                    className="h-8 rounded-[8px]"
+                    className="h-7"
                     value={tab}
                     onValueChange={switchTab}
                     items={[
@@ -898,12 +898,12 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         value: "form",
                         label: t("mcpPage.drawer.tabForm"),
                         disabled: tab === "json" && jsonError !== null,
-                        className: "min-w-[60px] rounded-[5px]",
+                        className: "min-w-[60px]",
                       },
                       {
                         value: "json",
                         label: "JSON",
-                        className: "min-w-[60px] rounded-[5px]",
+                        className: "min-w-[60px]",
                       },
                     ]}
                   />
@@ -917,7 +917,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       </span>
                       <SegmentedControl<McpTransport>
                         aria-label={t("mcpPage.drawer.transport")}
-                        className="h-8 self-start rounded-[8px]"
+                        className="h-7 self-start"
                         value={conn.transport}
                         onValueChange={(value) =>
                           patchConn({ transport: value })
@@ -926,17 +926,17 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                           {
                             value: "stdio",
                             label: t("mcpPage.drawer.transportStdio"),
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                           {
                             value: "http",
                             label: "HTTP",
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                           {
                             value: "sse",
                             label: "SSE",
-                            className: "rounded-[5px] px-3",
+                            className: "px-2",
                           },
                         ]}
                       />
@@ -956,7 +956,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                             type="text"
                             className={cn(
                               MONO_FIELD_CLASS,
-                              "placeholder:font-sans placeholder:text-body",
+                              "placeholder:font-sans placeholder:text-[12.35px] leading-[1.3]",
                             )}
                             value={conn.command}
                             placeholder={t("mcpPage.drawer.commandPlaceholder")}
@@ -1046,7 +1046,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         <div className="flex flex-col gap-1.5">
                           <label htmlFor="mcp-cwd" className={LABEL_CLASS}>
                             {t("mcpPage.drawer.cwd")}
-                            <span className="ms-1.5 text-caption font-normal text-fg-2">
+                            <span className="ms-1.5 text-[12.35px] leading-[1.3] font-normal text-fg-2">
                               {t("mcpPage.drawer.optional")}
                             </span>
                           </label>
@@ -1055,7 +1055,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                             type="text"
                             className={cn(
                               MONO_FIELD_CLASS,
-                              "placeholder:font-sans placeholder:text-body",
+                              "placeholder:font-sans placeholder:text-[12.35px] leading-[1.3]",
                             )}
                             value={conn.cwd}
                             placeholder={t("mcpPage.drawer.cwdPlaceholder")}
@@ -1114,7 +1114,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         {extraKeys.map((key) => (
                           <code
                             key={key}
-                            className="h-[22px] whitespace-nowrap rounded-control bg-subtle px-2 font-mono text-caption leading-[22px]"
+                            className="h-[22px] whitespace-nowrap rounded-[4px] bg-subtle px-2 font-mono text-[12.35px] leading-[1.3] leading-[22px]"
                           >
                             {key}
                           </code>
@@ -1122,7 +1122,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                         <button
                           type="button"
                           onClick={() => switchTab("json")}
-                          className="text-body font-medium text-fg-1 underline underline-offset-[3px] hover:text-fg-2"
+                          className="text-[12.35px] leading-[1.3] font-medium text-fg-1 underline underline-offset-[3px] hover:text-fg-2"
                         >
                           {t("mcpPage.drawer.editInJson")}
                         </button>
@@ -1146,7 +1146,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                           data-unsaved-ignore
                           aria-pressed={revealJson}
                           onClick={toggleRevealJson}
-                          className="inline-flex h-7 items-center gap-1 rounded-control pe-2 ps-1.5 text-body font-medium text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
+                          className="inline-flex h-7 items-center gap-1 rounded-[4px] pe-2 ps-1.5 text-[12.35px] leading-[1.3] font-medium text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
                         >
                           {revealJson ? (
                             <EyeOff className="h-3.5 w-3.5" strokeWidth={2} />
@@ -1167,7 +1167,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                       wrap="off"
                       className={cn(
                         MONO_FIELD_CLASS,
-                        "h-[300px] resize-y overflow-auto whitespace-pre px-3 py-2.5 leading-[18px]",
+                        "h-[300px] resize-y overflow-auto whitespace-pre px-3 py-2 leading-[18px]",
                       )}
                     />
                     {jsonError && (
@@ -1207,7 +1207,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
               {visibleAppIds.map((app) => (
                 <label
                   key={app}
-                  className="flex h-6 cursor-pointer items-center gap-2 text-body"
+                  className="flex h-6 cursor-pointer items-center gap-2 text-[12.35px] leading-[1.3]"
                 >
                   <input
                     type="checkbox"
@@ -1262,7 +1262,7 @@ const McpFormModal: React.FC<McpFormModalProps> = ({
                 {t("mcpPage.drawer.meta")}
               </DisclosureButton>
               {metaOpen && (
-                <div id="mcp-meta" className="flex flex-col gap-3.5">
+                <div id="mcp-meta" className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-0.5">
                       <label htmlFor="mcp-meta-name" className={LABEL_CLASS}>
@@ -1406,7 +1406,7 @@ function AddRowButton({
     <button
       type="button"
       onClick={onClick}
-      className="-ms-1.5 inline-flex h-7 items-center gap-1 self-start whitespace-nowrap rounded-control pe-2 ps-1.5 text-body font-medium text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
+      className="-ms-1.5 inline-flex h-7 items-center gap-1 self-start whitespace-nowrap rounded-[4px] pe-2 ps-1.5 text-[12.35px] leading-[1.3] font-medium text-fg-2 transition-colors hover:bg-subtle hover:text-fg-1"
     >
       <Plus aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
       {children}

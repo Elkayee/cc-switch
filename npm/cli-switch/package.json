@@ -1,0 +1,37 @@
+{
+  "name": "@spec-ade/cli-switch",
+  "version": "4.0.9",
+  "description": "Cli-Switch in your browser: manage providers, MCP servers, prompts and skills for Claude Code, Codex, Gemini CLI and more",
+  "license": "MIT",
+  "repository": "https://github.com/nullmastermind/cc-switch",
+  "homepage": "https://viber.vn",
+  "type": "module",
+  "bin": {
+    "cli-switch": "bin/cli-switch.mjs"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "codex",
+    "gemini",
+    "provider",
+    "config",
+    "cli"
+  ],
+  "optionalDependencies": {
+    "@spec-ade/cli-switch-win32-x64": "4.0.9",
+    "@spec-ade/cli-switch-win32-arm64": "4.0.9",
+    "@spec-ade/cli-switch-darwin-x64": "4.0.9",
+    "@spec-ade/cli-switch-darwin-arm64": "4.0.9",
+    "@spec-ade/cli-switch-linux-x64": "4.0.9",
+    "@spec-ade/cli-switch-linux-arm64": "4.0.9"
+  }
+}

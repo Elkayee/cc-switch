@@ -81,8 +81,9 @@ pub fn import_from_grokbuild(config: &mut MultiAppConfig) -> Result<usize, AppEr
     if text.trim().is_empty() {
         return Ok(0);
     }
-    let root: toml::Table = toml::from_str(&text)
-        .map_err(|e| AppError::McpValidation(format!("解析 ~/.grok/config.toml 失败: {e}")))?;
+    let root: toml::Table = toml::from_str(&text).map_err(|e| {
+        AppError::McpValidation(format!("Failed to parse ~/.grok/ config.toml: {e}"))
+    })?;
     let Some(entries) = root.get("mcp_servers").and_then(toml::Value::as_table) else {
         return Ok(0);
     };
@@ -146,7 +147,7 @@ pub fn sync_single_server_to_grokbuild(
         toml_edit::DocumentMut::new()
     } else {
         text.parse::<toml_edit::DocumentMut>().map_err(|e| {
-            AppError::McpValidation(format!("解析 Grok Build config.toml 失败: {e}"))
+            AppError::McpValidation(format!("Failed to parse Grok Build config.toml: {e}"))
         })?
     };
     // 若 mcp_servers 缺失或存在但不是 table（如 `mcp_servers = "x"` / `[]`），
@@ -167,7 +168,7 @@ pub fn sync_single_server_to_grokbuild(
         .get_mut("mcp_servers")
         .and_then(toml_edit::Item::as_table_like_mut)
         .ok_or_else(|| {
-            AppError::McpValidation("Grok Build config.toml 的 mcp_servers 不是表".to_string())
+            AppError::McpValidation("Grok Build config.toml mcp_servers is not a table".to_string())
         })?;
     servers.insert(
         id,

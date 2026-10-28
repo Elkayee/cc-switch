@@ -19,15 +19,19 @@ use super::{
 };
 use crate::database::Database;
 use axum::{
-    extract::DefaultBodyLimit,
+    extract::{DefaultBodyLimit, State},
+    response::IntoResponse,
     routing::{any, get, post},
-    Router,
+    Json, Router,
 };
 use hyper_util::rt::TokioIo;
-use std::net::SocketAddr;
+use std::io::ErrorKind;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::{oneshot, RwLock};
 use tokio::task::JoinHandle;
+use tower::util::ServiceExt;
 
 /// 代理服务器状态（共享）
 #[derive(Clone)]
@@ -45,7 +49,7 @@ pub struct ProxyState {
     /// Codex Chat bridge history，用于恢复 previous_response_id 指向的 tool call
     pub codex_chat_history: Arc<CodexChatHistoryStore>,
     /// AppHandle，用于发射事件和更新托盘菜单
-    pub app_handle: Option<tauri::AppHandle>,
+    pub app_handle: Option<tauri::AppHandle<crate::AppRuntime>>,
     /// 故障转移切换管理器
     pub failover_manager: Arc<FailoverSwitchManager>,
 }
@@ -71,7 +75,7 @@ impl ProxyServer {
     pub fn new(
         config: ProxyConfig,
         db: Arc<Database>,
-        app_handle: Option<tauri::AppHandle>,
+        app_handle: Option<tauri::AppHandle<crate::AppRuntime>>,
     ) -> Self {
         // 创建共享的 ProviderRouter（熔断器状态将跨所有请求保持）
         let provider_router = Arc::new(ProviderRouter::new(db.clone()));
@@ -108,7 +112,11 @@ impl ProxyServer {
         let addr: SocketAddr =
             format!("{}:{}", self.config.listen_address, self.config.listen_port)
                 .parse()
-                .map_err(|e| ProxyError::BindFailed(format!("无效的地址: {e}")))?;
+                .map_err(|e| ProxyError::BindFailed(format!("Invalid address: {e}")))?;
+
+        if listen_addr_in_use(addr).await {
+            return Err(ProxyError::BindFailed(port_in_use_message(addr.port())));
+        }
 
         // 创建关闭通道
         let (shutdown_tx, shutdown_rx) = oneshot::channel();
@@ -119,7 +127,7 @@ impl ProxyServer {
         // 绑定监听器
         let listener = tokio::net::TcpListener::bind(&addr)
             .await
-            .map_err(|e| ProxyError::BindFailed(e.to_string()))?;
+            .map_err(|e| ProxyError::BindFailed(map_bind_error(addr.port(), e)))?;
         let local_addr = listener
             .local_addr()
             .map_err(|e| ProxyError::BindFailed(e.to_string()))?;
@@ -151,7 +159,7 @@ impl ProxyServer {
             loop {
                 tokio::select! {
                     result = listener.accept() => {
-                        let (stream, _remote_addr) = match result {
+                        let (stream, remote_addr) = match result {
                             Ok(v) => v,
                             Err(e) => {
                                 log::error!("[{SRV}] accept 失败: {e}", SRV = log_srv::ACCEPT_ERR);
@@ -161,6 +169,7 @@ impl ProxyServer {
                         };
 
                         let app = app.clone();
+                        let peer = super::direct_token::PeerAddr(remote_addr);
                         tokio::spawn(async move {
                             // Peek raw TCP bytes to capture original header casing
                             // before hyper parses (and lowercases) the header names.
@@ -192,6 +201,7 @@ impl ProxyServer {
 
                                     // Insert our own header case map alongside hyper's internal one
                                     parts.extensions.insert(cases);
+                                    parts.extensions.insert(peer);
 
                                     let body = axum::body::Body::new(body);
                                     let axum_req = http::Request::from_parts(parts, body);
@@ -296,11 +306,16 @@ impl ProxyServer {
         );
     }
 
-    fn build_router(&self) -> Router {
+    fn route_table() -> Router<ProxyState> {
         Router::new()
             // 健康检查
             .route("/health", get(handlers::health_check))
             .route("/status", get(handlers::get_status))
+            // 托管 OAuth 的直连 token（仅本机、非浏览器调用方）
+            .route(
+                "/auth/token/:app/:provider_id",
+                get(super::direct_token::handle_direct_token),
+            )
             // Claude API (支持带前缀和不带前缀两种格式)
             .route("/v1/messages", post(handlers::handle_messages))
             .route("/claude/v1/messages", post(handlers::handle_messages))
@@ -421,7 +436,19 @@ impl ProxyServer {
             .route("/gemini/v1/*path", any(handlers::handle_gemini))
             // 提高默认请求体大小限制（避免 413 Payload Too Large）
             .layer(DefaultBodyLimit::max(200 * 1024 * 1024))
-            .with_state(self.state.clone())
+    }
+
+    fn build_router(&self) -> Router {
+        let state = self.state.clone();
+        let dispatch = Self::route_table().with_state(state.clone());
+        Self::route_table()
+            .fallback(
+                move |State(state): State<ProxyState>, request: axum::extract::Request| {
+                    let dispatch = dispatch.clone();
+                    async move { dispatch_pinned(state, dispatch, request).await }
+                },
+            )
+            .with_state(state)
     }
 
     /// 在不重启服务的情况下更新运行时配置
@@ -457,6 +484,97 @@ impl ProxyServer {
             .reset_provider_breaker(provider_id, app_type)
             .await;
     }
+}
+
+fn probe_socket_addr(addr: SocketAddr) -> SocketAddr {
+    if !addr.ip().is_unspecified() {
+        return addr;
+    }
+    let ip = if addr.is_ipv4() {
+        IpAddr::V4(Ipv4Addr::LOCALHOST)
+    } else {
+        IpAddr::V6(Ipv6Addr::LOCALHOST)
+    };
+    SocketAddr::new(ip, addr.port())
+}
+
+fn port_in_use_message(port: u16) -> String {
+    format!("Port {port} is already in use; startup cancelled (the process holding the port was not killed)")
+}
+
+fn map_bind_error(port: u16, err: std::io::Error) -> String {
+    if err.kind() == ErrorKind::AddrInUse {
+        port_in_use_message(port)
+    } else {
+        err.to_string()
+    }
+}
+
+async fn listen_addr_in_use(addr: SocketAddr) -> bool {
+    if addr.port() == 0 {
+        return false;
+    }
+    tokio::time::timeout(
+        Duration::from_millis(300),
+        tokio::net::TcpStream::connect(probe_socket_addr(addr)),
+    )
+    .await
+    .ok()
+    .and_then(Result::ok)
+    .is_some()
+}
+
+async fn dispatch_pinned(
+    state: ProxyState,
+    dispatch: Router,
+    request: axum::extract::Request,
+) -> axum::response::Response {
+    let discovery = handlers::is_claude_model_discovery(request.uri(), request.headers());
+    let path = request.uri().path().to_string();
+    let query = request.uri().query().map(str::to_string);
+    let classified = super::provider_pin::classify_provider_pin(&path, query.as_deref(), discovery);
+    let super::provider_pin::PinClass::Pin {
+        id,
+        app,
+        path,
+        query,
+    } = classified
+    else {
+        return axum::http::StatusCode::NOT_FOUND.into_response();
+    };
+    let provider = match state.db.get_provider_by_id(&id, app.as_str()) {
+        Ok(Some(provider)) => provider,
+        Ok(None) => {
+            return (
+                axum::http::StatusCode::NOT_FOUND,
+                Json(serde_json::json!({
+                    "error": {
+                        "message": format!("provider {id} not found for {}", app.as_str()),
+                        "type": "proxy_error",
+                    }
+                })),
+            )
+                .into_response();
+        }
+        Err(error) => return ProxyError::DatabaseError(error.to_string()).into_response(),
+    };
+    let (mut parts, body) = request.into_parts();
+    let rewritten = match query {
+        Some(query) => format!("{path}?{query}"),
+        None => path,
+    };
+    let Ok(uri) = rewritten.parse() else {
+        return axum::http::StatusCode::NOT_FOUND.into_response();
+    };
+    parts.uri = uri;
+    parts
+        .extensions
+        .insert(super::provider_pin::PinnedProvider { provider });
+    let request = axum::extract::Request::from_parts(parts, body);
+    dispatch
+        .oneshot(request)
+        .await
+        .unwrap_or_else(|error| match error {})
 }
 
 #[cfg(test)]
@@ -1316,5 +1434,477 @@ mod tests {
             full_url_request.body["commands"]["search_query"][0]["q"],
             "full URL"
         );
+    }
+
+    #[tokio::test]
+    async fn pinned_claude_id_forwards_to_that_provider_not_in_use() {
+        async fn mock_upstream() -> (
+            std::net::SocketAddr,
+            tokio::task::JoinHandle<()>,
+            Arc<Mutex<usize>>,
+        ) {
+            let hits = Arc::new(Mutex::new(0usize));
+            let hits_for_route = hits.clone();
+            let app = Router::new().route(
+                "/v1/messages",
+                post(move |request: axum::extract::Request| {
+                    let hits_for_route = hits_for_route.clone();
+                    async move {
+                        let _ = axum::body::to_bytes(request.into_body(), 1024 * 1024).await;
+                        *hits_for_route.lock().await += 1;
+                        (
+                            StatusCode::OK,
+                            r#"{"id":"msg","type":"message","role":"assistant","content":[]}"#,
+                        )
+                    }
+                }),
+            );
+            let listener = tokio::net::TcpListener::bind(("127.0.0.1", 0))
+                .await
+                .expect("bind mock upstream");
+            let addr = listener.local_addr().expect("mock address");
+            let handle = tokio::spawn(async move {
+                axum::serve(listener, app)
+                    .await
+                    .expect("serve mock upstream");
+            });
+            (addr, handle, hits)
+        }
+
+        let (in_use_addr, in_use_handle, in_use_hits) = mock_upstream().await;
+        let (pinned_addr, pinned_handle, pinned_hits) = mock_upstream().await;
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let in_use = Provider::with_id(
+            "in-use".to_string(),
+            "In Use".to_string(),
+            json!({
+                "env": {
+                    "ANTHROPIC_BASE_URL": format!("http://{in_use_addr}"),
+                    "ANTHROPIC_AUTH_TOKEN": "sk-in-use"
+                }
+            }),
+            None,
+        );
+        let pinned = Provider::with_id(
+            "pinned-id".to_string(),
+            "Pinned".to_string(),
+            json!({
+                "env": {
+                    "ANTHROPIC_BASE_URL": format!("http://{pinned_addr}"),
+                    "ANTHROPIC_AUTH_TOKEN": "sk-pinned"
+                }
+            }),
+            None,
+        );
+        db.save_provider("claude", &in_use).expect("save in-use");
+        db.save_provider("claude", &pinned).expect("save pinned");
+        db.set_current_provider("claude", &in_use.id)
+            .expect("select in-use");
+
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_port: 0,
+                enable_logging: false,
+                non_streaming_timeout: 10,
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+        let proxy_info = proxy.start().await.expect("start test proxy");
+        let client = reqwest::Client::new();
+        let response = client
+            .post(format!(
+                "http://127.0.0.1:{}/pinned-id/v1/messages",
+                proxy_info.port
+            ))
+            .json(&json!({
+                "model": "claude-sonnet",
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": "hi"}]
+            }))
+            .send()
+            .await
+            .expect("send pinned request");
+
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(*pinned_hits.lock().await, 1, "pinned upstream was not used");
+        assert_eq!(*in_use_hits.lock().await, 0, "pin fell back to In Use");
+
+        let status: Value = client
+            .get(format!("http://127.0.0.1:{}/status", proxy_info.port))
+            .send()
+            .await
+            .expect("status")
+            .json()
+            .await
+            .expect("status json");
+        assert_eq!(status["failover_count"], 0, "pin incremented failover");
+        assert_eq!(
+            status["current_provider_id"],
+            Value::Null,
+            "pin wrote In Use: {status}"
+        );
+
+        let unprefixed = client
+            .post(format!("http://127.0.0.1:{}/v1/messages", proxy_info.port))
+            .json(&json!({
+                "model": "claude-sonnet",
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": "hi"}]
+            }))
+            .send()
+            .await
+            .expect("send unprefixed request");
+        assert_eq!(unprefixed.status(), StatusCode::OK);
+        assert_eq!(*in_use_hits.lock().await, 1, "unprefixed left In Use");
+        assert_eq!(*pinned_hits.lock().await, 1, "unprefixed also hit the pin");
+
+        proxy.stop().await.expect("stop test proxy");
+        in_use_handle.abort();
+        pinned_handle.abort();
+    }
+
+    #[tokio::test]
+    async fn pinned_failure_does_not_fall_through_to_in_use() {
+        async fn mock_upstream(
+            status: StatusCode,
+        ) -> (
+            std::net::SocketAddr,
+            tokio::task::JoinHandle<()>,
+            Arc<Mutex<usize>>,
+        ) {
+            let hits = Arc::new(Mutex::new(0usize));
+            let hits_for_route = hits.clone();
+            let app = Router::new().route(
+                "/v1/messages",
+                post(move |request: axum::extract::Request| {
+                    let hits_for_route = hits_for_route.clone();
+                    async move {
+                        let _ = axum::body::to_bytes(request.into_body(), 1024 * 1024).await;
+                        *hits_for_route.lock().await += 1;
+                        (status, r#"{"id":"msg","type":"message"}"#)
+                    }
+                }),
+            );
+            let listener = tokio::net::TcpListener::bind(("127.0.0.1", 0))
+                .await
+                .expect("bind mock upstream");
+            let addr = listener.local_addr().expect("mock address");
+            let handle = tokio::spawn(async move {
+                axum::serve(listener, app)
+                    .await
+                    .expect("serve mock upstream");
+            });
+            (addr, handle, hits)
+        }
+
+        let (in_use_addr, in_use_handle, in_use_hits) = mock_upstream(StatusCode::OK).await;
+        let (pinned_addr, pinned_handle, pinned_hits) =
+            mock_upstream(StatusCode::INTERNAL_SERVER_ERROR).await;
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let in_use = Provider::with_id(
+            "in-use".to_string(),
+            "In Use".to_string(),
+            json!({
+                "env": {
+                    "ANTHROPIC_BASE_URL": format!("http://{in_use_addr}"),
+                    "ANTHROPIC_AUTH_TOKEN": "sk-in-use"
+                }
+            }),
+            None,
+        );
+        let pinned = Provider::with_id(
+            "pinned-id".to_string(),
+            "Pinned".to_string(),
+            json!({
+                "env": {
+                    "ANTHROPIC_BASE_URL": format!("http://{pinned_addr}"),
+                    "ANTHROPIC_AUTH_TOKEN": "sk-pinned"
+                }
+            }),
+            None,
+        );
+        db.save_provider("claude", &in_use).expect("save in-use");
+        db.save_provider("claude", &pinned).expect("save pinned");
+        db.set_current_provider("claude", &in_use.id)
+            .expect("select in-use");
+
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_port: 0,
+                enable_logging: false,
+                non_streaming_timeout: 10,
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+        let proxy_info = proxy.start().await.expect("start test proxy");
+        let response = reqwest::Client::new()
+            .post(format!(
+                "http://127.0.0.1:{}/pinned-id/v1/messages",
+                proxy_info.port
+            ))
+            .json(&json!({
+                "model": "ccs-claude-other--other-model",
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": "hi"}]
+            }))
+            .send()
+            .await
+            .expect("send failing pin");
+
+        assert_ne!(response.status(), StatusCode::OK);
+        assert!(
+            *pinned_hits.lock().await >= 1,
+            "failing pin never reached its provider"
+        );
+        assert_eq!(*in_use_hits.lock().await, 0, "pin failed over to In Use");
+
+        proxy.stop().await.expect("stop test proxy");
+        in_use_handle.abort();
+        pinned_handle.abort();
+    }
+
+    #[tokio::test]
+    async fn pinned_claude_desktop_wrong_token_is_unauthorized() {
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let pinned = Provider::with_id(
+            "desktop-id".to_string(),
+            "Desktop".to_string(),
+            json!({ "env": { "ANTHROPIC_BASE_URL": "http://127.0.0.1:1" } }),
+            None,
+        );
+        db.save_provider("claude-desktop", &pinned)
+            .expect("save desktop");
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_port: 0,
+                enable_logging: false,
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+        let proxy_info = proxy.start().await.expect("start test proxy");
+        let response = reqwest::Client::new()
+            .post(format!(
+                "http://127.0.0.1:{}/desktop-id/claude-desktop/v1/messages",
+                proxy_info.port
+            ))
+            .header("authorization", "Bearer wrong-token")
+            .json(&json!({
+                "model": "claude-sonnet",
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": "hi"}]
+            }))
+            .send()
+            .await
+            .expect("send desktop pin");
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        proxy.stop().await.expect("stop test proxy");
+    }
+
+    #[tokio::test]
+    async fn missing_pinned_id_is_not_found_and_is_not_forwarded() {
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_port: 0,
+                enable_logging: false,
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+        let proxy_info = proxy.start().await.expect("start test proxy");
+        let client = reqwest::Client::new();
+        let response = client
+            .post(format!(
+                "http://127.0.0.1:{}/missing-id/v1/messages",
+                proxy_info.port
+            ))
+            .json(&json!({
+                "model": "claude-sonnet",
+                "max_tokens": 16,
+                "messages": [{"role": "user", "content": "hi"}]
+            }))
+            .send()
+            .await
+            .expect("send missing id");
+
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        let body: Value = response.json().await.expect("error json");
+        assert_eq!(
+            body,
+            json!({
+                "error": {
+                    "message": "provider missing-id not found for claude",
+                    "type": "proxy_error"
+                }
+            })
+        );
+        proxy.stop().await.expect("stop test proxy");
+    }
+
+    #[tokio::test]
+    async fn pinned_claude_models_come_from_that_provider() {
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let pinned = Provider::with_id(
+            "pinned-id".to_string(),
+            "Pinned".to_string(),
+            json!({
+                "env": {
+                    "ANTHROPIC_MODEL": "claude-main",
+                    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "haiku-mini",
+                    "ANTHROPIC_DEFAULT_SONNET_MODEL": "kimi-k2",
+                    "ANTHROPIC_DEFAULT_SONNET_MODEL_NAME": "Kimi K2",
+                    "ANTHROPIC_DEFAULT_OPUS_MODEL": "kimi-k2",
+                    "ANTHROPIC_DEFAULT_FABLE_MODEL": "  "
+                }
+            }),
+            None,
+        );
+        let empty = Provider::with_id(
+            "empty-id".to_string(),
+            "Empty".to_string(),
+            json!({ "env": {} }),
+            None,
+        );
+        let codex = Provider::with_id(
+            "codex-id".to_string(),
+            "Codex".to_string(),
+            json!({ "auth": {} }),
+            None,
+        );
+        db.save_provider("claude", &pinned).expect("save pinned");
+        db.save_provider("claude", &empty).expect("save empty");
+        db.save_provider("codex", &codex).expect("save codex");
+
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_port: 0,
+                enable_logging: false,
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+        let proxy_info = proxy.start().await.expect("start test proxy");
+        let client = reqwest::Client::new();
+        let listed = client
+            .get(format!(
+                "http://127.0.0.1:{}/pinned-id/v1/models?limit=1000",
+                proxy_info.port
+            ))
+            .header("anthropic-version", "2023-06-01")
+            .send()
+            .await
+            .expect("pinned models");
+        assert_eq!(listed.status(), StatusCode::OK);
+        let listed_body: Value = listed.json().await.expect("models json");
+        assert_eq!(
+            listed_body,
+            json!({
+                "data": [
+                    {
+                        "type": "model",
+                        "id": "claude-main",
+                        "display_name": "claude-main",
+                        "description": ""
+                    },
+                    {
+                        "type": "model",
+                        "id": "haiku-mini",
+                        "display_name": "haiku-mini",
+                        "description": ""
+                    },
+                    {
+                        "type": "model",
+                        "id": "kimi-k2",
+                        "display_name": "Kimi K2",
+                        "description": ""
+                    }
+                ],
+                "has_more": false
+            })
+        );
+
+        let empty_models = client
+            .get(format!(
+                "http://127.0.0.1:{}/empty-id/v1/models?limit=1000",
+                proxy_info.port
+            ))
+            .header("anthropic-version", "2023-06-01")
+            .send()
+            .await
+            .expect("empty models");
+        assert_eq!(empty_models.status(), StatusCode::OK);
+        let empty_body: Value = empty_models.json().await.expect("empty json");
+        assert_eq!(empty_body, json!({ "data": [], "has_more": false }));
+
+        let catalog = client
+            .get(format!(
+                "http://127.0.0.1:{}/codex-id/v1/models",
+                proxy_info.port
+            ))
+            .send()
+            .await
+            .expect("codex catalog");
+        assert_eq!(catalog.status(), StatusCode::OK);
+        let catalog_body: Value = catalog.json().await.expect("catalog json");
+        assert!(
+            catalog_body.get("models").is_some(),
+            "codex pin should stay a catalog probe: {catalog_body}"
+        );
+        assert!(
+            catalog_body.get("data").is_none(),
+            "codex pin must not use the Claude model list: {catalog_body}"
+        );
+
+        proxy.stop().await.expect("stop test proxy");
+    }
+
+    #[tokio::test]
+    async fn start_fails_when_listen_port_already_in_use_without_taking_the_port() {
+        let occupant = tokio::net::TcpListener::bind(("127.0.0.1", 0))
+            .await
+            .expect("bind occupant");
+        let addr = occupant.local_addr().expect("occupant addr");
+
+        let db = Arc::new(Database::memory().expect("memory database"));
+        let proxy = ProxyServer::new(
+            ProxyConfig {
+                listen_address: "127.0.0.1".to_string(),
+                listen_port: addr.port(),
+                ..ProxyConfig::default()
+            },
+            db,
+            None,
+        );
+
+        let err = proxy
+            .start()
+            .await
+            .expect_err("start should fail when the port is taken");
+        match err {
+            ProxyError::BindFailed(msg) => {
+                assert!(
+                    msg.contains(&addr.port().to_string()),
+                    "error should name the port: {msg}"
+                );
+                assert!(
+                    msg.contains("already in use"),
+                    "error should say the port is in use: {msg}"
+                );
+            }
+            other => panic!("expected BindFailed, got {other:?}"),
+        }
+
+        tokio::net::TcpStream::connect(addr)
+            .await
+            .expect("occupant must keep the port");
     }
 }

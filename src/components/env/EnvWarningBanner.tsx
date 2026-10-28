@@ -120,10 +120,10 @@ export function EnvWarningBanner({
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-warning-text">
+                  <h3 className="text-[12.35px] leading-[1.3] font-semibold text-warning-text">
                     {t("env.warning.title")}
                   </h3>
-                  <p className="text-sm text-warning-text mt-0.5">
+                  <p className="text-[12.35px] leading-[1.3] text-warning-text mt-0.5">
                     {t("env.warning.description", { count: conflicts.length })}
                   </p>
                 </div>
@@ -172,7 +172,7 @@ export function EnvWarningBanner({
                     />
                     <label
                       htmlFor="select-all"
-                      className="text-sm font-medium text-warning-text cursor-pointer"
+                      className="text-[12.35px] leading-[1.3] font-medium text-warning-text cursor-pointer"
                     >
                       {t("env.actions.selectAll")}
                     </label>
@@ -184,7 +184,7 @@ export function EnvWarningBanner({
                       return (
                         <div
                           key={key}
-                          className="flex items-start gap-3 p-3 bg-surface rounded-md border border-transparent"
+                          className="flex items-start gap-3 p-3 bg-surface rounded-[4px] border border-transparent"
                         >
                           <Checkbox
                             id={key}
@@ -195,14 +195,14 @@ export function EnvWarningBanner({
                           <div className="flex-1 min-w-0">
                             <label
                               htmlFor={key}
-                              className="block text-sm font-medium text-fg-1 cursor-pointer"
+                              className="block text-[12.35px] leading-[1.3] font-medium text-fg-1 cursor-pointer"
                             >
                               {conflict.varName}
                             </label>
-                            <p className="text-xs text-fg-2 mt-1 break-all">
+                            <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1 break-all">
                               {t("env.field.value")}: {conflict.varValue}
                             </p>
-                            <p className="text-xs text-fg-2 mt-1">
+                            <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1">
                               {t("env.field.source")}:{""}
                               {getSourceDescription(conflict)}
                             </p>
@@ -256,7 +256,7 @@ export function EnvWarningBanner({
               <p>
                 {t("env.confirm.message", { count: selectedConflicts.size })}
               </p>
-              <p className="text-sm text-fg-2">
+              <p className="text-[12.35px] leading-[1.3] text-fg-2">
                 {t("env.confirm.backupNotice")}
               </p>
             </DialogDescription>

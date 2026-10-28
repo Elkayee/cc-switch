@@ -107,7 +107,7 @@ function MetricCell({
   onSelect: () => void;
 }) {
   return (
-    <div className="group relative min-w-0 px-4 pb-3.5 pt-2.5">
+    <div className="group relative min-w-0 px-3 pb-3 pt-2">
       <button
         type="button"
         aria-pressed={selected}
@@ -180,7 +180,7 @@ function SubMetric({
   help?: { title: string; body: string };
 }) {
   return (
-    <div className="flex min-w-0 flex-col gap-0.5 px-4 py-2.5">
+    <div className="flex min-w-0 flex-col gap-0.5 px-3 py-2">
       <span className="flex h-[18px] items-center gap-0.5 whitespace-nowrap text-caption text-fg-3">
         {label}
         {help && <HelpTip title={help.title}>{help.body}</HelpTip>}

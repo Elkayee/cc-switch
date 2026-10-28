@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "CC Switch",
+    "title": "Viber Switch",
     "description": "Claude Code / Codex / Gemini CLI 全方位輔助工具"
   },
   "common": {
@@ -53,9 +53,9 @@
     "required": "必填"
   },
   "firstRunNotice": {
-    "title": "歡迎使用 CC Switch",
-    "bodyDefault": "CC Switch 可以協助您在 Claude Code / Codex / Gemini CLI 的多個供應商之間一鍵切換。如果您之前已經設定過這些工具，CC Switch 會自動將現有設定儲存為名為 default 的供應商，確保您的設定不會遺失。",
-    "bodyOfficial": "清單中還預設了「官方 (Official)」供應商，隨時點擊即可切換回官方預設設定。切換前 CC Switch 會自動將目前設定備份回 default，可以放心來回切換。這就是 CC Switch 的運作方式。",
+    "title": "歡迎使用 Viber Switch",
+    "bodyDefault": "Viber Switch 可以協助您在 Claude Code / Codex / Gemini CLI 的多個供應商之間一鍵切換。如果您之前已經設定過這些工具，Viber Switch 會自動將現有設定儲存為名為 default 的供應商，確保您的設定不會遺失。",
+    "bodyOfficial": "清單中還預設了「官方 (Official)」供應商，隨時點擊即可切換回官方預設設定。切換前 Viber Switch 會自動將目前設定備份回 default，可以放心來回切換。這就是 Viber Switch 的運作方式。",
     "confirm": "我了解了"
   },
   "apiKeyInput": {
@@ -82,7 +82,8 @@
     "disableAutoModeServerHelp": "閘道不支援伺服器端檢查，auto mode 每個工作階段會先停下提示一次「不符合條件」，按 Enter 後改用本機檢查。勾選後直接用本機檢查，不再提示。官方端點不要勾選。",
     "keyFieldsHint": "位址、Key、模型、上下文視窗和相容開關隨供應商切換；其餘欄位是 Claude Code 全域設定，儲存後對所有供應商生效。",
     "inactiveFieldsHint": "這些是舊版存進卡裡的設定，現在切換不會寫出去。點一下加入上方，儲存後對所有供應商生效。",
-    "addToGlobalSettings": "加入全域設定"
+    "addToGlobalSettings": "加入全域設定",
+    "enableTodoTools": "啟用 Todo 工具"
   },
   "header": {
     "viewOnGithub": "在 GitHub 上檢視",
@@ -119,8 +120,8 @@
     "stackBadgeNoModels": "這家沒有設定模型，不會出現在模型選擇器裡",
     "stackSaved": "已儲存，重新啟動 {{client}} 後生效",
     "stackSavedLive": "已儲存，{{client}} 裡立即生效",
-    "stackReselectHint": "CC Switch 每次改寫用戶端設定後，如果模型選擇器裡選的是聚合的模型，需要重新選一次",
-    "stackPartial": "已部分寫入，將在下次操作或重新啟動 CC Switch 時補完",
+    "stackReselectHint": "Viber Switch 每次改寫用戶端設定後，如果模型選擇器裡選的是聚合的模型，需要重新選一次",
+    "stackPartial": "已部分寫入，將在下次操作或重新啟動 Viber Switch 時補完",
     "stackFailed": "聚合的模型儲存失敗：{{error}}",
     "stackDefaultCannotRemove": "預設供應商不能移除，請先把別的供應商設為預設",
     "stackDefaultHint": "它是預設供應商：列表裡的第一個模型負責 Claude Code 啟動和背景任務",
@@ -139,9 +140,9 @@
       "nothingUsable": "Codex 內建列表：裡面沒有能用的模型，請把 Codex 升級到最新版"
     },
     "routeOwnsCatalog": "聚合的模型不會出現在 Codex 中：路由供應商使用自己的模型目錄檔案（model_catalog_json）",
-    "adoptCatalog": "改用 CC Switch 的模型目錄",
-    "adoptCatalogDone": "已改用 CC Switch 的模型目錄，重新啟動 Codex 後生效",
-    "adoptCatalogFailed": "改用 CC Switch 的模型目錄失敗：{{error}}",
+    "adoptCatalog": "改用 Viber Switch 的模型目錄",
+    "adoptCatalogDone": "已改用 Viber Switch 的模型目錄，重新啟動 Codex 後生效",
+    "adoptCatalogFailed": "改用 Viber Switch 的模型目錄失敗：{{error}}",
     "noRoutingSupport": "不支援路由",
     "blockedByProxyHint": "路由模式下無法切換至官方供應商",
     "editProvider": "編輯供應商",
@@ -270,7 +271,39 @@
     "formSubtitleStack": "{{app}}（聚合模式）",
     "editCurrentNoticeFile": "這是正在使用的供應商。儲存後會立即寫進",
     "editCurrentNoticeFileEnd": "，下一次請求生效。",
-    "editCurrentNotice": "這是正在使用的供應商。儲存後立即生效，下一次請求就用新的設定。"
+    "editCurrentNotice": "這是正在使用的供應商。儲存後立即生效，下一次請求就用新的設定。",
+    "copyProxyUrl": "複製代理 URL",
+    "connect": {
+      "title": "連線：{{name}}",
+      "desc": "使用 CC Switch 代理，或直接連線上游供應商。",
+      "proxyTitle": "CC Switch 代理",
+      "proxyUrl": "代理 URL",
+      "proxyHint": "客戶端指向這裡即可。真實金鑰保留在 CC Switch 中，填任意佔位金鑰即可（如 PROXY_MANAGED）。",
+      "upstreamTitle": "上游（直連）",
+      "baseUrl": "Base URL",
+      "apiKey": "API Key",
+      "model": "模型",
+      "copyField": "複製{{name}}",
+      "show": "顯示",
+      "hide": "隱藏",
+      "notSet": "未設定",
+      "endpoint": "端點（完整 URL）",
+      "fullEndpoint": "完整請求位址",
+      "apiKeyEnv": "API Key（環境變數）",
+      "nativeLogin": "Codex CLI 的 ChatGPT 登入",
+      "nativeHint": "使用 Codex CLI 自身的 ChatGPT 登入，CC Switch 中不保存 API Key。",
+      "defaultAccount": "{{name}}（預設帳號）",
+      "noAccount": "尚未登入任何帳號",
+      "needsReauth": "需要重新登入：重新整理憑證已失效。",
+      "managedHint": "沒有靜態 API Key：此 OAuth 權杖由 CC Switch 保管並自動更新，只有代理會把它附加到請求上。要使用此供應商，請透過上面的代理 URL 連線。",
+      "oauthHint": "下面是你的 存取權杖，有效期較短，剩餘不足一小時時 CC Switch 會自動更新；請從權杖 URL 取得目前權杖，不要重複複製。",
+      "token": "存取權杖",
+      "tokenUntil": "存取權杖（有效至 {{time}}）",
+      "tokenUrl": "權杖 URL（GET）",
+      "tokenUrlHint": "GET 以純文字回傳目前權杖（回應本文即權杖，到期時間在 X-Token-Expires-At 標頭中）。上游對該權杖回應 401 後，帶上標頭 X-Invalid-Token: <該權杖> 再請求即可取得新權杖：curl -H \"X-Invalid-Token: <token>\" <URL>。只有該權杖仍是目前儲存的權杖時才會被替換，每個帳號最多每 30 秒一次（此時回應帶 Retry-After 標頭）。僅限本機、非瀏覽器呼叫。",
+      "requiredHeaders": "必要標頭",
+      "requiredHeadersHint": "請求時需連同權杖一併送出這些標頭（Authorization: Bearer <token>）。權杖 URL 會以 X-Upstream-<名稱> 回應標頭回傳。"
+    }
   },
   "claudeCode": {
     "needsRouting": "需要路由",
@@ -332,7 +365,9 @@
         "inactive": "開啟 Claude Desktop 本地路由，用於需要模型對應或格式轉換的供應商。目前設定位址：{{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "還有其他應用處於路由模式。請先讓這些應用回到直連，再停止路由服務。"
-    }
+    },
+    "modelMappingOffHint": "僅當供應商直接接受 Claude Desktop 可識別的三檔角色 ID（claude-sonnet-* / claude-opus-* / claude-haiku-*）時才適用直連；其他模型名（含 claude-3-5-sonnet-… 等舊式 ID）請選擇「模型映射」。",
+    "modelMappingOnHint": "Claude Desktop 只接受 claude-sonnet-* / claude-opus-* / claude-haiku-* 三檔角色 ID。選擇「模型映射」後，Viber Switch 會把這三檔對應到供應商的實際模型，並在使用期間保持本地路由開啟。"
   },
   "notifications": {
     "providerAdded": "供應商已新增",
@@ -384,13 +419,14 @@
     "codexAuthCleanupFailed": "切換成功，但未能刪除 auth.json，官方登入憑證仍留在磁碟上；如需徹底移除請手動刪除 Codex 設定目錄中的 auth.json",
     "windowControlFailed": "視窗控制失敗：{{error}}",
     "officialBlockedByProxy": "本地路由模式下不能切換至官方供應商，使用路由存取官方 API 可能導致帳號被封鎖",
-    "proxyOfficialWarning": "目前供應商 {{name}} 是官方供應商，建議切換至第三方供應商後再使用本地路由"
+    "proxyOfficialWarning": "目前供應商 {{name}} 是官方供應商，建議切換至第三方供應商後再使用本地路由",
+    "claudeDesktopProxyRestartRequired": "切換成功，請保持 Viber Switch 執行，並重新啟動 Claude Desktop 後生效"
   },
   "confirm": {
     "deleteProvider": "刪除供應商",
     "deleteProviderMessage": "確定要刪除供應商「{{name}}」嗎？此操作無法復原。",
     "removeProvider": "移除供應商",
-    "removeProviderMessage": "確定要從設定中移除供應商「{{name}}」嗎？\n\n移除後該供應商將不再生效，但設定資料會保留在 CC Switch 中，您可以隨時重新新增。",
+    "removeProviderMessage": "確定要從設定中移除供應商「{{name}}」嗎？\n\n移除後該供應商將不再生效，但設定資料會保留在 Viber Switch 中，您可以隨時重新新增。",
     "piDefaultProviderWarning": "Pi 的全域預設目前指向此供應商。繼續後，Pi 會嘗試其他可用模型；你可以在 Pi 中使用 /model 重新選擇，或使用 /login 登入其他供應商。",
     "proxy": {
       "title": "啟用本地路由服務",
@@ -404,7 +440,7 @@
     },
     "unifyCodexHistory": {
       "title": "統一 Codex 會話歷史",
-      "message": "開啟後，Codex CLI 的 resume 清單會把官方訂閱與第三方的會話合併顯示（Codex 桌面版更新後已經可以顯示全部會話，不受影響）。注意：跨供應商繼續舊會話時，可能因對方後端無法解密 encrypted_content 推理內容而失敗。\n\n可選擇同時把現有官方會話歷史遷入共享清單（遷移前自動備份到 ~/.cc-switch/backups，關閉開關時可選擇恢復）。",
+      "message": "開啟後，Codex CLI 的 resume 清單會把官方訂閱與第三方的會話合併顯示（Codex 桌面版更新後已經可以顯示全部會話，不受影響）。注意：跨供應商繼續舊會話時，可能因對方後端無法解密 encrypted_content 推理內容而失敗。\n\n可選擇同時把現有官方會話歷史遷入共享清單（遷移前自動備份到 應用備份目錄，關閉開關時可選擇恢復）。",
       "migrateExisting": "同時遷入現有官方會話歷史",
       "confirm": "我已了解，繼續開啟"
     },
@@ -438,13 +474,13 @@
       "goToApps": "前往「應用」",
       "updates": "各應用的新版本",
       "checkToolUpdates": "啟動時檢查各應用的新版本",
-      "checkToolUpdatesHelp": "開啟後，每次啟動 CC Switch 會查一次已安裝的命令列應用有沒有新版本，查到了就在側欄「應用」上顯示一個圓點。不會自動升級。",
+      "checkToolUpdatesHelp": "開啟後，每次啟動 Viber Switch 會查一次已安裝的命令列應用有沒有新版本，查到了就在側欄「應用」上顯示一個圓點。不會自動升級。",
       "windowAndTerminal": "視窗與終端機",
       "trayStyle": "系統匣樣式",
       "trayStylePanel": "面板",
       "trayStyleMenu": "選單",
       "trayStyleHelp": "點系統匣圖示時彈出什麼（Windows 上左鍵一律開啟主視窗，右鍵彈出所選樣式）。面板：各應用使用中的供應商、額度與用量，可以搜尋、切換。選單：系統原生選單。切換後立即生效。",
-      "minimizeToTrayHelp": "開啟時，點關閉按鈕只隱藏視窗，CC Switch 留在系統匣裡繼續執行（輕量模式在系統匣選單裡）；關閉時點關閉按鈕直接結束。",
+      "minimizeToTrayHelp": "開啟時，點關閉按鈕只隱藏視窗，Viber Switch 留在系統匣裡繼續執行（輕量模式在系統匣選單裡）；關閉時點關閉按鈕直接結束。",
       "terminalHelp": "點供應商卡片上的「開啟終端機」時用哪個終端機。選的終端機無法使用時，改用系統預設終端機。"
     },
     "tabGeneral": "通用",
@@ -456,7 +492,8 @@
       "beta": "Beta",
       "copilotDescription": "管理 GitHub Copilot 帳號",
       "codexOauthDescription": "管理 ChatGPT 帳號",
-      "xaiOauthDescription": "管理 xAI / Grok 帳號"
+      "xaiOauthDescription": "管理 xAI / Grok 帳號",
+      "title": "OAuth 驗證中心"
     },
     "advanced": {
       "configDir": {
@@ -485,7 +522,7 @@
       },
       "globalProxy": {
         "title": "全域出站代理伺服器",
-        "description": "設定 CC Switch 存取外部 API 時使用的代理伺服器"
+        "description": "設定 Viber Switch 存取外部 API 時使用的代理伺服器"
       },
       "data": {
         "title": "資料管理",
@@ -512,7 +549,8 @@
         "mediaFallback": "不支援圖片降級",
         "mediaFallbackDescription": "當供應商不支援圖片輸入時（已宣告純文字能力，或上游回傳不支援圖片的錯誤），自動將圖片區塊替換為 [Unsupported Image] 標記，使對話不中斷",
         "mediaHeuristic": "純文字模型預判",
-        "mediaHeuristicDescription": "傳送前依內建的已確認純文字模型登錄表移除圖片。關閉只會停用代理的登錄表預判；已宣告純文字模型的處理與上游錯誤兜底仍會保留，且不會改變 Codex 模型目錄的能力宣告"
+        "mediaHeuristicDescription": "傳送前依內建的已確認純文字模型登錄表移除圖片。關閉只會停用代理的登錄表預判；已宣告純文字模型的處理與上游錯誤兜底仍會保留，且不會改變 Codex 模型目錄的能力宣告",
+        "enabledDescription": "總開關，關閉後所有整流功能將被停用"
       },
       "optimizer": {
         "title": "Bedrock 請求最佳化工具",
@@ -527,7 +565,7 @@
         "title": "應用程式診斷日誌",
         "description": "控制應用程式診斷日誌的輸出層級",
         "enabled": "啟用應用程式診斷日誌",
-        "enabledDescription": "控制 cc-switch.log；不影響請求用量記錄和 crash.log",
+        "enabledDescription": "控制應用執行日誌；請求用量紀錄與 crash.log 不受影響",
         "openLog": "開啟日誌",
         "openLogFailed": "開啟日誌所在位置失敗：{{error}}",
         "level": "日誌層級",
@@ -545,7 +583,8 @@
           "info": "一般操作資訊（預設）",
           "debug": "詳細資訊，包含 SSE 串流與請求/回應詳情",
           "trace": "全部日誌，最詳細"
-        }
+        },
+        "levelHint": "日誌層級說明："
       }
     },
     "language": "介面語言",
@@ -556,7 +595,7 @@
     "themeDark": "月之暗面",
     "themeSystem": "跟隨系統",
     "importExport": "SQL 匯入匯出",
-    "importExportHint": "匯入/匯出資料庫 SQL 備份（僅支援匯入由 CC Switch 匯出的備份），便於備份或遷移。",
+    "importExportHint": "匯入/匯出資料庫 SQL 備份（僅支援匯入由 Viber Switch 匯出的備份），便於備份或遷移。",
     "exportConfig": "匯出 SQL 備份",
     "selectConfigFile": "選擇 SQL 檔案",
     "noFileSelected": "尚未選擇設定檔。",
@@ -633,15 +672,15 @@
         },
         "codexHistoryUnifyRestore": {
           "name": "Codex 工作階段統一還原備份",
-          "hint": "執行「還原備份」前留下的工作階段副本，CC Switch 不會再讀取。"
+          "hint": "執行「還原備份」前留下的工作階段副本，Viber Switch 不會再讀取。"
         },
         "codexHistoryProviderMigration": {
           "name": "Codex 工作階段分組遷移備份",
-          "hint": "工作階段分組遷移前留下的副本，CC Switch 不會再讀取。"
+          "hint": "工作階段分組遷移前留下的副本，Viber Switch 不會再讀取。"
         },
         "liveFirstWrite": {
           "name": "設定檔首次寫入備份",
-          "hint": "CC Switch 第一次改寫各用戶端設定檔前的原始檔案。刪除後無法再找回改寫前的原檔，下次寫入時會重新備份當時的檔案。"
+          "hint": "Viber Switch 第一次改寫各用戶端設定檔前的原始檔案。刪除後無法再找回改寫前的原檔，下次寫入時會重新備份當時的檔案。"
         },
         "hermes": {
           "name": "Hermes 設定備份",
@@ -653,7 +692,7 @@
         },
         "proxyLiveBackup": {
           "name": "舊版路由接管備份",
-          "hint": "升級時從舊版路由接管備份轉存出的設定副本，CC Switch 不會再讀取。"
+          "hint": "升級時從舊版路由接管備份轉存出的設定副本，Viber Switch 不會再讀取。"
         },
         "envVars": {
           "name": "環境變數清理備份",
@@ -754,7 +793,10 @@
         "warning": "將覆寫雲端已有的同步資料",
         "legacyNotice": "檢測到舊版雲端路徑資料。本次上傳將寫入新路徑 v2/db-v6，不會覆寫舊路徑。",
         "confirm": "確認上傳"
-      }
+      },
+      "description": "透過 WebDAV 在多裝置間同步資料庫和技能設定。",
+      "remoteRootDefault": "預設：cli-switch-sync",
+      "profileDefault": "預設: default"
     },
     "syncType": {
       "label": "同步方式",
@@ -782,7 +824,7 @@
       "region": "區域 (Region)",
       "regionPlaceholder": "例如 us-east-1",
       "bucket": "儲存桶 (Bucket)",
-      "bucketPlaceholder": "例如 my-cc-switch-bucket",
+      "bucketPlaceholder": "例如 my-config-sync-bucket",
       "accessKeyId": "Access Key ID",
       "accessKeyIdPlaceholder": "例如 AKIA...",
       "secretAccessKey": "Secret Access Key",
@@ -853,7 +895,9 @@
         "createdAt": "上傳時間",
         "warning": "將覆寫該 S3 路徑下已有的同步資料",
         "confirm": "確認上傳"
-      }
+      },
+      "remoteRootDefault": "預設：cli-switch-sync",
+      "profileDefault": "預設: default"
     },
     "autoReload": "資料已重新整理",
     "languageOptionChinese": "简体中文",
@@ -864,7 +908,7 @@
     "windowBehavior": "視窗行為",
     "windowBehaviorHint": "設定視窗最小化與 Claude 外掛程式連動策略。",
     "launchOnStartup": "開機自動啟動",
-    "launchOnStartupDescription": "隨系統啟動自動執行 CC Switch",
+    "launchOnStartupDescription": "隨系統啟動自動執行 Viber Switch",
     "silentStartup": "靜默啟動",
     "silentStartupDescription": "程式啟動時不顯示主視窗，僅在系統匣執行",
     "autoLaunchFailed": "設定開機自動啟動失敗",
@@ -885,7 +929,7 @@
     "codexStackClassicSubagentsDescription": "主、子 agent 不在同一家供應商時必須開啟，否則子 agent 收不到任務。",
     "codexStackClassicSubagentsForcedV2": "Codex 的 config.toml 裡開啟了 [features] multi_agent_v2，它比這個開關優先，開關不會生效",
     "codexSessionCompression": "壓縮 Codex 歷史對話",
-    "codexSessionCompressionDescription": "開啟後，Codex 每次啟動時會在背景把 7 天以上沒動過的對話檔案壓縮保存，明顯減少佔用的磁碟空間；在這些對話上繼續對話時 Codex 會自動解壓。CC Switch 照常顯示和統計壓縮過的對話，只是列表裡不顯示它們最後一則回覆的預覽。這是 Codex 還在開發中的功能，開啟後 Codex 每次啟動會顯示一條提示；需要較新版本的 Codex，重新啟動 Codex 後生效。關閉後不再壓縮，已壓縮的對話保持原樣",
+    "codexSessionCompressionDescription": "開啟後，Codex 每次啟動時會在背景把 7 天以上沒動過的對話檔案壓縮保存，明顯減少佔用的磁碟空間；在這些對話上繼續對話時 Codex 會自動解壓。Viber Switch 照常顯示和統計壓縮過的對話，只是列表裡不顯示它們最後一則回覆的預覽。這是 Codex 還在開發中的功能，開啟後 Codex 每次啟動會顯示一條提示；需要較新版本的 Codex，重新啟動 Codex 後生效。關閉後不再壓縮，已壓縮的對話保持原樣",
     "codexSessionCompressionUsage": "對話目錄目前佔用 {{size}}",
     "codexSessionCompressionFailed": "修改 Codex 對話壓縮設定失敗",
     "unifyCodexHistoryRestoreCompleted": "已按備份還原官方會話歷史（{{files}} 個會話檔案、{{rows}} 條索引記錄）",
@@ -937,9 +981,9 @@
     },
     "configDirectoryOverride": "設定目錄覆寫（進階）",
     "configDirectoryDescription": "在 WSL 等環境使用 Claude Code 或 Codex 的時候，可手動指定為 WSL 裡的設定目錄，供應商資料與主環境保持一致。",
-    "appConfigDir": "CC Switch 設定目錄",
-    "appConfigDirDescription": "自訂 CC Switch 的設定儲存位置（指定至雲端同步資料夾即可雲端同步設定）",
-    "browsePlaceholderApp": "例如：C:\\Users\\Administrator\\.cc-switch",
+    "appConfigDir": "Viber Switch 設定目錄",
+    "appConfigDirDescription": "自訂 Viber Switch 的設定儲存位置（指定至雲端同步資料夾即可雲端同步設定）",
+    "browsePlaceholderApp": "例如 C:\\Users\\Administrator\\AppData",
     "claudeConfigDir": "Claude Code 設定目錄",
     "claudeConfigDirDescription": "覆寫 Claude 設定目錄 (settings.json)。真正自訂目錄會在目錄內存放 Claude MCP 的 .claude.json；預設 ~/.claude 目錄仍使用 Claude 預設的 ~/.claude.json。",
     "codexConfigDir": "Codex 設定目錄",
@@ -974,7 +1018,7 @@
     "checking": "檢查中...",
     "upToDate": "已是最新",
     "aboutHint": "檢視版本資訊與更新狀態。",
-    "portableMode": "目前為可攜版，更新需手動下載。",
+    "portableMode": "目前為攜帶版。",
     "portableUpdateHint": "可攜版：點擊上方按鈕會下載新版壓縮檔，解壓後覆蓋原本的 cc-switch.exe 即可。設定和資料保存在使用者目錄下的 .cc-switch，不會因覆蓋而遺失。",
     "updateAvailable": "檢測到新版本：{{version}}",
     "updateBadge": "有更新可用",
@@ -986,7 +1030,7 @@
     "viewCurrentReleaseNotes": "檢視目前版本更新日誌",
     "officialWebsite": "官方網站",
     "github": "GitHub",
-    "starPrompt": "如果 CC Switch 幫到了你，請在 GitHub 點個 Star，這對我們意義重大",
+    "starPrompt": "如果 Viber Switch 幫到了你，請在 GitHub 點個 Star，這對我們意義重大",
     "starOnGithub": "去點 Star",
     "manualInstallCommands": "手動安裝指令",
     "manualUninstallCommands": "手動解除安裝指令",
@@ -1049,7 +1093,7 @@
     "toolUpgradeConfirmBtn": "確認更新",
     "toolUpgradeUnanchoredHint": "無法判定命令列實際使用的安裝位置；將執行預設更新指令（可能安裝至 PATH 中第一個 npm）。",
     "toolUpgradeUnmanagedTitle": "以下工具已略過更新",
-    "toolUpgradeUnmanagedDetail": "{{tool}}（{{path}}）不是透過 npm 或可辨識的安裝程式安裝的，CC Switch 無法判斷如何更新它。請使用你原本的安裝方式更新（例如 winget、Scoop 或重新執行官方安裝指令碼）。",
+    "toolUpgradeUnmanagedDetail": "{{tool}}（{{path}}）不是透過 npm 或可辨識的安裝程式安裝的，Viber Switch 無法判斷如何更新它。請使用你原本的安裝方式更新（例如 winget、Scoop 或重新執行官方安裝指令碼）。",
     "envBadge": {
       "wsl": "WSL",
       "windows": "Win",
@@ -1063,7 +1107,7 @@
     "importFailedError": "匯入設定失敗：{{message}}",
     "exportFailedError": "匯出設定失敗：",
     "restartRequired": "需要重新啟動應用程式",
-    "restartRequiredMessage": "修改 CC Switch 設定目錄後需要重新啟動應用程式才能生效，是否立即重新啟動？",
+    "restartRequiredMessage": "修改 Viber Switch 設定目錄後需要重新啟動應用程式才能生效，是否立即重新啟動？",
     "restartNow": "立即重新啟動",
     "restartLater": "稍後重新啟動",
     "restartFailed": "應用程式重新啟動失敗，請手動關閉後重新開啟。",
@@ -1110,6 +1154,40 @@
     },
     "data": {
       "location": "儲存位置"
+    },
+    "languageOptionVietnamese": "Tiếng Việt",
+    "skillStorage": {
+      "title": "Skills 儲存位置",
+      "description": "選擇 Viber Switch 存放 Skills 主副本的目錄",
+      "ccSwitch": "Viber Switch",
+      "unified": "~/.agents/skills",
+      "ccSwitchHint": "Skills 統一存放在應用資料目錄中，並透過符號連結或複製同步到各應用。",
+      "unifiedHint": "技能儲存在 ~/.agents/skills/，遵循 Agent Skills 開放標準。相容的工具（Claude Code、Codex、Gemini CLI 等）可直接發現此目錄中的技能。",
+      "confirmTitle": "遷移技能儲存位置",
+      "confirmMessage": "將移動 {{count}} 個技能至新位置，是否繼續？",
+      "migrationSuccess": "已成功遷移 {{count}} 個技能",
+      "migrationPartial": "遷移了 {{migrated}} 個技能，{{errors}} 個失敗，請查看日誌"
+    },
+    "skillSync": {
+      "title": "Skills 同步方式",
+      "description": "選擇 Skills 的檔案同步策略",
+      "symlink": "軟連結",
+      "copy": "檔案複製",
+      "symlinkHint": "軟連結節省磁碟空間並支援即時同步。注意：Windows 可能需要管理員權限或開啟開發者模式"
+    },
+    "appUpdate": {
+      "check": "檢查更新",
+      "checking": "正在檢查更新…",
+      "upToDate": "已是最新版本",
+      "available": "可更新至 v{{version}}",
+      "install": "立即更新",
+      "downloading": "正在下載更新…",
+      "downloadingPct": "正在下載 {{pct}}%",
+      "restarting": "正在重新啟動…",
+      "failed": "更新失敗",
+      "confirmTitle": "安裝更新？",
+      "confirmBody": "下載並安裝 v{{version}}，然後重新啟動 Viber Switch。無需開啟 GitHub。",
+      "toastTitle": "Viber Switch v{{version}} 已可安裝"
     }
   },
   "apps": {
@@ -1203,7 +1281,7 @@
     },
     "current": {
       "readFailed": "無法讀取 Pi 供應商設定",
-      "stateUnavailableHint": "CC Switch 讀取到 Pi 供應商設定前，供應商變更會暫時停用。"
+      "stateUnavailableHint": "Viber Switch 讀取到 Pi 供應商設定前，供應商變更會暫時停用。"
     },
     "prompts": {
       "globalTab": "提示庫",
@@ -1256,7 +1334,7 @@
       "libraryLabel": "Pi 的提示庫",
       "systemFilesLabel": "Pi 的系統提示檔案",
       "templatesLabel": "Pi 的提示詞範本",
-      "externalTitle": "AGENTS.md 在 CC Switch 之外改過",
+      "externalTitle": "AGENTS.md 在 Viber Switch 之外改過",
       "externalDetail": "內容（{{size}}）和提示庫裡的每一條都不同，所以沒有哪條顯示為已啟用；啟用別的之前會先存進提示庫。",
       "saveToLibrary": "存進提示庫",
       "reloadAfterDelete": "已開啟的 Pi 閒置時執行 /reload 後生效。",
@@ -1299,7 +1377,8 @@
     "keyFieldsHint": "預設模型（models.default）和它指向的模型表隨供應商切換；其餘是 Grok Build 全域設定，儲存後對所有供應商生效。",
     "inactiveFieldsHint": "這些是舊版存進卡裡的設定，現在切換不會寫出去。點一下複製 TOML，需要時貼到上方。",
     "inactiveFieldCopied": "已複製",
-    "routeOnlySettingsHint": "以下兩項只在路由模式下生效。"
+    "routeOnlySettingsHint": "以下兩項只在路由模式下生效。",
+    "advancedSectionHint": "包含上游格式、思考能力與自訂 User-Agent。使用 Chat Completions / Anthropic Messages 協定的供應商需開啟路由接管才能使用。"
   },
   "sessionManager": {
     "searchPlaceholder": "搜尋標題、目錄、首末訊息或工作階段 ID",
@@ -1333,7 +1412,7 @@
     "expandContent": "展開完整內容",
     "collapseContent": "收起",
     "helpTitle": "工作階段從哪裡來",
-    "helpBody": "CC Switch 讀取各個應用保存在本機的工作階段記錄，位置見右上角 ⋯ 裡的「工作階段記錄在哪裡」。Claude Desktop 沒有單獨的工作階段記錄。",
+    "helpBody": "Viber Switch 讀取各個應用保存在本機的工作階段記錄，位置見右上角 ⋯ 裡的「工作階段記錄在哪裡」。Claude Desktop 沒有單獨的工作階段記錄。",
     "moreActions": "工作階段的更多操作",
     "refreshList": "重新整理列表",
     "listRefreshed": "已重新整理工作階段列表",
@@ -1341,7 +1420,7 @@
     "preferredTerminal": "偏好終端機",
     "whereMenu": "工作階段記錄在哪裡",
     "whereTitle": "工作階段記錄在哪裡",
-    "whereLead": "CC Switch 從這些位置讀取工作階段。Claude Desktop 沒有單獨的工作階段記錄。",
+    "whereLead": "Viber Switch 從這些位置讀取工作階段。Claude Desktop 沒有單獨的工作階段記錄。",
     "whereNote": "在設定裡改過設定目錄的應用，按改過的目錄讀取。",
     "appPrefix": "應用：",
     "chooseApp": "選擇應用",
@@ -1385,7 +1464,7 @@
     "hermesLimit": "Hermes 只顯示最近 500 個工作階段",
     "emptyApp": "還沒有 {{app}} 的工作階段記錄",
     "emptyAll": "還沒有工作階段記錄",
-    "emptyAppHint": "CC Switch 讀取 {{path}} 下的工作階段資料",
+    "emptyAppHint": "Viber Switch 讀取 {{path}} 下的工作階段資料",
     "emptySearch": "沒有標題、目錄或首末訊息符合「{{query}}」的工作階段",
     "clearSearchAction": "清除搜尋",
     "backToList": "返回工作階段列表",
@@ -1574,7 +1653,36 @@
       "rawMatch": "原文中的相符項目",
       "expandContent": "展開完整內容",
       "collapseContent": "收合"
-    }
+    },
+    "title": "工作階段管理",
+    "providerFilterAll": "全部",
+    "providerFilterTooltip": "供應商篩選",
+    "viewModeTooltip": "檢視方式",
+    "viewModeFlat": "清單",
+    "viewModeGrouped": "分類",
+    "toggleProviderGroup": "展開或摺疊 {{provider}} 供應商分組",
+    "toggleDirectoryGroup": "展開或摺疊 {{directory}} 目錄分組",
+    "collapseAllGroups": "全部收起",
+    "manageBatchTooltip": "進入批次管理",
+    "exitBatchModeTooltip": "退出批次管理",
+    "batchModeHint": "勾選要刪除的工作階段",
+    "selectForBatch": "選擇工作階段",
+    "selectedCount": "已選 {{count}} 項",
+    "selectAllFiltered": "全選目前",
+    "clearFilteredSelection": "取消全選",
+    "clearSelection": "清空已選",
+    "deleteSelected": "批次刪除",
+    "noSessions": "未發現工作階段",
+    "selectSession": "請選擇工作階段檢視詳情",
+    "projectDirCopied": "目錄已複製",
+    "delete": "刪除工作階段",
+    "deleting": "刪除中...",
+    "deleteTooltip": "永久刪除此本地工作階段紀錄",
+    "clickToCopyPath": "點擊複製路徑",
+    "resume": "繼續工作階段",
+    "resumeTooltip": "在終端機中繼續此工作階段",
+    "copyCommand": "複製命令",
+    "conversationHistory": "對話紀錄"
   },
   "console": {
     "providerSwitchReceived": "收到供應商切換事件：",
@@ -1749,7 +1857,8 @@
     "stackModelPlaceholder": "例如 deepseek-v4-pro",
     "stackModelDefault": "預設模型",
     "stackLayout": {
-      "noModels": "模型列表為空：把這家加入聚合後，模型選擇器裡不會多出它的模型"
+      "noModels": "模型列表為空：把這家加入聚合後，模型選擇器裡不會多出它的模型",
+      "advancedHint": "自訂 User-Agent 與請求覆寫，一般無需修改。"
     },
     "modelRoleLabel": "模型角色",
     "modelRoleSonnet": "Sonnet",
@@ -1814,7 +1923,21 @@
     "localProxyRequestOverridesHelp": "作用於格式轉換後發給上游的請求。",
     "apiFormatHelp": "看供應商原生支援哪種協定：Anthropic Messages 原樣轉發、不轉換格式；其餘三種由路由轉成 Anthropic Messages。",
     "directModeFormatInUse": "這張卡正在直連使用：改成這種格式後儲存，請求會失敗。請先切到路由或聚合。",
-    "directModeFormatSwitch": "直連模式下用不了這種格式，切到路由或聚合後才能用這張卡。"
+    "directModeFormatSwitch": "直連模式下用不了這種格式，切到路由或聚合後才能用這張卡。",
+    "apiFormatHint": "供應商原生為 Anthropic Messages API 就選 Anthropic Messages（直連，不轉換格式）；使用 Chat Completions 協定就選 Chat；使用 Responses API 就選 Responses；使用 Gemini generateContent 協定就選 Gemini Native。Chat、Responses 與 Gemini Native 均需開啟路由接管才能轉換為 Anthropic Messages。",
+    "customUserAgentHint": "僅在路由模式下生效，會取代轉發至供應商 API 請求中的 User-Agent。",
+    "localProxyRequestOverridesHint": "僅在路由模式下生效，套用於格式轉換後的上游請求。",
+    "fullUrlEnabled": "完整 URL 模式",
+    "fullUrlDisabled": "標記為完整 URL",
+    "fullUrlHint": "請填寫完整請求 URL，並且必須開啟路由後使用；路由將直接使用此 URL，不拼接路徑",
+    "fullUrlHintGeminiNative": "Gemini Native 下，完整 URL 模式同時相容兩類位址：1. 官方/標準 Gemini URL，代理伺服器會依模型和串流參數自動標準化；2. 自訂 relay 的完整 URL，代理伺服器會盡量原樣使用，只補齊查詢參數，不再強制附加 models 路徑",
+    "stackModelsHint": "這些模型會出現在 Claude Code 的 /model 裡，選中後請求直達這家。第一個（★）是這家的預設模型：這家被設為預設時，Claude Code 啟動和背景任務都用它。",
+    "stackModelMakeDefault": "設為預設模型",
+    "fallbackModelHint": "用於未明確落到 Sonnet、Opus、Fable、Haiku 角色的請求。使用第三方/中轉端點時建議填寫：否則這些請求（含 Haiku 背景子任務）會以原始 Claude 模型名透傳給上游，可能因上游無此模型而報錯。官方端點可留空。",
+    "advancedOptionsHint": "包含 API 格式、驗證欄位、模型對應等設定。大多數場景下保持預設即可。",
+    "fetchedModelsTitle": "可用模型（{{count}}）",
+    "modelAlreadyAdded": "已新增",
+    "addSelectedModels": "新增所選模型（{{count}}）"
   },
   "copilot": {
     "automaticFormat": "由路由依模型自動選擇",
@@ -1854,7 +1977,8 @@
     "deploymentType": "GitHub 部署類型",
     "deploymentGitHubCom": "GitHub.com",
     "deploymentEnterprise": "GitHub Enterprise Server",
-    "enterpriseDomainPlaceholder": "例如：company.ghe.com"
+    "enterpriseDomainPlaceholder": "例如：company.ghe.com",
+    "logoutAll": "登出所有帳號"
   },
   "codexOauth": {
     "authStatus": "驗證狀態",
@@ -1898,7 +2022,9 @@
     "browserLogin": "瀏覽器登入",
     "deviceCodeLogin": "裝置代碼登入",
     "openBrowserLogin": "開啟瀏覽器登入",
-    "loginExpired": "登入已過期，請重試。"
+    "loginExpired": "登入已過期，請重試。",
+    "loginWithChatGPT": "使用 ChatGPT 登入",
+    "reauthTitle": "部分帳號需要重新登入"
   },
   "xaiOauth": {
     "authStatus": "xAI OAuth 驗證",
@@ -1930,8 +2056,8 @@
     "remove": {
       "titleOne": "刪除帳號「{{login}}」？",
       "titleAll": "刪除全部 {{service}} 帳號？",
-      "leadOne": "會刪除這個帳號儲存在 CC Switch 裡的登入憑證，無法復原。",
-      "leadAll": "會刪除這 {{count}} 個帳號儲存在 CC Switch 裡的登入憑證，無法復原。",
+      "leadOne": "會刪除這個帳號儲存在 Viber Switch 裡的登入憑證，無法復原。",
+      "leadAll": "會刪除這 {{count}} 個帳號儲存在 Viber Switch 裡的登入憑證，無法復原。",
       "brokenOne": "這些供應商會無法使用，直到重新登入或改選別的帳號：",
       "brokenAll": "這些供應商會無法使用，直到重新登入：",
       "moved": "這些供應商用的是預設帳號，刪除後改用新的預設帳號：",
@@ -2052,7 +2178,28 @@
     "inactiveFieldCopied": "已複製",
     "upstreamFormatCopilotRouteHint": "所有模式都需要開啟路由，由路由注入 Copilot 帳號憑證；手動指定的協定模型不支援時會報錯。",
     "maxOutputTokensWarning": "不要超過模型或閘道的真實輸出上限，否則會回傳 400。",
-    "routeOnlySettingsHint": "以下兩項只在路由、聚合模式下生效。"
+    "routeOnlySettingsHint": "以下兩項只在路由、聚合模式下生效。",
+    "extractFailed": "擷取失敗：{{error}}",
+    "modelNameHint": "指定使用的模型，將自動更新到 config.toml 中",
+    "modelName": "模型名稱",
+    "modelNamePlaceholder": "例如: gpt-5-codex",
+    "autoCompactLimitHint": "上下文 token 數達到此閾值時自動壓縮歷史",
+    "defaultModelNotInCatalog": "該模型不在模型映射中，Codex 的 /model 選單不會列出它（直接請求仍然有效）。",
+    "addToModelMapping": "加入映射",
+    "modelMappingTitle": "模型映射",
+    "modelMappingHint": "產生 Codex model_catalog_json，讓 /model 指令顯示這些第三方模型名；表中條目按填寫內容原樣儲存。修改後需要重新啟動 Codex 才能重新整理模型清單。",
+    "stackModelListHint": "這些模型會出現在 Codex 的 /model 裡，選中後請求直達這家。★ 是這家的預設模型：這家被設為預設時 Codex 預設使用它。修改後需要重新啟動 Codex。",
+    "stackDefaultNotInList": "預設模型 {{model}} 不在清單裡：Codex 預設仍請求它，但 /model 裡沒有這一項。",
+    "stackAdvancedHint": "思考能力、Anthropic 專有項、自訂 User-Agent 與請求覆寫，一般無需修改。",
+    "catalogDisplayName": "顯示名稱",
+    "catalogModelId": "模型 ID",
+    "contextWindow": "上下文視窗",
+    "upstreamModelName": "上游模型名稱",
+    "upstreamModelNameHint": "Chat 格式下這裡填寫真實上游模型；路由會把 Codex 的 Responses 請求轉換為 Chat Completions 並保持該模型。",
+    "modelMetadataAdvanced": "模型中繼資料進階選項",
+    "modelMetadataAdvancedHint": "用於未知模型的 Codex 中繼資料覆寫；清空欄位會從 config.toml 刪除對應設定。",
+    "reasoningSectionHint": "預設供應商已自動設定；自訂供應商會按名稱/位址自動推斷。僅當自動識別不準時才需手動覆寫。",
+    "advancedSectionHint": "包含上游格式、模型映射、思考能力與自訂 User-Agent。使用 Chat Completions 協定的供應商需開啟路由接管才能使用。"
   },
   "geminiConfig": {
     "envFile": "環境變數 (.env)",
@@ -2093,7 +2240,7 @@
     "headerName": "請求標頭",
     "headerValue": "值",
     "headerNamePlaceholder": "X-Title",
-    "headerValuePlaceholder": "CC Switch",
+    "headerValuePlaceholder": "Viber Switch",
     "removeHeader": "刪除請求標頭",
     "noHeaders": "暫無自訂請求標頭",
     "extraOptions": "額外選項",
@@ -2113,7 +2260,10 @@
     "modelExtraFieldKeyPlaceholder": "variants",
     "sdkOptions": "SDK 選項",
     "modelOptionKeyPlaceholder": "provider",
-    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}"
+    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}",
+    "npmPackageHint": "選擇 AI 服務的 API 格式",
+    "baseUrlHint": "自訂 API 端點位址",
+    "modelsHint": "設定可用的模型及其顯示名稱"
   },
   "providerPreset": {
     "label": "預設供應商",
@@ -2195,7 +2345,9 @@
       "intl": "海外"
     },
     "planLabel": "方案",
-    "regionLabel": "地區"
+    "regionLabel": "地區",
+    "unofficial": "非官方",
+    "unofficialAriaLabel": "展開或收合非官方供應商"
   },
   "usage": {
     "title": "使用統計",
@@ -2384,11 +2536,11 @@
     "modelsDevDefaultHint": "預設展示最新發布的 {{shown}} 個模型（共 {{total}} 個），輸入關鍵字可全量搜尋",
     "modelsDevAutoSync": {
       "title": "自動同步 models.dev 定價",
-      "description": "開啟後，CC Switch 會在啟動時定期擷取所選模型的最新價格，並儲存到本機定價檔案。",
+      "description": "開啟後，Viber Switch 會在啟動時定期擷取所選模型的最新價格，並儲存到本機定價檔案。",
       "enabled": "已開啟",
       "disabled": "已關閉",
       "enableConfirmTitle": "開啟自動同步定價？",
-      "enableConfirmMessage": "開啟後，CC Switch 會在啟動時定期從 models.dev 更新所選模型的價格（最多每 6 小時一次）。相同模型 ID 的軟體內建價格和手動設定價格都會被覆寫。",
+      "enableConfirmMessage": "開啟後，Viber Switch 會在啟動時定期從 models.dev 更新所選模型的價格（最多每 6 小時一次）。相同模型 ID 的軟體內建價格和手動設定價格都會被覆寫。",
       "enableConfirmAction": "開啟自動同步",
       "configure": "選擇模型",
       "configureTitle": "選擇自動同步定價的模型",
@@ -2423,10 +2575,15 @@
       "minutesAgo": "{{count}} 分鐘前同步",
       "syncing": "同步中…",
       "tip": "點擊立即同步",
-      "tipOff": "自動掃描已關閉，點擊立即同步"
+      "tipOff": "自動掃描已關閉，點擊立即同步",
+      "auto": "工作階段日誌 · 自動掃描",
+      "off": "工作階段日誌 · 自動掃描已關閉",
+      "tipAuto": "每 60 秒自動掃描一次工作階段日誌"
     },
     "refreshMenu": {
-      "label": "每 {{seconds}} 秒掃描"
+      "label": "每 {{seconds}} 秒掃描",
+      "off": "自動重新整理已關閉",
+      "seconds": "{{seconds}} 秒"
     },
     "dataSources": "資料來源",
     "display": {
@@ -2540,12 +2697,13 @@
       "speedEstimateTooFew": "輸出不到 200 token，不估速度",
       "noTimingSession": "工作階段日誌沒有計時資料",
       "noFirstToken": "沒有首字計時，不算速度",
-      "providerId": "供應商 ID"
+      "providerId": "供應商 ID",
+      "sourceSession": "工作階段日誌"
     },
     "sources": {
       "scanTitle": "自動掃描工作階段日誌",
       "scanHelpTitle": "工作階段日誌是什麼",
-      "scanHelp": "各應用程式寫在本機的工作階段記錄。CC Switch 從中讀取用量，不開路由也有資料。",
+      "scanHelp": "各應用程式寫在本機的工作階段記錄。Viber Switch 從中讀取用量，不開路由也有資料。",
       "coverage": "涵蓋 7 個應用程式：{{apps}}",
       "cadenceOn": "啟動時掃描一次，背景每 10 分鐘一次；開啟用量頁時立即掃描，之後依所選間隔掃描",
       "cadenceOff": "自動掃描已關閉，只在點「立即同步」時掃描",
@@ -2589,7 +2747,9 @@
       "title": "用量設定",
       "pricingSummary": "依模型設定每百萬 Tokens 的價格，可從 models.dev 同步",
       "managePricing": "管理定價…"
-    }
+    },
+    "refreshOff": "關閉",
+    "sortedByRequests": "依請求數排序"
   },
   "usageScript": {
     "title": "設定用量查詢",
@@ -2683,7 +2843,7 @@
   },
   "dbUpgrade": {
     "title": "資料庫版本過新",
-    "description": "目前資料庫由較新版本的 CC Switch 建立，需要升級應用後才能繼續使用。升級不會刪除你的資料。",
+    "description": "目前資料庫由較新版本的 Viber Switch 建立，需要升級應用後才能繼續使用。升級不會刪除你的資料。",
     "versionInfo": "資料庫版本 v{{db}} · 應用支援 v{{supported}}",
     "dbPath": "資料庫檔案",
     "checking": "正在檢查可用更新…",
@@ -2729,7 +2889,7 @@
       "deleteConfirm": "確定要刪除伺服器 \"{{id}}\" 嗎？此操作無法復原。",
       "noServers": "暫無伺服器",
       "enabledApps": "啟用的應用程式",
-      "noImportFound": "未發現需要匯入的 MCP 伺服器。所有伺服器已在 CC Switch 統一管理中。",
+      "noImportFound": "未發現需要匯入的 MCP 伺服器。所有伺服器已在 Viber Switch 統一管理中。",
       "importSuccess": "成功匯入 {{count}} 個 MCP 伺服器",
       "searchPlaceholder": "搜尋 MCP 名稱、描述、標籤或命令...",
       "searchAriaLabel": "搜尋已管理的 MCP 伺服器",
@@ -2872,7 +3032,8 @@
         "name": "@upstash/context7-mcp",
         "description": "Context7 文件搜尋工具，提供最新的函式庫文件和程式碼範例，設定 key 會有更高限額"
       }
-    }
+    },
+    "unsupported": "{{app}} 不支援 MCP"
   },
   "prompts": {
     "add": "新增提示詞",
@@ -2887,7 +3048,7 @@
     "name": "名稱",
     "namePlaceholder": "例如 團隊編碼規範",
     "description": "說明",
-    "descriptionPlaceholder": "選填，只在 CC Switch 裡顯示",
+    "descriptionPlaceholder": "選填，只在 Viber Switch 裡顯示",
     "content": "正文",
     "contentPlaceholder": "# {{filename}}\n\n用 Markdown 寫給 {{appName}} 的長期說明…",
     "loadFailed": "載入提示詞失敗",
@@ -2947,7 +3108,7 @@
     "deleteBlocked": "啟用中的不能刪除，先停用",
     "emptyTitle": "{{app}} 還沒有提示詞",
     "emptyTarget": "啟用的那條會寫進 {{path}}。",
-    "emptyFile": "{{path}} 裡已有 {{size}} 內容，還不在 CC Switch 裡",
+    "emptyFile": "{{path}} 裡已有 {{size}} 內容，還不在 Viber Switch 裡",
     "importExisting": "匯入現有內容",
     "formDescription": "名稱、說明和寫進 {{file}} 的正文",
     "requiredMark": "（必填）",
@@ -2988,13 +3149,15 @@
       "savedActive": "已儲存「{{name}}」，已覆寫 {{path}}",
       "savedActivePi": "已儲存「{{name}}」，已寫入 AGENTS.md",
       "deleted": "已刪除「{{name}}」",
-      "deletedSub": "只從 CC Switch 裡刪除，{{path}} 沒有改動",
+      "deletedSub": "只從 Viber Switch 裡刪除，{{path}} 沒有改動",
       "deletedPiSub": "只從提示庫刪除，AGENTS.md 沒有改動",
       "restored": "已恢復「{{name}}」",
       "imported": "已匯入 {{path}} 的內容，檔案沒有改動",
       "importedPi": "已把 AGENTS.md 存進提示庫，檔案沒有改動",
       "copied": "已把「{{name}}」複製到 {{apps}}"
-    }
+    },
+    "manage": "提示詞",
+    "title": "{{appName}} 提示詞管理"
   },
   "profiles": {
     "switcherAriaLabel": "專案：{{name}}",
@@ -3069,7 +3232,8 @@
       "noSearchResults": "沒有找到符合的每日記憶。",
       "searching": "搜尋中...",
       "searchFailed": "搜尋失敗",
-      "matchCount": "{{count}} 處相符"
+      "matchCount": "{{count}} 處相符",
+      "cardDescription": "瀏覽管理每日記憶"
     }
   },
   "openclaw": {
@@ -3118,7 +3282,8 @@
       "saveSuccess": "環境變數已儲存",
       "saveFailed": "儲存環境變數失敗",
       "loadFailed": "讀取環境變數失敗",
-      "duplicateKey": "檢測到重複的變數名稱: {{key}}"
+      "duplicateKey": "檢測到重複的變數名稱: {{key}}",
+      "description": "管理 openclaw.json 中的環境變數設定（API Key、自訂變數等）"
     },
     "tools": {
       "title": "工具權限",
@@ -3138,7 +3303,8 @@
       "addDeny": "新增拒絕",
       "saveSuccess": "工具權限已儲存",
       "saveFailed": "儲存工具權限失敗",
-      "loadFailed": "讀取工具權限失敗"
+      "loadFailed": "讀取工具權限失敗",
+      "description": "管理 openclaw.json 中的工具權限設定（允許/拒絕清單）"
     },
     "agents": {
       "title": "Agents 設定",
@@ -3170,7 +3336,8 @@
       "stringifiedEnvVars": "env.vars 應為物件，但目前值看起來像被字串化或已損壞。",
       "stringifiedShellEnv": "env.shellEnv 應為物件，但目前值看起來像被字串化或已損壞。",
       "parseFailed": "openclaw.json 不是合法 JSON5。請先修復檔案，再透過這裡編輯。"
-    }
+    },
+    "baseUrlHint": "供應商的 API 端點位址。"
   },
   "hermes": {
     "form": {
@@ -3205,7 +3372,9 @@
       "removeModel": "移除模型",
       "modelsHint": "啟用為目前供應商時，第一個模型會設為 Hermes 預設模型。",
       "rateLimitDelay": "請求間隔（秒）",
-      "rateLimitDelayHint": "連續請求間的最小間隔秒數（選填）。留空表示無限制。"
+      "rateLimitDelayHint": "連續請求間的最小間隔秒數（選填）。留空表示無限制。",
+      "baseUrlHint": "供應商的 API 端點位址。",
+      "apiModeHint": "供應商 API 協定。請根據端點選擇正確的協定。"
     },
     "webui": {
       "open": "開啟 Hermes Web UI",
@@ -3242,7 +3411,8 @@
       "remaining": "剩餘 {{remaining}} / {{limit}} 字元",
       "overLimitBy": "超出上限 {{over}} 字元，Hermes 下次載入時會截斷",
       "toggledOn": "已啟用 {{name}}，Hermes 下次啟動或建立新工作階段時生效。",
-      "toggledOff": "已停用 {{name}}，Hermes 下次啟動或建立新工作階段時生效。"
+      "toggledOff": "已停用 {{name}}，Hermes 下次啟動或建立新工作階段時生效。",
+      "title": "記憶管理"
     }
   },
   "env": {
@@ -3307,7 +3477,7 @@
     "installSuccess": "技能 {{name}} 已安裝",
     "installFailed": "安裝失敗",
     "uninstallSuccess": "技能 {{name}} 已解除安裝",
-    "uninstallPiPreserved": "無法確認該 Pi 副本由 CC Switch 管理，已保留：{{path}}",
+    "uninstallPiPreserved": "無法確認該 Pi 副本由 Viber Switch 管理，已保留：{{path}}",
     "uninstallPiCleanupIncomplete": "Pi 清理未能完成，請手動檢查 Pi Skills 目錄中是否有殘留副本。",
     "uninstallFailed": "解除安裝失敗",
     "update": "更新",
@@ -3389,10 +3559,12 @@
       "searchPlaceholder": "搜尋 skills.sh（至少 2 個字元）...",
       "installs": "{{count}} 次安裝",
       "loadMore": "載入更多",
-      "loading": "正在搜尋 skills.sh...",
+      "loading": "正在載入 skills.sh...",
       "noResults": "未找到 \"{{query}}\" 相關技能",
       "error": "搜尋 skills.sh 失敗",
-      "poweredBy": "由 skills.sh 提供"
+      "poweredBy": "由 skills.sh 提供",
+      "trending": "趨勢（24 小時）",
+      "noTrending": "暫無趨勢技能"
     },
     "filter": {
       "placeholder": "狀態篩選",
@@ -3405,12 +3577,12 @@
     "noResults": "未找到相符的技能",
     "noInstalled": "暫無已安裝的技能",
     "noInstalledDescription": "從儲存庫發現並安裝技能，或匯入已有的技能",
-    "discover": "發現技能",
+    "discover": "社群技能",
     "import": "匯入已有",
-    "importDescription": "選擇要匯入至 CC Switch 統一管理的技能",
+    "importDescription": "選擇要匯入至 Viber Switch 統一管理的技能",
     "importSuccess": "成功匯入 {{count}} 個技能",
     "importSelected": "匯入已選 ({{count}})",
-    "noUnmanagedFound": "未發現需要匯入的技能。所有技能已在 CC Switch 統一管理中。",
+    "noUnmanagedFound": "未發現需要匯入的技能。所有技能已在 Viber Switch 統一管理中。",
     "unmanagedAvailable": "發現可匯入的技能",
     "foundIn": "發現於",
     "local": "本地",
@@ -3468,7 +3640,7 @@
       "resyncPartial": "{{count}} 個應用沒有同步完整：{{apps}}",
       "resyncSkillItem": "{{directory}}：{{error}}",
       "locationTitle": "主副本放在",
-      "locationCcSwitch": "CC Switch 目錄",
+      "locationCcSwitch": "Viber Switch 目錄",
       "locationUnified": "通用目錄",
       "openFolder": "打開",
       "openFolderAria": "打開 {{path}}",
@@ -3476,7 +3648,7 @@
       "move": "移動並切換",
       "moving": "正在移動…",
       "moveConfirmTitle": "把 {{count}} 個 Skill 移到 {{path}}？",
-      "moveConfirmBody": "會逐個移動主副本，再讓各應用裡的連結指向新位置。移動完成前請不要退出 CC Switch。",
+      "moveConfirmBody": "會逐個移動主副本，再讓各應用裡的連結指向新位置。移動完成前請不要退出 Viber Switch。",
       "moveConfirmButton": "移動並切換",
       "moveDone": "已把 {{count}} 個 Skill 移到 {{path}}",
       "movePartial": "移動了 {{migrated}} 個 Skill，{{errors}} 個失敗，請查看日誌",
@@ -3488,11 +3660,25 @@
       "syncCopyDesc": "佔用更多空間，更新後會重新複製",
       "moveHint": "切換位置會把 {{count}} 個 Skill 移動過去。"
     },
-    "updatesIncomplete": "沒有發現更新，但有 {{count}} 個倉庫沒有讀到"
+    "updatesIncomplete": "沒有發現更新，但有 {{count}} 個倉庫沒有讀到",
+    "replace": "取代",
+    "replacing": "取代中...",
+    "replaceSuccess": "技能 {{name}} 已取代",
+    "replaceFailed": "取代失敗",
+    "autoUpdateRunning": "正在背景更新…",
+    "autoUpdateNever": "每天自動更新",
+    "autoUpdateOk": "已自動更新 {{count}}",
+    "autoUpdateFailed": "自動更新失敗 ({{count}})",
+    "preview": "預覽技能",
+    "previewTitle": "技能預覽",
+    "frontmatter": "YAML frontmatter",
+    "frontmatterEmpty": "（空）",
+    "frontmatterMissing": "（無 YAML frontmatter）",
+    "previewLoadFailed": "無法載入技能內容：{{error}}"
   },
   "deeplink": {
     "confirmImport": "確認匯入供應商設定",
-    "confirmImportDescription": "以下設定將匯入至 CC Switch",
+    "confirmImportDescription": "以下設定將匯入至 Viber Switch",
     "importPrompt": "匯入提示詞",
     "importPromptDescription": "請確認是否匯入此系統提示詞",
     "importMcp": "匯入 MCP Servers",
@@ -3781,7 +3967,7 @@
         "authTitle": "Codex 可能仍快取著切換前的帳號；重新啟動背景服務才能載入新登入",
         "title": "Codex 還在用舊的模型清單，切換後的模型不會出現",
         "unverifiedTitle": "切換前就開著的 Codex 可能還在用之前的帳號或模型清單",
-        "unverifiedHint": "CC Switch 看不到桌面版和編輯器擴充功能是否在執行；沒開著的話直接關掉這則提示即可。",
+        "unverifiedHint": "Viber Switch 看不到桌面版和編輯器擴充功能是否在執行；沒開著的話直接關掉這則提示即可。",
         "daemon": "命令列：重開 codex 不夠，要重新啟動背景的守護行程。",
         "others": "桌面版：要完全結束再重開（macOS 上按 ⌘Q，只關視窗不行）；編輯器擴充功能要重開編輯器視窗。",
         "restart": "重新啟動 Codex 守護行程",
@@ -3791,6 +3977,10 @@
         "restarted": "Codex 守護行程已重新啟動，重開 codex 以載入最新帳號和模型清單",
         "notRunning": "Codex 守護行程沒有在執行，下次啟動時會載入目前的登入和模型清單",
         "failed": "重新啟動 Codex 守護行程失敗：{{error}}"
+      },
+      "tooltip": {
+        "active": "{{appLabel}} 已開啟疊加模式：新增的供應商的模型出現在模型清單裡，重新啟動用戶端後生效",
+        "inactive": "進入疊加模式：新增多家供應商，它們的模型都出現在 {{appLabel}} 的模型清單裡"
       }
     },
     "failover": {
@@ -4192,13 +4382,16 @@
     "appsTitle": "應用：安裝、升級、在側欄顯示哪些",
     "appsHasUpdate": "應用 · 有可用更新",
     "settings": "設定",
-    "settingsHasUpdate": "設定 · CC Switch 有新版本",
+    "settingsHasUpdate": "設定 · Viber Switch 有新版本",
     "mode": {
       "route": "路由",
-      "stack": "聚合"
+      "stack": "聚合",
+      "mapping": "映射",
+      "mappingFull": "模型映射"
     },
     "needsAttention": "需要處理",
-    "back": "返回"
+    "back": "返回",
+    "todayCost": "今日 {{cost}}"
   },
   "appsPage": {
     "showInSidebar": "在側欄顯示 {{name}}",
@@ -4217,7 +4410,7 @@
     "columnVersion": "版本",
     "columnVisible": "顯示",
     "visibleHelp": "關掉後，這個應用不再出現在側欄、系統匣選單、MCP / Skills 的應用欄，以及提示詞和工作階段的應用下拉選單裡。只是不顯示：它的供應商、MCP 等設定都還在，它自己的設定檔也不會被改動。",
-    "desktopHelp": "Claude Desktop 是桌面應用，不能在這裡安裝或升級；CC Switch 透過它的設定檔接入。",
+    "desktopHelp": "Claude Desktop 是桌面應用，不能在這裡安裝或升級；Viber Switch 透過它的設定檔接入。",
     "desktopUnsupported": "目前系統不支援",
     "desktopConnected": "已接入",
     "desktopNotConnected": "未接入",
@@ -4239,6 +4432,20 @@
       "mcode": "安裝時執行官方安裝腳本，失敗時改用 npm",
       "agy": "安裝時執行官方安裝腳本",
       "omp": "安裝時執行官方安裝腳本"
+    },
+    "uninstall": "解除安裝這處安裝",
+    "uninstallConfirmTitle": "解除安裝這處安裝？",
+    "uninstallConfirmDesc": "只會解除安裝 {{path}} 這一處，另一處保持不變。若這是終端機正在使用的那處，指令會切換到剩下的安裝。",
+    "uninstallConfirmDescFile": "這處安裝不是由套件管理員安裝的，只會刪除執行檔 {{path}}，另一處保持不變。",
+    "uninstallConfirm": "解除安裝",
+    "uninstallDone": "已解除安裝 {{path}}",
+    "uninstallFailed": "解除安裝失敗",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "這是唯一的安裝，無法在此解除安裝。",
+      "UNINSTALL_NOT_FOUND": "這處安裝已不存在，請重新整理後再試。",
+      "UNINSTALL_UNSUPPORTED": "這處安裝不是由 Viber Switch 能解除安裝的套件管理員安裝的。",
+      "UNINSTALL_INCOMPLETE": "套件管理員已執行完畢，但執行檔仍然存在且無法自動刪除，請手動刪除。",
+      "UNINSTALL_IN_USE": "這處安裝正在被使用。請關閉所有正在執行的 {{tool}}（終端機、編輯器、背景程序）後重試。"
     }
   },
   "appPage": {
@@ -4320,21 +4527,22 @@
       "clientConfigChanged": "用戶端設定也已更新；重新啟動 {{app}} 以載入更新後的設定。",
       "defaultRemembered": "切換到聚合模式後，預設供應商是 {{provider}}。",
       "restartHint": "重新啟動 {{app}} 後生效。",
-      "failed": "切換失敗：{{detail}}"
+      "failed": "切換失敗：{{detail}}",
+      "undo": "復原"
     },
     "dialog": {
       "routeTitle": "讓 {{app}} 使用路由模式？",
       "stackTitle": "讓 {{app}} 使用聚合模式？",
       "switchTitle": "把 {{app}} 從「{{from}}」切換到「{{to}}」？",
-      "routeLead": "請求會先經過本機的 CC Switch，再轉給你選的供應商。",
+      "routeLead": "請求會先經過本機的 Viber Switch，再轉給你選的供應商。",
       "stackLead": "預設供應商承接不帶前綴的請求。",
       "routeTo": "路由到",
       "stackDefault": "預設供應商",
       "officialOption": "{{name}}（官方）",
       "stackOfficialNote": "如果你在用官方訂閱，請把官方帳號設為預設供應商。",
-      "routeNoteFile": "會改寫 {{file}} 裡的位址和金鑰；真實金鑰留在 CC Switch 裡，其他設定不動。",
+      "routeNoteFile": "會改寫 {{file}} 裡的位址和金鑰；真實金鑰留在 Viber Switch 裡，其他設定不動。",
       "routeNoteSwitch": "之後在「路由」分頁裡換供應商，不再改寫設定檔。",
-      "routeNoteKeepRunning": "CC Switch 需要保持執行；結束時自動寫回直連，下次啟動再接上。",
+      "routeNoteKeepRunning": "Viber Switch 需要保持執行；結束時自動寫回直連，下次啟動再接上。",
       "desktopRouteNoteModels": "Claude Desktop 的模型清單換成路由那家的模型；之後換路由那家會改寫設定檔。",
       "desktopRouteNoteRestart": "{{app}} 只在啟動時讀設定，確認後要重新啟動 {{app}} 才生效。",
       "desktopRouteNoteKeepRunning": "CC Switch 需要保持執行，{{app}} 的請求才能轉出去。",
@@ -4357,14 +4565,16 @@
       "needsRouteTitle": "{{provider}} 需要路由",
       "needsRouteLead": "{{provider}}：{{reason}}。直連切換過去，{{app}} 會無法使用它。",
       "switchAnyway": "仍然直連切換",
-      "routeAndUse": "開始路由並使用它"
+      "routeAndUse": "開始路由並使用它",
+      "stackToRouteNote": "聚合的模型會從 /model 撤下（名單保留）；已選中的聚合模型需要改回一般模型。"
     },
     "help": {
       "title": "連線模式的差別",
       "direct": "直連：CC Switch 不經手任何請求，用戶端直接連所選供應商，體驗最原生。",
-      "route": "路由：請求經本機 CC Switch 轉發，可熱切換供應商，並支援故障轉移、格式轉換等進階功能。",
+      "route": "路由：請求經本機 Viber Switch 轉發，可熱切換供應商，並支援故障轉移、格式轉換等進階功能。",
       "stack": "聚合：多家供應商的模型同列在 /model，在用戶端內即可無感切換。"
-    }
+    },
+    "copyEndpoint": "複製端點網址"
   },
   "providerCard": {
     "status": {
@@ -4372,7 +4582,8 @@
       "routing": "路由中",
       "currentDefault": "目前預設",
       "defaultAfterSwitch": "切換後預設",
-      "default": "預設"
+      "default": "預設",
+      "current": "目前"
     },
     "action": {
       "switch": "切換",
@@ -4400,7 +4611,8 @@
       "noModels": "沒有模型",
       "direct": "直連",
       "hermesManaged": "Hermes 託管",
-      "defaultModel": "預設模型 {{model}}"
+      "defaultModel": "預設模型 {{model}}",
+      "mapping": "模型映射"
     },
     "reason": {
       "noRoute": "官方訂閱不經過路由，回到直連後可用。",
@@ -4411,7 +4623,8 @@
       "defaultCannotRemove": "預設那家不能移除，先把別家設為預設。",
       "inUseCannotDelete": "正在用的這家不能刪除，先切到別家。",
       "directDefaultCannotDelete": "退出路由後會回到這家，所以不能刪除。先在直連頁對別家點「回到直連並使用」，再刪除。",
-      "noFailover": "官方帳號不進故障轉移佇列：它用客戶端自己的登入，不能和別家輪換。"
+      "noFailover": "官方帳號不進故障轉移佇列：它用客戶端自己的登入，不能和別家輪換。",
+      "currentCannotRemove": "正在用的這家不能移除，先啟用別家。"
     },
     "section": {
       "queue": "佇列 · 依優先順序（{{count}}）",
@@ -4466,7 +4679,9 @@
     "exitAllTitle": "讓所有應用回到直連？",
     "exitAllMessage": "在路由和聚合模式下的應用都會寫回直連設定，然後停止路由服務。路由目標、佇列和聚合名單會保留。",
     "exitAllConfirm": "全部回到直連",
-    "failoverHelp": "這裡調整各應用的逾時、重試和熔斷。佇列在各應用頁的「路由」分頁裡管理。"
+    "failoverHelp": "這裡調整各應用的逾時、重試和熔斷。佇列在各應用頁的「路由」分頁裡管理。",
+    "desktopMode": "模型映射 · 自動保持執行",
+    "desktopDetail": "目前供應商 {{name}}"
   },
   "quota": {
     "tierShort": "{{label}} {{value}}%",
@@ -4508,7 +4723,8 @@
     "windows": {
       "title": "各檔額度",
       "showAll": "查看各檔額度"
-    }
+    },
+    "balanceUsedUp": "餘額已用完"
   },
   "appMatrix": {
     "clearSearch": "清除搜尋",
@@ -4558,7 +4774,7 @@
     "failNoticeTitle": "無法寫入 {{app}} 的設定",
     "failNoticeBody": "{{error}}。修好檔案後點「重試」。",
     "loadFailed": "讀取 MCP 列表失敗",
-    "noFilesChanged": "CC Switch 沒有改動任何檔案。",
+    "noFilesChanged": "Viber Switch 沒有改動任何檔案。",
     "emptyTitle": "還沒有 MCP 伺服器",
     "emptyBody": "已經在應用裡設定過的 MCP，可以直接匯入",
     "importHelpTitle": "匯入會讀哪些設定",
@@ -4578,8 +4794,8 @@
     "disableEverywhere": "全部關閉",
     "deleteEllipsis": "刪除",
     "deleteTitle": "刪除 {{id}}？",
-    "deleteBodyApps": "會從 CC Switch 以及 {{apps}} 的設定檔裡刪除這一項，無法復原。",
-    "deleteBody": "會從 CC Switch 裡刪除這一項，無法復原。",
+    "deleteBodyApps": "會從 Viber Switch 以及 {{apps}} 的設定檔裡刪除這一項，無法復原。",
+    "deleteBody": "會從 Viber Switch 裡刪除這一項，無法復原。",
     "toast": {
       "written": "已寫入 {{app}}",
       "rowAllOn": "{{id}} 已在全部 {{count}} 個應用啟用",
@@ -4598,7 +4814,7 @@
       "title": "匯入完成",
       "added": "新增 {{count}} 個 MCP：{{names}}。",
       "none": "沒有發現新的 MCP。",
-      "sameName": "已有的同名 MCP 只打開了對應應用的開關，設定仍以 CC Switch 裡的為準。",
+      "sameName": "已有的同名 MCP 只打開了對應應用的開關，設定仍以 Viber Switch 裡的為準。",
       "failedTitle": "有應用沒有讀到",
       "filesTitle": "讀取了哪些檔案",
       "claudeNote": "（頂層 mcpServers）",
@@ -4698,7 +4914,7 @@
       "metaHint": "顯示名稱、描述、標籤、首頁、文件",
       "displayName": "顯示名稱",
       "displayNameHelpTitle": "顯示名稱用在哪",
-      "displayNameHelp": "只在 CC Switch 裡顯示，不寫進應用的設定。",
+      "displayNameHelp": "只在 Viber Switch 裡顯示，不寫進應用的設定。",
       "description": "描述",
       "tags": "標籤",
       "tagsPlaceholder": "用逗號分隔，例如 docs, web",
@@ -4710,7 +4926,7 @@
   "skillsPage": {
     "noun": "Skill",
     "helpTitle": "Skills 怎麼同步",
-    "help": "主副本放在 CC Switch 的目錄裡，再同步到你勾選的應用。Claude Desktop、OpenClaw 不支援 Skills，所以表格裡沒有這兩欄。",
+    "help": "主副本放在 Viber Switch 的目錄裡，再同步到你勾選的應用。Claude Desktop、OpenClaw 不支援 Skills，所以表格裡沒有這兩欄。",
     "add": "新增 Skill",
     "addMenu": {
       "discover": "在探索裡瀏覽",
@@ -4729,7 +4945,7 @@
     "lastChecked": "上次檢查：{{when}}",
     "justNow": "剛剛",
     "banner": {
-      "unmanaged": "本機有 {{count}} 個 Skill 不在 CC Switch 管理中。",
+      "unmanaged": "本機有 {{count}} 個 Skill 不在 Viber Switch 管理中。",
       "reviewImport": "查看並匯入",
       "ignore": "忽略",
       "close": "關閉提示"
@@ -4779,7 +4995,7 @@
     "confirm": {
       "uninstallOne": "解除安裝 {{name}}？",
       "uninstallMany": "解除安裝 {{count}} 個 Skill？",
-      "uninstallBody": "會從所有應用中移除，並刪除 CC Switch 裡的主副本。解除安裝前會自動備份到 {{path}}。",
+      "uninstallBody": "會從所有應用中移除，並刪除 Viber Switch 裡的主副本。解除安裝前會自動備份到 {{path}}。",
       "uninstallManyButton": "解除安裝 {{count}} 個",
       "updateAll": "更新 {{count}} 個 Skill？",
       "updateBody": "更新會用倉庫裡的內容取代本機目錄。本機改過的地方只保留在備份裡（{{path}}）。",
@@ -4797,7 +5013,8 @@
       "noUpdatesInSelection": "選中的 Skill 沒有可用的更新",
       "selectionAlreadyOn": "選中的 {{count}} 個 Skill 已經在 {{app}} 啟用",
       "selectionAlreadyOff": "選中的 {{count}} 個 Skill 都沒有在 {{app}} 啟用",
-      "disabledSelection": "已在 {{app}} 停用 {{count}} 個 {{noun}}"
+      "disabledSelection": "已在 {{app}} 停用 {{count}} 個 {{noun}}",
+      "copiedDir": "已複製目錄名稱 {{dir}}"
     },
     "installTo": {
       "prefix": "安裝到：",
@@ -4849,14 +5066,14 @@
     "import": {
       "title": "匯入本機已有的 Skill",
       "helpTitle": "哪些算本機已有",
-      "help": "有 SKILL.md、但還不歸 CC Switch 管理的目錄。",
-      "lead": "匯入會複製一份到 CC Switch 的目錄，原來的檔案不動。",
+      "help": "有 SKILL.md、但還不歸 Viber Switch 管理的目錄。",
+      "lead": "匯入會複製一份到 Viber Switch 的目錄，原來的檔案不動。",
       "searchPlaceholder": "搜尋名稱或位置",
       "searchAria": "搜尋要匯入的 Skill",
       "selectAll": "全選",
       "selectNone": "全不選",
       "foundIn": "發現於：{{places}}",
-      "foundCcSwitch": "CC Switch 目錄",
+      "foundCcSwitch": "Viber Switch 目錄",
       "appsTitle": "匯入後在這些應用裡啟用",
       "appsHelpTitle": "預設勾選哪些應用",
       "appsHelp": "預設勾選「發現於」裡的應用，只在發現它的應用裡啟用；另外勾選的應用，所有匯入的 Skill 都會啟用。Pi 按目錄判斷，不在這裡選。",
@@ -4875,11 +5092,12 @@
     "headerUpdatesShow": "只看可更新的 Skill",
     "headerUpdatesClear": "顯示全部 Skill",
     "updateAllCount": "全部更新（{{count}} 個）",
-    "updatingProgress": "正在更新 {{done}}/{{total}}…"
+    "updatingProgress": "正在更新 {{done}}/{{total}}…",
+    "copyDir": "複製目錄名稱"
   },
   "newLayoutNotice": {
     "title": "介面改版了",
-    "body": "CC Switch 這一版重新設計了介面，常用功能的位置有變化：\n• 模式移到了每個應用頁的頂部\n• 用量統計和授權中心移到了左側邊欄\n想了解全部變化，可以看看這一版的更新說明。",
+    "body": "Viber Switch 這一版重新設計了介面，常用功能的位置有變化：\n• 模式移到了每個應用頁的頂部\n• 用量統計和授權中心移到了左側邊欄\n想了解全部變化，可以看看這一版的更新說明。",
     "viewReleaseNotes": "查看更新說明",
     "confirm": "我知道了"
   },
@@ -4937,7 +5155,8 @@
       "open": "開啟授權頁面",
       "note": "已在瀏覽器開啟授權頁面，完成後這裡會自動更新。注意 {{service}} 的使用條款。",
       "browserNote": "已在瀏覽器開啟 {{service}} 的登入頁，登入並同意授權後這裡會自動更新。",
-      "reopen": "重新開啟登入頁"
+      "reopen": "重新開啟登入頁",
+      "login": "登入 {{service}} · 等待授權中…"
     },
     "toast": {
       "added": "已新增 {{service}} 帳號。",
@@ -4974,7 +5193,9 @@
       "empty": "還沒有新增 Claude 帳號。要在多個訂閱帳號之間切換時在這裡登入。",
       "removeNote": "只刪除 CC Switch 為這個帳號儲存的登入，不會讓它在其他地方登出；Claude Code 目前的登入（~/.claude）不受影響。綁定它的卡片會改用 Claude Code 目前的登入。",
       "wslUnsupported": "Claude 設定目錄在 WSL 裡，暫不支援新增和切換 Claude 帳號。"
-    }
+    },
+    "groupMenu": "{{service}} 的更多操作",
+    "removeAll": "刪除全部帳號"
   },
   "kimi": {
     "oauth": {
@@ -5077,5 +5298,23 @@
       "description": "設定請求網址、API Key 和模型。現有的自訂供應商會自動顯示在這裡。"
     },
     "deleteSessionHint": "請在 DeepSeek Harness 中刪除此工作階段，以保持原生歷史記錄一致。"
+  },
+  "agents": {
+    "title": "Agent"
+  },
+  "languagePicker": {
+    "title": "選擇語言",
+    "hint": "之後可在設定中更改。"
+  },
+  "desktopAccess": {
+    "current": "目前：{{name}} · {{mode}}",
+    "noCurrent": "還沒有選擇供應商",
+    "helpTitle": "接入方式",
+    "help": "Claude Desktop 的接入方式依供應商設定：直連的供應商直接寫進 Desktop 的設定；模型映射的供應商經路由服務轉發，模型映射在用時路由服務自動保持執行。",
+    "service": "路由服務",
+    "running": "執行中",
+    "notRunning": "路由服務沒能啟動",
+    "changePort": "更改連接埠",
+    "notNeeded": "路由服務：目前供應商不需要"
   }
 }

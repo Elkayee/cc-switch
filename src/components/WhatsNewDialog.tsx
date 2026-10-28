@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { getVersion } from "@tauri-apps/api/app";
-import { ChevronRight, ExternalLink, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,6 @@ import { settingsApi } from "@/lib/api";
 import { useSettingsQuery } from "@/lib/query";
 import {
   WHATS_NEW_ENTRIES,
-  changelogUrl,
   entriesSince,
   isNewerThanSeen,
   markSeen,
@@ -53,23 +52,9 @@ export function WhatsNewDialog({
   const visible = showAll ? entries : entries.slice(0, EXPANDED_VERSIONS);
   const hiddenCount = entries.length - visible.length;
 
-  const openExternal = (url: string) => {
-    settingsApi.openExternal(url).catch((error) => {
-      console.error("Failed to open changelog:", error);
-    });
-  };
-
-  const handleViewFull = () => {
-    // 只有一个版本就直接打开这一版，多个版本打开更新日志列表
-    openExternal(
-      changelogUrl(
-        language,
-        entries.length === 1 ? entries[0].version : undefined,
-      ),
-    );
-    onClose();
-  };
-
+  // Fork: no links to the upstream cc-switch website changelog (ccswitch.io); the
+  // dialog is read-only. Do not restore the per-version "Details" link or the
+  // "View full changelog" button on upstream merge.
   return (
     <Dialog
       open={open}
@@ -78,13 +63,13 @@ export function WhatsNewDialog({
       }}
     >
       <DialogContent
-        className="max-w-md"
+        className="max-w-[480px]"
         zIndex="top"
         {...(since ? {} : { "aria-describedby": undefined })}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-fg-1" />
+            <Sparkles className="h-4 w-4 text-fg-1" />
             {updatedTo
               ? t("whatsNew.updatedTo", { version: updatedTo })
               : t("whatsNew.recentTitle")}
@@ -95,31 +80,19 @@ export function WhatsNewDialog({
             </DialogDescription>
           )}
         </DialogHeader>
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-6 py-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
           {visible.map((entry) => (
             <section key={entry.version}>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-strong tabular-nums text-fg-1">
-                  v{entry.version}
-                </h3>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1 text-caption text-fg-2 hover:text-fg-1"
-                  onClick={() =>
-                    openExternal(changelogUrl(language, entry.version))
-                  }
-                >
-                  {t("whatsNew.versionDetails")}
-                  <ExternalLink className="h-3 w-3" />
-                </button>
-              </div>
-              <ul className="mt-2 space-y-1.5">
+              <h3 className="text-[12.35px] font-semibold leading-[1.3] tabular-nums text-fg-1">
+                v{entry.version}
+              </h3>
+              <ul className="mt-1 space-y-1">
                 {entry.items.map((item, index) => (
                   <li
                     key={index}
-                    className="flex items-start gap-2 text-body text-fg-1"
+                    className="flex items-start gap-2 text-[12.35px] leading-[1.3] text-fg-1"
                   >
-                    <span className="mt-0.5 shrink-0 rounded-control bg-subtle px-1.5 text-badge text-fg-2">
+                    <span className="shrink-0 rounded-[3px] bg-subtle px-1 text-[12.35px] leading-[1.3] text-fg-2">
                       {t(`whatsNew.types.${item.type}`)}
                     </span>
                     <span className="min-w-0">{item[language]}</span>
@@ -131,18 +104,15 @@ export function WhatsNewDialog({
           {hiddenCount > 0 && (
             <button
               type="button"
-              className="inline-flex items-center gap-1 text-caption text-fg-2 hover:text-fg-1"
+              className="inline-flex items-center gap-1 text-[12.35px] leading-[1.3] text-fg-2 hover:text-fg-1"
               onClick={() => setShowAll(true)}
             >
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="h-4 w-4" />
               {t("whatsNew.showEarlier", { count: hiddenCount })}
             </button>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleViewFull}>
-            {t("whatsNew.viewFull")}
-          </Button>
           <Button onClick={onClose}>{t("whatsNew.confirm")}</Button>
         </DialogFooter>
       </DialogContent>

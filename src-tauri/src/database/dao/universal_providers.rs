@@ -26,8 +26,9 @@ impl Database {
             .ok();
 
         match result {
-            Some(json) => serde_json::from_str(&json)
-                .map_err(|e| AppError::Database(format!("解析统一供应商数据失败: {e}"))),
+            Some(json) => serde_json::from_str(&json).map_err(|e| {
+                AppError::Database(format!("Failed to parse unified provider data: {e}"))
+            }),
             None => Ok(HashMap::new()),
         }
     }

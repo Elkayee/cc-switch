@@ -27,7 +27,7 @@ export function useCodexTomlValidation() {
       return true;
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "TOML 格式错误";
+        error instanceof Error ? error.message : "Invalid TOML";
       setConfigError(errorMessage);
       return false;
     }

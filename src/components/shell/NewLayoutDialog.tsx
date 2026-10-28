@@ -18,8 +18,6 @@ import { useSettingsQuery } from "@/lib/query";
 import { markSeen } from "@/lib/whatsNew";
 import type { Settings } from "@/types";
 
-const RELEASES_URL = "https://github.com/farion1231/cc-switch/releases";
-
 /** 任一应用的数据库里已经有供应商（找到一家就停） */
 async function hasAnyProvider(): Promise<boolean> {
   for (const app of APP_IDS) {
@@ -93,18 +91,6 @@ export function NewLayoutDialog() {
     }
   };
 
-  const handleViewReleaseNotes = async () => {
-    try {
-      const version = await getVersion();
-      await settingsApi.openExternal(
-        version ? `${RELEASES_URL}/tag/v${version}` : RELEASES_URL,
-      );
-    } catch (error) {
-      console.error("Failed to open release notes:", error);
-    }
-    await handleAcknowledge();
-  };
-
   return (
     <Dialog
       open={isOpen}
@@ -112,22 +98,19 @@ export function NewLayoutDialog() {
         if (!open) void handleAcknowledge();
       }}
     >
-      <DialogContent className="max-w-md" zIndex="top">
+      <DialogContent className="max-w-[480px]" zIndex="top">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-fg-1" />
+            <Sparkles className="h-4 w-4 text-fg-1" />
             {t("newLayoutNotice.title")}
           </DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-5">
-          <DialogDescription className="whitespace-pre-line leading-relaxed">
+        <div>
+          <DialogDescription className="whitespace-pre-line leading-[1.3]">
             {t("newLayoutNotice.body")}
           </DialogDescription>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleViewReleaseNotes}>
-            {t("newLayoutNotice.viewReleaseNotes")}
-          </Button>
           <Button onClick={handleAcknowledge}>
             {t("newLayoutNotice.confirm")}
           </Button>

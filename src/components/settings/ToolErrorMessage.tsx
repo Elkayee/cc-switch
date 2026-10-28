@@ -37,7 +37,7 @@ export function ToolErrorMessage({ message }: { message: string }) {
           <div
             ref={textRef}
             tabIndex={isTruncated ? 0 : undefined}
-            className={`truncate text-[11px] text-fg-2${isTruncated ? "cursor-help" : ""}`}
+            className={`truncate text-[12.35px] leading-[1.3] text-muted-foreground${isTruncated ? " cursor-help" : ""}`}
           >
             {message}
           </div>

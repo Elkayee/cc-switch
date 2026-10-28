@@ -6,7 +6,6 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "updater:default",
     "log:default",
     "core:window:allow-set-skip-taskbar",
     "core:window:allow-start-dragging",
@@ -17,6 +16,7 @@
     "core:window:allow-set-decorations",
     "process:allow-exit",
     "process:allow-restart",
-    "dialog:default"
+    "dialog:default",
+    "updater:default"
   ]
 }

@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input";
 import { HoverTip } from "@/components/ui/hover-tip";
 import { cn } from "@/lib/utils";
 
-export interface SearchFieldProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "value" | "onChange" | "type"
-  > {
+export interface SearchFieldProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "type"
+> {
   value: string;
   onValueChange: (value: string) => void;
   /** 清除按钮的名字（悬停提示 + aria-label） */
@@ -41,7 +40,7 @@ export const SearchField = React.forwardRef<HTMLInputElement, SearchFieldProps>(
         <Search
           aria-hidden="true"
           strokeWidth={1.5}
-          className="pointer-events-none absolute start-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fg-3"
+          className="pointer-events-none absolute start-2 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-3"
         />
         <Input
           ref={inputRef}
@@ -70,9 +69,9 @@ export const SearchField = React.forwardRef<HTMLInputElement, SearchFieldProps>(
                 inputRef.current?.focus();
               }}
               aria-label={clearLabel}
-              className="absolute end-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-control text-fg-3 transition-colors hover:bg-subtle hover:text-fg-1"
+              className="absolute end-0 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-[3px] text-fg-3 transition-colors hover:bg-subtle hover:text-fg-1"
             >
-              <X aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={1.5} />
+              <X aria-hidden="true" className="h-4 w-4" strokeWidth={1.5} />
             </button>
           </HoverTip>
         )}

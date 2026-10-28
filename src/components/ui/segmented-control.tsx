@@ -49,15 +49,14 @@ export function SegmentedControl<T extends string>({
       role="group"
       aria-label={rest["aria-label"]}
       className={cn(
-        "relative inline-flex items-stretch bg-subtle p-[3px]",
-        size === "md" ? "h-9 rounded-[10px]" : "h-7 rounded-[8px]",
+        "relative inline-flex h-6 items-stretch rounded-[4px] bg-subtle p-0.5",
         className,
       )}
     >
       <SegmentThumb
         rect={indicator.rect}
         animate={indicator.animate}
-        className={size === "md" ? "rounded-[7px]" : "rounded-[5px]"}
+        className="rounded-[3px]"
       />
       {items.map((item) => {
         const pressed = item.value === value;
@@ -70,17 +69,17 @@ export function SegmentedControl<T extends string>({
             disabled={item.disabled}
             onClick={() => onValueChange(item.value)}
             className={cn(
-              "relative inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium text-fg-2 transition-colors duration-150 hover:text-fg-1 disabled:cursor-not-allowed disabled:opacity-45",
+              "relative inline-flex items-center justify-center gap-1 whitespace-nowrap font-medium text-fg-2 transition-colors duration-150 hover:text-fg-1 disabled:cursor-not-allowed disabled:opacity-45",
               size === "md"
-                ? "rounded-[7px] px-3.5 text-body"
-                : "rounded-[5px] px-2.5 text-caption",
+                ? "rounded-[3px] px-2 text-[12.35px] leading-[1.3]"
+                : "rounded-[3px] px-1 text-[12.35px] leading-[1.3]",
               item.className,
               pressed && "text-fg-1",
             )}
           >
             {Icon ? (
               <Icon
-                className={size === "md" ? "h-4 w-4" : "h-3.5 w-3.5"}
+                className={size === "md" ? "h-4 w-4" : "h-3 w-3"}
                 strokeWidth={2}
               />
             ) : null}

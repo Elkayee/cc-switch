@@ -101,7 +101,7 @@ const GeminiConfigEditor: React.FC<GeminiConfigEditorProps> = ({
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-fg-2">
+      <p className="text-ui text-muted-foreground">
         {isAgy
           ? t("provider.form.agy.keyFieldsHint")
           : t("geminiConfig.keyFieldsHint", {

@@ -706,7 +706,7 @@ pub(crate) fn should_skip_session_insert(
 fn proxy_request_id_exists(conn: &Connection, request_id: &str) -> Result<bool, AppError> {
     conn.prepare_cached("SELECT EXISTS(SELECT 1 FROM proxy_request_logs WHERE request_id = ?1)")
         .and_then(|mut stmt| stmt.query_row(params![request_id], |row| row.get::<_, bool>(0)))
-        .map_err(|e| AppError::Database(format!("查询 request_id 失败: {e}")))
+        .map_err(|e| AppError::Database(format!("Failed to query request_id: {e}")))
 }
 
 // 会话重导每个 token 事件都要跑一次这条查询；SQL 文本静态化让
@@ -770,7 +770,7 @@ pub(crate) fn has_matching_proxy_usage_log(
                 |row| row.get::<_, bool>(0),
             )
         })
-        .map_err(|e| AppError::Database(format!("查询重复代理用量日志失败: {e}")))
+        .map_err(|e| AppError::Database(format!("Failed to query duplicate proxy usage logs: {e}")))
 }
 
 /// grokbuild 会话导入的接管活动守卫：给定时刻 ±窗口内存在任何 grokbuild
@@ -804,7 +804,7 @@ pub(crate) fn has_recent_grokbuild_proxy_activity(
         params![created_at, SESSION_PROXY_DEDUP_WINDOW_SECONDS],
         |row| row.get::<_, bool>(0),
     )
-    .map_err(|e| AppError::Database(format!("查询 Grok 接管活动失败: {e}")))
+    .map_err(|e| AppError::Database(format!("Failed to query Grok takeover activity: {e}")))
 }
 
 static SUSPECTED_CODEX_DUPLICATE_SQL: LazyLock<String> = LazyLock::new(|| {
@@ -845,7 +845,11 @@ pub(crate) fn has_suspected_codex_session_duplicate(
                 |row| row.get::<_, bool>(0),
             )
         })
-        .map_err(|error| AppError::Database(format!("查询疑似重复 Codex 会话用量失败: {error}")))
+        .map_err(|error| {
+            AppError::Database(format!(
+                "Failed to query suspected duplicate Codex session usage: {error}"
+            ))
+        })
 }
 
 #[derive(Debug, Clone, Default)]
@@ -859,7 +863,7 @@ fn local_datetime_from_timestamp(ts: i64) -> Result<chrono::DateTime<Local>, App
     Local
         .timestamp_opt(ts, 0)
         .single()
-        .ok_or_else(|| AppError::Database(format!("无法解析本地时间戳: {ts}")))
+        .ok_or_else(|| AppError::Database(format!("Cannot parse local timestamp: {ts}")))
 }
 
 fn compute_rollup_date_bounds(
@@ -1488,7 +1492,7 @@ impl Database {
         for row in detail_rows {
             let (bucket_date, stat) = row?;
             let date = NaiveDate::parse_from_str(&bucket_date, "%Y-%m-%d")
-                .map_err(|err| AppError::Database(format!("解析趋势日期失败: {err}")))?;
+                .map_err(|err| AppError::Database(format!("Failed to parse trend date: {err}")))?;
             map.insert(date, stat);
         }
 
@@ -1563,8 +1567,9 @@ impl Database {
 
         for row in rollup_rows {
             let (bucket_date, (req, cost, tok, inp, out, cc, cr)) = row?;
-            let date = NaiveDate::parse_from_str(&bucket_date, "%Y-%m-%d")
-                .map_err(|err| AppError::Database(format!("解析 rollup 趋势日期失败: {err}")))?;
+            let date = NaiveDate::parse_from_str(&bucket_date, "%Y-%m-%d").map_err(|err| {
+                AppError::Database(format!("Failed to parse rollup trend date: {err}"))
+            })?;
             let entry = map.entry(date).or_insert_with(|| DailyStats {
                 date: String::new(),
                 request_count: 0,
@@ -2418,9 +2423,11 @@ impl Database {
             return Ok(0);
         }
 
-        let tx = conn
-            .unchecked_transaction()
-            .map_err(|e| AppError::Database(format!("启动用量成本回填事务失败: {e}")))?;
+        let tx = conn.unchecked_transaction().map_err(|e| {
+            AppError::Database(format!(
+                "Failed to begin usage cost backfill transaction: {e}"
+            ))
+        })?;
 
         let mut updated = 0u64;
         let mut pricing_cache = HashMap::new();
@@ -2429,8 +2436,11 @@ impl Database {
                 updated += 1;
             }
         }
-        tx.commit()
-            .map_err(|e| AppError::Database(format!("提交用量成本回填事务失败: {e}")))?;
+        tx.commit().map_err(|e| {
+            AppError::Database(format!(
+                "Failed to commit usage cost backfill transaction: {e}"
+            ))
+        })?;
 
         if updated > 0 {
             log::info!("已回填 {updated} 条缺失的用量成本");
@@ -2527,7 +2537,7 @@ impl Database {
                 log.request_id
             ],
         )
-        .map_err(|e| AppError::Database(format!("更新请求成本失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to update request cost: {e}")))?;
 
         Ok(true)
     }
@@ -2548,13 +2558,15 @@ impl Database {
 
         let pricing = PricingInfo {
             input: rust_decimal::Decimal::from_str(&input)
-                .map_err(|e| AppError::Database(format!("解析输入价格失败: {e}")))?,
+                .map_err(|e| AppError::Database(format!("Failed to parse input price: {e}")))?,
             output: rust_decimal::Decimal::from_str(&output)
-                .map_err(|e| AppError::Database(format!("解析输出价格失败: {e}")))?,
-            cache_read: rust_decimal::Decimal::from_str(&cache_read)
-                .map_err(|e| AppError::Database(format!("解析缓存读取价格失败: {e}")))?,
-            cache_creation: rust_decimal::Decimal::from_str(&cache_creation)
-                .map_err(|e| AppError::Database(format!("解析缓存写入价格失败: {e}")))?,
+                .map_err(|e| AppError::Database(format!("Failed to parse output price: {e}")))?,
+            cache_read: rust_decimal::Decimal::from_str(&cache_read).map_err(|e| {
+                AppError::Database(format!("Failed to parse cache-read price: {e}"))
+            })?,
+            cache_creation: rust_decimal::Decimal::from_str(&cache_creation).map_err(|e| {
+                AppError::Database(format!("Failed to parse cache-write price: {e}"))
+            })?,
         };
 
         cache.insert(model.to_string(), pricing.clone());
@@ -2687,7 +2699,7 @@ fn query_model_pricing_exact(
         },
     )
     .optional()
-    .map_err(|e| AppError::Database(format!("查询模型定价失败: {e}")))
+    .map_err(|e| AppError::Database(format!("Failed to query model pricing: {e}")))
 }
 
 fn query_model_pricing_prefix(
@@ -2713,7 +2725,7 @@ fn query_model_pricing_prefix(
         },
     )
     .optional()
-    .map_err(|e| AppError::Database(format!("查询模型前缀定价失败: {e}")))
+    .map_err(|e| AppError::Database(format!("Failed to query model prefix pricing: {e}")))
 }
 
 fn model_pricing_candidates(model_id: &str) -> Vec<String> {

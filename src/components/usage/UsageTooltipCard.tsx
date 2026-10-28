@@ -47,11 +47,11 @@ export function UsageTooltipCard({
   ];
 
   return (
-    <div className="min-w-[180px] rounded-[10px] border border-border bg-surface px-4 py-3 shadow-v7-lg">
-      <p className="m-0 mb-2 whitespace-nowrap text-body font-semibold text-fg-1">
+    <div className="min-w-[180px] rounded-[8px] border border-border bg-card px-2 py-2 shadow-lg">
+      <p className="m-0 mb-2 whitespace-nowrap text-ui font-semibold text-foreground">
         {heading}
       </p>
-      <div className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-body">
+      <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-ui">
         {rows.map((row) => (
           <div key={row.label} className="contents">
             <span className="whitespace-nowrap text-fg-2">{row.label}</span>

@@ -48,53 +48,53 @@ export function SkillRestoreDialog({
       }}
     >
       <div className="flex shrink-0 flex-col gap-1">
-        <DialogTitle className="text-section">
+        <DialogTitle className="text-[12.35px] leading-[1.3] font-semibold">
           {t("skills.restoreFromBackup.title")}
         </DialogTitle>
-        <DialogDescription className="text-caption text-fg-2">
+        <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
           {t("skillsPage.restore.lead", { apps: targetsLabel })}
         </DialogDescription>
       </div>
 
       <div className="min-h-0 overflow-y-auto overscroll-contain">
         {isLoading ? (
-          <p className="m-0 py-10 text-center text-body text-fg-2">
+          <p className="m-0 py-10 text-center text-[12.35px] leading-[1.3] text-fg-2">
             {t("common.loading")}
           </p>
         ) : backups.length === 0 ? (
-          <p className="m-0 py-10 text-center text-body text-fg-2">
+          <p className="m-0 py-10 text-center text-[12.35px] leading-[1.3] text-fg-2">
             {t("skills.restoreFromBackup.empty")}
           </p>
         ) : (
-          <ul className="m-0 list-none rounded-panel border border-border p-0">
+          <ul className="m-0 list-none rounded-[8px] border border-border p-0">
             {backups.map((backup, index) => (
               <li
                 key={backup.backupId}
                 className={cn(
-                  "flex items-start gap-4 px-4 py-3",
+                  "flex items-start gap-2 px-2 py-2",
                   index > 0 && "border-t border-border",
                 )}
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="truncate text-body font-medium">
+                    <span className="truncate text-[12.35px] leading-[1.3] font-medium">
                       {backup.skill.name}
                     </span>
-                    <span className="truncate font-mono text-caption text-fg-3">
+                    <span className="truncate font-mono text-[12.35px] leading-[1.3] text-fg-3">
                       {backup.skill.directory}
                     </span>
                   </div>
                   {backup.skill.description && (
-                    <span className="text-caption text-fg-2">
+                    <span className="text-[12.35px] leading-[1.3] text-fg-2">
                       {backup.skill.description}
                     </span>
                   )}
-                  <span className="text-caption text-fg-2">
+                  <span className="text-[12.35px] leading-[1.3] text-fg-2">
                     {t("skills.restoreFromBackup.createdAt")}:{" "}
                     {formatSkillBackupDate(backup.createdAt)}
                   </span>
                   <span
-                    className="break-all font-mono text-caption text-fg-3"
+                    className="break-all font-mono text-[12.35px] leading-[1.3] text-fg-3"
                     title={backup.backupPath}
                   >
                     {backup.backupPath}
@@ -135,7 +135,6 @@ export function SkillRestoreDialog({
         <Button
           type="button"
           variant="neutral"
-          size="regular"
           disabled={pending}
           onClick={onClose}
         >

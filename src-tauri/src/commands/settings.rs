@@ -3,7 +3,7 @@
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_updater::UpdaterExt;
 
-/// 应用更新下载进度（通过 `update-download-progress` 事件发给前端）。
+/// 应用更新下载进度（通过 update-download-progress 事件发给前端）。
 #[derive(Clone, serde::Serialize)]
 struct UpdateDownloadProgress {
     downloaded: u64,
@@ -125,7 +125,7 @@ pub async fn save_settings(
                 log::error!("回滚统一会话开关设置失败: {rollback_err}");
             }
             return Err(format!(
-                "统一 Codex 会话历史开关未生效（live 配置重写失败）: {err}"
+                "Unified Codex session history toggle did not apply (live config rewrite failed): {err}"
             ));
         }
 
@@ -252,7 +252,7 @@ pub async fn restore_codex_unified_history() -> Result<CodexUnifyHistoryRestoreR
 
 /// 重启应用程序（当 app_config_dir 变更后使用）
 #[tauri::command]
-pub async fn restart_app(app: AppHandle) -> Result<bool, String> {
+pub async fn restart_app(app: AppHandle<crate::AppRuntime>) -> Result<bool, String> {
     crate::save_window_state_before_exit(&app);
 
     // 在后台延迟重启，让函数有时间返回响应
@@ -270,14 +270,8 @@ pub async fn restart_app(app: AppHandle) -> Result<bool, String> {
     Ok(true)
 }
 
-/// 下载并安装应用更新，然后由后端直接重启应用。
-///
-/// macOS 更新会原地替换 `.app` bundle。如果先返回前端、再让旧 WebView 调
-/// `process.relaunch()`，旧进程可能已经处在 bundle 被替换后的不稳定窗口期。
-/// 这里把退出清理、安装和重启串在同一个后端流程中，避免依赖旧前端继续执行。
 #[tauri::command]
-pub async fn install_update_and_restart(app: AppHandle) -> Result<bool, String> {
-    let builder = app.updater_builder();
+pub async fn install_update_and_restart(app: AppHandle<crate::AppRuntime>) -> Result<bool, String> {    let builder = app.updater_builder();
     // Windows 上 updater 以 `msiexec /passive /promptrestart` 安装 MSI。passive 没有模态框、
     // 未指定重启选项时，安装目录里有文件被占用，Windows Installer 会不经确认直接重启系统
     // （#8534）。`/promptrestart` 只对应 REBOOTPROMPT，挡不住这一点，因此显式追加
@@ -360,7 +354,9 @@ pub async fn install_update_and_restart(app: AppHandle) -> Result<bool, String> 
 /// 已是最新版本，但数据库仍不兼容（通常由第三方客户端或更高版本创建），应提示用户
 /// 升级无法解决，而不是让其反复尝试。
 #[tauri::command]
-pub async fn check_app_update_available(app: AppHandle) -> Result<Option<String>, String> {
+pub async fn check_app_update_available(
+    app: AppHandle<crate::AppRuntime>,
+) -> Result<Option<String>, String> {
     let updater = app
         .updater_builder()
         .build()
@@ -374,7 +370,9 @@ pub async fn check_app_update_available(app: AppHandle) -> Result<Option<String>
 
 /// 获取 app_config_dir 覆盖配置 (从 Store)
 #[tauri::command]
-pub async fn get_app_config_dir_override(app: AppHandle) -> Result<Option<String>, String> {
+pub async fn get_app_config_dir_override(
+    app: AppHandle<crate::AppRuntime>,
+) -> Result<Option<String>, String> {
     Ok(crate::app_store::refresh_app_config_dir_override(&app)
         .map(|p| p.to_string_lossy().to_string()))
 }
@@ -382,7 +380,7 @@ pub async fn get_app_config_dir_override(app: AppHandle) -> Result<Option<String
 /// 设置 app_config_dir 覆盖配置 (到 Store)
 #[tauri::command]
 pub async fn set_app_config_dir_override(
-    app: AppHandle,
+    app: AppHandle<crate::AppRuntime>,
     path: Option<String>,
 ) -> Result<bool, String> {
     crate::app_store::set_app_config_dir_to_store(&app, path.as_deref())?;
@@ -393,9 +391,11 @@ pub async fn set_app_config_dir_override(
 #[tauri::command]
 pub async fn set_auto_launch(enabled: bool) -> Result<bool, String> {
     if enabled {
-        crate::auto_launch::enable_auto_launch().map_err(|e| format!("启用开机自启失败: {e}"))?;
+        crate::auto_launch::enable_auto_launch()
+            .map_err(|e| format!("Failed to enable auto-launch: {e}"))?;
     } else {
-        crate::auto_launch::disable_auto_launch().map_err(|e| format!("禁用开机自启失败: {e}"))?;
+        crate::auto_launch::disable_auto_launch()
+            .map_err(|e| format!("Failed to disable auto-launch: {e}"))?;
     }
     Ok(true)
 }
@@ -737,7 +737,8 @@ mod tests {
 /// 获取开机自启状态
 #[tauri::command]
 pub async fn get_auto_launch_status() -> Result<bool, String> {
-    crate::auto_launch::is_auto_launch_enabled().map_err(|e| format!("获取开机自启状态失败: {e}"))
+    crate::auto_launch::is_auto_launch_enabled()
+        .map_err(|e| format!("Failed to get auto-launch status: {e}"))
 }
 
 /// 获取整流器配置

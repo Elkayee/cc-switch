@@ -1,0 +1,346 @@
+name: npm Release
+
+# Publishes @spec-ade/cli-switch (the JS launcher) plus one prebuilt-binary
+# package per platform. Separate from release.yml, which builds the desktop
+# bundles and is left untouched.
+
+on:
+  # Publishing a GitHub release is enough to ship to npm.
+  # `published` also covers flipping an existing draft release to public.
+  release:
+    types: [published]
+  # Tag trigger kept so npm can ship independently of a desktop release
+  # (e.g. a launcher/webshim-only fix that needs no new desktop bundles).
+  push:
+    tags:
+      - 'npm-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (blank = read from package.json)'
+        type: string
+        required: false
+      dry_run:
+        description: 'Build and pack without publishing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  # Grouped by tag/release name: if a release-published and a tag-push event
+  # both point at the same version, they queue instead of racing
+  # (`cancel-in-progress: true` could cancel one mid-`npm publish`).
+  group: npm-release-${{ github.event.release.tag_name || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  # Resolve the version once and share it with every other job, so build and
+  # publish never derive it independently and drift when a trigger is added.
+  resolve:
+    name: Resolve version
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      publish: ${{ steps.resolve.outputs.publish }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Resolve version and publish mode
+        id: resolve
+        shell: bash
+        env:
+          # Passed through env instead of interpolated straight into the
+          # script: a tag/input is user-controlled data, and interpolating it
+          # directly would be a script-injection hole.
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          case "${{ github.event_name }}" in
+            release)          raw="$RELEASE_TAG" ;;
+            push)             raw="${GITHUB_REF#refs/tags/}" ;;
+            workflow_dispatch) raw="${INPUT_VERSION:-$(node -p "require('./package.json').version")}" ;;
+            *) echo "unsupported event: ${{ github.event_name }}" >&2; exit 1 ;;
+          esac
+
+          # Reuses set-version.mjs's own normalize/validate instead of a
+          # second semver regex here — two copies drift apart over time.
+          # A bad tag is caught here, before spending 6 runners on a build.
+          if ! version="$(RAW="$raw" node --input-type=module -e "
+            import { normalizeVersion } from './npm/set-version.mjs';
+            console.log(normalizeVersion(process.env.RAW));
+          ")"; then
+            echo "::error::invalid tag/version: '$raw' (expected v1.2.3, npm-v1.2.3, or 1.2.3)"
+            exit 1
+          fi
+
+          # release/tag events publish for real; workflow_dispatch defaults to a dry run.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            publish="${{ inputs.dry_run == false }}"
+          else
+            publish=true
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          {
+            echo "### npm release"
+            echo ""
+            echo "- trigger: \`${{ github.event_name }}\`"
+            echo "- version: \`$version\`"
+            echo "- publish: \`$publish\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    name: Build ${{ matrix.target }}
+    needs: resolve
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: x86_64-pc-windows-msvc
+            pkg: win32-x64
+            binary: server.exe
+          - os: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            pkg: win32-arm64
+            binary: server.exe
+          - os: macos-14
+            target: x86_64-apple-darwin
+            pkg: darwin-x64
+            binary: server
+          - os: macos-14
+            target: aarch64-apple-darwin
+            pkg: darwin-arm64
+            binary: server
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            pkg: linux-x64
+            binary: server
+          - os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            pkg: linux-arm64
+            binary: server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # `rust-toolchain.toml` pins the channel (1.95), so the target must be
+      # added to *that* toolchain, not to whichever one this action installs.
+      # Passing `targets:` here installs into `stable` instead, and `cargo
+      # build` then switches to the pinned 1.95 and fails with
+      # "can't find crate for `std`". `release.yml` uses `rustup target add`
+      # for the same reason.
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust target
+        shell: bash
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      # Tauri keeps its default `wry` feature enabled even under
+      # `server-runtime`, so the headless binary still links WebKitGTK on Linux
+      # and needs these at build time.
+      - name: Install Linux system deps
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config libssl-dev \
+            libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev \
+            || sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.0-dev
+          sudo apt-get install -y --no-install-recommends libsoup-3.0-dev \
+            || sudo apt-get install -y --no-install-recommends libsoup2.4-dev
+
+      # `rquickjs-sys` runs bindgen, which needs libclang matching the runner's
+      # architecture. Use the LLVM preinstalled on the ARM64 image rather than
+      # `choco install llvm`, which drops an x86-64 `libclang.dll` that bindgen
+      # rejects with "invalid DLL (x86-64)". Point at `bin/` (where
+      # `libclang.dll` lives), not `lib/`. Same approach as release.yml.
+      - name: Setup LLVM for Windows ARM64
+        if: matrix.pkg == 'win32-arm64'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $llvmRoot = 'C:\Program Files\LLVM'
+          if (-not (Test-Path $llvmRoot)) {
+            throw "LLVM not found at $llvmRoot"
+          }
+          $llvmBin = Join-Path $llvmRoot 'bin'
+          "LIBCLANG_PATH=$llvmBin" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "CLANG_PATH=$(Join-Path $llvmBin 'clang.exe')" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          $llvmBin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+
+      - name: Install frontend deps
+        run: bun install --frozen-lockfile
+
+      # No --allow-app-mismatch: for a real release/tag, the version must match
+      # the repo root's package.json (i.e. the maintainer bumped it before
+      # tagging). A mismatch here means the bump was forgotten, so this fails
+      # the build hard rather than publishing the wrong version to npm.
+      # workflow_dispatch can still test an arbitrary version by bumping
+      # package.json on the same test branch.
+      - name: Stamp npm package versions
+        shell: bash
+        run: node npm/set-version.mjs "${{ needs.resolve.outputs.version }}"
+
+      - name: Build web frontend
+        run: bun run build:web
+
+      - name: Build server binary
+        working-directory: src-tauri
+        run: cargo build --release --bin server --features server-runtime --target ${{ matrix.target }}
+
+      - name: Stage platform package
+        shell: bash
+        run: |
+          set -euxo pipefail
+          dest="npm/platforms/${{ matrix.pkg }}/bin"
+          mkdir -p "$dest"
+          cp "src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary }}" "$dest/"
+          # The server resolves `dist/` as a sibling of the executable.
+          cp -r dist-web "$dest/dist"
+          rm -f "$dest/.gitkeep"
+
+      - name: Pack platform package
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p artifacts
+          cd "npm/platforms/${{ matrix.pkg }}"
+          npm pack --pack-destination "$GITHUB_WORKSPACE/artifacts"
+
+      - name: Upload packed tarball
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-${{ matrix.pkg }}
+          path: artifacts/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish to npm
+    needs: [resolve, build]
+    runs-on: ubuntu-22.04
+    environment: release
+    permissions:
+      contents: read
+      # Only this job needs it: `npm publish --provenance` signs an
+      # attestation over OIDC. Provenance only works for a public repo on a
+      # GitHub-hosted runner.
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download platform tarballs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: npm-*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Verify all six platform tarballs are present
+        shell: bash
+        run: |
+          set -euxo pipefail
+          count=$(ls artifacts/*.tgz | wc -l)
+          if [ "$count" -ne 6 ]; then
+            echo "Expected 6 platform tarballs, found $count:" >&2
+            ls -la artifacts >&2
+            exit 1
+          fi
+          # Every tarball must carry the resolved version — catches a build
+          # job that ran against stale source (e.g. a cache or rerun mismatch).
+          for tarball in artifacts/*.tgz; do
+            found=$(tar -xzO -f "$tarball" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0)).version")
+            if [ "$found" != "${{ needs.resolve.outputs.version }}" ]; then
+              echo "$tarball has version $found, expected ${{ needs.resolve.outputs.version }}" >&2
+              exit 1
+            fi
+          done
+
+      # This checkout is a separate job from `build`, so the version stamp
+      # applied there is not inherited — the launcher's own package.json
+      # (published directly, not from a tarball) needs it stamped again here.
+      #
+      # Same strict validation as the build job: if build already passed,
+      # this passes too, so --allow-app-mismatch here would only drop a
+      # safety check without buying anything.
+      - name: Stamp launcher package version
+        shell: bash
+        run: node npm/set-version.mjs "${{ needs.resolve.outputs.version }}"
+
+      # Platform packages go first: the launcher lists them as
+      # optionalDependencies at an exact version, so publishing it first would
+      # leave a window where `npx` resolves a launcher whose binaries do not
+      # exist yet.
+      - name: Publish platform packages
+        if: needs.resolve.outputs.publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          for tarball in artifacts/*.tgz; do
+            name=$(tar -xzO -f "$tarball" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0)).name")
+            # Idempotent: if this version was already published (e.g. a rerun
+            # after the publish job failed partway through), skip it instead
+            # of letting `npm publish` error out and turn the run red for
+            # no reason.
+            if npm view "$name@${{ needs.resolve.outputs.version }}" version >/dev/null 2>&1; then
+              echo "$name@${{ needs.resolve.outputs.version }} is already on npm, skipping"
+              continue
+            fi
+            # `$PWD/` is required: given a bare relative path like
+            # `artifacts/x.tgz`, npm treats the argument as a git dependency
+            # spec and tries `git ls-remote ssh://git@github.com/artifacts/...`,
+            # failing with "Permission denied (publickey)". An absolute path (or
+            # a leading `./`) makes it read the local tarball.
+            npm publish "$PWD/$tarball" --access public --provenance
+          done
+
+      - name: Publish launcher
+        if: needs.resolve.outputs.publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: npm/cli-switch
+        shell: bash
+        run: |
+          set -euxo pipefail
+          if npm view "@spec-ade/cli-switch@${{ needs.resolve.outputs.version }}" version >/dev/null 2>&1; then
+            echo "@spec-ade/cli-switch@${{ needs.resolve.outputs.version }} is already on npm, skipping"
+            exit 0
+          fi
+          npm publish --access public --provenance
+
+      - name: Summary
+        shell: bash
+        run: |
+          if [ "${{ needs.resolve.outputs.publish }}" = "true" ]; then
+            echo "Published version ${{ needs.resolve.outputs.version }} to npm."
+          else
+            echo "Dry run — nothing published. Packed tarballs:"
+            ls -la artifacts
+          fi

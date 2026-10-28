@@ -123,35 +123,34 @@ export function RequestHeadersEditor({
         <Button
           type="button"
           variant="outline"
-          size="sm"
           onClick={addHeader}
           aria-label={t("opencode.addHeader", {
             defaultValue: "Add header",
           })}
-          className="h-7 shrink-0 gap-1"
+          className="shrink-0"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-4 w-4" />
           {t("opencode.addHeader", { defaultValue: "Add" })}
         </Button>
       </div>
 
       <div aria-live="polite">
         {Object.keys(headers).length === 0 ? (
-          <p className="py-1 text-sm text-fg-2">
+          <p className="py-1 text-ui text-muted-foreground">
             {t("opencode.noHeaders", {
               defaultValue: "No custom headers configured",
             })}
           </p>
         ) : (
           <div className="space-y-2">
-            <div className="mb-1 flex items-center gap-2 px-1 text-xs text-fg-2">
+            <div className="mb-1 flex items-center gap-2 text-ui text-muted-foreground">
               <span className="flex-1">
                 {t("opencode.headerName", { defaultValue: "Header" })}
               </span>
               <span className="flex-1">
                 {t("opencode.headerValue", { defaultValue: "Value" })}
               </span>
-              <span className="w-9" />
+              <span className="w-6" />
             </div>
             {Object.entries(headers).map(([key, value]) => (
               <div key={key} className="flex items-center gap-2">
@@ -172,7 +171,7 @@ export function RequestHeadersEditor({
                     defaultValue: "Value",
                   })}
                   placeholder={t("opencode.headerValuePlaceholder", {
-                    defaultValue: "CC Switch",
+                    defaultValue: "Viber Switch",
                   })}
                   className="min-w-0 flex-1"
                 />
@@ -189,7 +188,7 @@ export function RequestHeadersEditor({
                     aria-label={t("opencode.removeHeader", {
                       defaultValue: "Remove header",
                     })}
-                    className="h-9 w-9 shrink-0 text-fg-2 hover:text-destructive"
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

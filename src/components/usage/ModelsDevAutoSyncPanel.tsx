@@ -230,13 +230,13 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-1 min-h-0 flex-col gap-3 px-6 py-4">
-          <div className="flex items-center justify-between gap-4 rounded-panel border border-border bg-subtle px-3 py-2.5">
+        <div className="flex flex-1 min-h-0 flex-col gap-2 px-2 py-2">
+          <div className="flex items-center justify-between gap-2 rounded-[8px] border border-border bg-subtle px-2 py-2">
             <div>
-              <div className="text-body font-medium">
+              <div className="text-ui font-medium">
                 {t("usage.modelsDevAutoSync.commonModels")}
               </div>
-              <div className="text-caption text-fg-2">
+              <div className="text-ui text-muted-foreground">
                 {t("usage.modelsDevAutoSync.commonModelsDescription", {
                   count: commonModelKeys.size,
                 })}
@@ -251,7 +251,7 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
 
           {isLoading ? (
             <div className="flex flex-1 items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-fg-3" />
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : error ? (
             <Notice
@@ -289,12 +289,12 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                   </SelectContent>
                 </Select>
                 <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-2" />
+                  <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder={t("usage.modelsDevSearchPlaceholder")}
-                    className="pl-8"
+                    className="pl-2"
                   />
                 </div>
                 <Button
@@ -317,7 +317,7 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                 </Button>
               </div>
 
-              <div className="flex items-center justify-between text-caption text-fg-2">
+              <div className="flex items-center justify-between text-ui text-muted-foreground">
                 <span>
                   {t("usage.modelsDevAutoSync.selectedCount", {
                     count: effectiveSelectedKeys.size,
@@ -326,9 +326,9 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                 <span>{t("usage.modelsDevAutoSync.selectionHint")}</span>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto rounded-panel border border-border">
+              <div className="flex-1 min-h-0 overflow-y-auto rounded-[8px] border border-border">
                 {filtered.length === 0 ? (
-                  <div className="flex h-full items-center justify-center py-8 text-body text-fg-2">
+                  <div className="flex h-full items-center justify-center py-2 text-ui text-muted-foreground">
                     {t("usage.modelsDevNoResults")}
                   </div>
                 ) : (
@@ -342,7 +342,7 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                           type="button"
                           aria-pressed={selected}
                           onClick={() => toggleEntry(entry)}
-                          className={`flex w-full items-center gap-3 px-3 py-2 text-left ${
+                          className={`flex w-full items-center gap-2 px-2 py-2 text-left ${
                             selected ? "bg-selected" : "hover:bg-subtle"
                           }`}
                         >
@@ -353,41 +353,41 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                                 : "border-border-strong"
                             }`}
                           >
-                            {selected && <Check className="h-3 w-3" />}
+                            {selected && <Check className="h-4 w-4" />}
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="truncate text-body font-medium">
+                              <span className="truncate text-ui font-medium">
                                 {entry.modelName}
                               </span>
-                              <span className="shrink-0 text-caption text-fg-2">
+                              <span className="shrink-0 text-ui text-muted-foreground">
                                 {entry.providerName}
                               </span>
                               {common && (
-                                <span className="rounded bg-subtle px-1.5 text-badge text-fg-2">
+                                <span className="rounded bg-subtle px-2 text-ui text-muted-foreground">
                                   {t("usage.modelsDevAutoSync.commonBadge")}
                                 </span>
                               )}
                               {entry.releaseDate && (
-                                <span className="shrink-0 text-badge text-fg-3">
+                                <span className="shrink-0 text-ui text-muted-foreground">
                                   {entry.releaseDate}
                                 </span>
                               )}
                             </div>
                             <div
-                              className="truncate font-mono text-caption text-fg-2"
+                              className="truncate font-mono text-ui text-muted-foreground"
                               title={entry.modelId}
                             >
                               {entry.normalizedId}
                             </div>
                           </div>
-                          <div className="flex shrink-0 gap-3 text-right">
+                          <div className="flex shrink-0 gap-2 text-right">
                             {priceColumns(entry).map((column) => (
                               <div key={column.label} className="w-16">
-                                <div className="text-badge text-fg-2">
+                                <div className="text-ui text-muted-foreground">
                                   {column.label}
                                 </div>
-                                <div className="font-mono text-caption">
+                                <div className="font-mono text-ui">
                                   ${formatPrice(column.value)}
                                 </div>
                               </div>
@@ -397,7 +397,7 @@ function AutoSyncDialog({ state, onClose, onSaved }: AutoSyncDialogProps) {
                       );
                     })}
                     {filtered.length > visible.length && (
-                      <div className="px-3 py-2 text-center text-caption text-fg-2">
+                      <div className="px-2 py-2 text-center text-ui text-muted-foreground">
                         {isFiltering
                           ? t("usage.modelsDevTruncated", {
                               shown: visible.length,
@@ -535,8 +535,8 @@ export function ModelsDevAutoSyncPanel() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[58px] items-center justify-center rounded-panel bg-subtle">
-        <Loader2 className="h-4 w-4 animate-spin text-fg-3" />
+      <div className="flex h-[58px] items-center justify-center rounded-[8px] bg-subtle">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -583,15 +583,15 @@ export function ModelsDevAutoSyncPanel() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-panel bg-subtle px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-[8px] bg-subtle px-2 py-2">
           <RefreshCw
             aria-hidden="true"
-            className="h-4 w-4 shrink-0 text-fg-2"
+            className="h-4 w-4 shrink-0 text-muted-foreground"
             strokeWidth={1.5}
           />
           <div className="flex min-w-0 flex-1 flex-col">
             <div className="flex min-w-0 items-center gap-0.5">
-              <span className="truncate text-body font-semibold text-fg-1">
+              <span className="truncate text-ui font-semibold text-foreground">
                 {t("usage.pricing.modelsDevTitle", {
                   status: enabled
                     ? t("usage.modelsDevAutoSync.enabled")
@@ -603,7 +603,7 @@ export function ModelsDevAutoSyncPanel() {
               </HelpTip>
             </div>
             <span
-              className="truncate text-caption text-fg-2"
+              className="truncate text-ui text-muted-foreground"
               title={lastSyncTitle}
             >
               {data.config.includeCommonModels
@@ -633,7 +633,7 @@ export function ModelsDevAutoSyncPanel() {
               onClick={() => void syncNow()}
               disabled={isSyncing}
             >
-              {isSyncing && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isSyncing && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("usage.modelsDevAutoSync.syncNow")}
             </Button>
             <DropdownMenu>
@@ -651,14 +651,14 @@ export function ModelsDevAutoSyncPanel() {
               </HoverTip>
               <DropdownMenuContent
                 align="end"
-                className="min-w-[220px] max-w-[320px] rounded-panel border-border bg-surface shadow-v7-md"
+                className="min-w-[220px] max-w-[320px] rounded-[8px] border-border bg-card shadow-md"
               >
                 <DropdownMenuLabel className="flex flex-col gap-0.5 font-normal">
-                  <span className="text-caption text-fg-2">
+                  <span className="text-ui text-muted-foreground">
                     {t("usage.modelsDevAutoSync.localFile")}
                   </span>
                   <span
-                    className="truncate font-mono text-caption text-fg-1"
+                    className="truncate font-mono text-ui text-foreground"
                     title={data.configPath}
                   >
                     {data.configPath}
@@ -666,14 +666,14 @@ export function ModelsDevAutoSyncPanel() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-body"
+                  className="text-ui"
                   onSelect={() => void openLocalFileFolder()}
                 >
                   <FolderOpen className="h-4 w-4" strokeWidth={1.5} />
                   {t("usage.modelsDevAutoSync.openFolder")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-body"
+                  className="text-ui"
                   disabled={isReloading}
                   onSelect={() => void reloadLocalFile()}
                 >

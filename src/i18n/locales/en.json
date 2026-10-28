@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "CC Switch",
+    "title": "Viber Switch",
     "description": "All-in-One Assistant for Claude Code, Codex & Gemini CLI"
   },
   "common": {
@@ -53,9 +53,9 @@
     "required": "required"
   },
   "firstRunNotice": {
-    "title": "Welcome to CC Switch",
-    "bodyDefault": "CC Switch lets you switch between multiple Claude Code / Codex / Gemini CLI providers with a single click. If you already had these tools configured, CC Switch has saved your existing setup as a provider named “default” so none of your previous configuration is lost.",
-    "bodyOfficial": "An “Official” preset is also included in the list — click it any time you want to switch back to the official default. CC Switch automatically backs up your current config to “default” before switching, so you can move back and forth freely. That's how CC Switch works 😊",
+    "title": "Welcome to Viber Switch",
+    "bodyDefault": "Viber Switch lets you switch between multiple Claude Code / Codex / Gemini CLI providers with a single click. If you already had these tools configured, Viber Switch has saved your existing setup as a provider named “default” so none of your previous configuration is lost.",
+    "bodyOfficial": "An “Official” preset is also included in the list — click it any time you want to switch back to the official default. Viber Switch automatically backs up your current config to “default” before switching, so you can move back and forth freely. That's how Viber Switch works 😊",
     "confirm": "Got it"
   },
   "apiKeyInput": {
@@ -82,7 +82,8 @@
     "disableAutoModeServerHelp": "Gateways can't run the server-side check, so auto mode pauses once per session with a \"not eligible\" notice, then falls back to the local check after you press Enter. Checked, it uses the local check right away with no notice. Leave it unchecked on official endpoints.",
     "keyFieldsHint": "Endpoint, key, models, context window and compatibility switches follow the provider; everything else is a global Claude Code setting and applies to every provider once saved.",
     "inactiveFieldsHint": "Saved in this provider by an older version; switching no longer applies them. Click one to add it above; after saving it applies to every provider.",
-    "addToGlobalSettings": "Add to global settings"
+    "addToGlobalSettings": "Add to global settings",
+    "enableTodoTools": "Enable Todo Tools"
   },
   "header": {
     "viewOnGithub": "View on GitHub",
@@ -119,8 +120,8 @@
     "stackBadgeNoModels": "This provider has no models configured, so nothing shows up in the model picker",
     "stackSaved": "Saved. Restart {{client}} to apply",
     "stackSavedLive": "Saved. Takes effect in {{client}} right away",
-    "stackReselectHint": "Whenever CC Switch rewrites the client config, pick the aggregated model again in the model picker",
-    "stackPartial": "Partly written; it will be finished on the next change or when CC Switch restarts",
+    "stackReselectHint": "Whenever Viber Switch rewrites the client config, pick the aggregated model again in the model picker",
+    "stackPartial": "Partly written; it will be finished on the next change or when Viber Switch restarts",
     "stackFailed": "Failed to save aggregated models: {{error}}",
     "stackDefaultCannotRemove": "The default provider cannot be removed; set another provider as the default first",
     "stackDefaultHint": "This is the default provider: the first model in its list handles Claude Code's startup and background tasks",
@@ -139,9 +140,9 @@
       "nothingUsable": "Codex built-in list: it has no usable models. Update Codex to the latest version"
     },
     "routeOwnsCatalog": "Aggregated models won't show up in Codex: the routed provider uses its own model catalog file (model_catalog_json)",
-    "adoptCatalog": "Use CC Switch's model catalog",
-    "adoptCatalogDone": "Now using CC Switch's model catalog. Restart Codex to apply",
-    "adoptCatalogFailed": "Failed to switch to CC Switch's model catalog: {{error}}",
+    "adoptCatalog": "Use Viber Switch's model catalog",
+    "adoptCatalogDone": "Now using Viber Switch's model catalog. Restart Codex to apply",
+    "adoptCatalogFailed": "Failed to switch to Viber Switch's model catalog: {{error}}",
     "noRoutingSupport": "No Routing Support",
     "blockedByProxyHint": "Can't switch to an official provider in Routing mode",
     "editProvider": "Edit Provider",
@@ -270,7 +271,39 @@
     "formSubtitleStack": "{{app}} (Aggregation mode)",
     "editCurrentNoticeFile": "This is the provider in use. Saving writes it to",
     "editCurrentNoticeFileEnd": " right away; the next request uses it.",
-    "editCurrentNotice": "This is the provider in use. Saving takes effect right away; the next request uses the new settings."
+    "editCurrentNotice": "This is the provider in use. Saving takes effect right away; the next request uses the new settings.",
+    "copyProxyUrl": "Copy proxy URL",
+    "connect": {
+      "title": "Connect: {{name}}",
+      "desc": "Use the CC Switch proxy, or connect straight to the upstream provider.",
+      "proxyTitle": "CC Switch proxy",
+      "proxyUrl": "Proxy URL",
+      "proxyHint": "Point your client here. The real key stays in CC Switch, so any placeholder key works (e.g. PROXY_MANAGED).",
+      "upstreamTitle": "Upstream (direct)",
+      "baseUrl": "Base URL",
+      "apiKey": "API key",
+      "model": "Model",
+      "copyField": "Copy {{name}}",
+      "show": "Show",
+      "hide": "Hide",
+      "notSet": "Not set",
+      "endpoint": "Endpoint (full URL)",
+      "fullEndpoint": "Full endpoint",
+      "apiKeyEnv": "API key (environment variable)",
+      "nativeLogin": "Codex CLI ChatGPT login",
+      "nativeHint": "Uses the ChatGPT login of the Codex CLI itself. No API key is stored in CC Switch.",
+      "defaultAccount": "{{name}} (default account)",
+      "noAccount": "No account signed in",
+      "needsReauth": "Re-login required: the refresh credential is invalid.",
+      "managedHint": "No static API key: this OAuth token is held and refreshed by CC Switch and only the proxy attaches it to requests. To use this provider, connect through the proxy URL above.",
+      "oauthHint": "Your access token is below. It is short-lived and renewed by CC Switch when under an hour is left; fetch the current one from the token URL instead of copying it again.",
+      "token": "Access token",
+      "tokenUntil": "Access token (valid until {{time}})",
+      "tokenUrl": "Token URL (GET)",
+      "tokenUrlHint": "GET returns the current token as plain text (the body is the token; expiry is in the X-Token-Expires-At header). After the upstream answers 401 for it, call again with the header X-Invalid-Token: <that token> to get a new one: curl -H \"X-Invalid-Token: <token>\" <URL>. The token is only replaced if it is still the stored one, at most once per 30 s per account (the response then carries a Retry-After header). Local, non-browser callers only.",
+      "requiredHeaders": "Required headers",
+      "requiredHeadersHint": "Send these headers with the token (Authorization: Bearer <token>). The token URL returns them as X-Upstream-<name> response headers."
+    }
   },
   "claudeCode": {
     "needsRouting": "Needs Routing",
@@ -332,7 +365,9 @@
         "inactive": "Turn on Claude Desktop local routing for providers that need model mapping or format conversion. Configured address: {{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "Other apps are still in Routing mode. Switch them back to Direct before stopping the routing service."
-    }
+    },
+    "modelMappingOffHint": "Direct mode works only when the provider accepts Claude Desktop's three role IDs (claude-sonnet-* / claude-opus-* / claude-haiku-*); for any other model name (including legacy IDs like claude-3-5-sonnet-…), select Model Mapping.",
+    "modelMappingOnHint": "Claude Desktop only accepts the three role IDs claude-sonnet-* / claude-opus-* / claude-haiku-*. In Model Mapping mode, Viber Switch maps these roles to your provider's actual models and keeps local routing running while in use."
   },
   "notifications": {
     "providerAdded": "Provider added",
@@ -384,13 +419,14 @@
     "codexAuthCleanupFailed": "Switched successfully, but auth.json could not be removed — the official login credentials are still on disk; delete auth.json from the Codex config directory to remove them",
     "windowControlFailed": "Window control failed: {{error}}",
     "officialBlockedByProxy": "Cannot switch to official provider while local routing is active. Using routing with official APIs may cause account bans.",
-    "proxyOfficialWarning": "Current provider {{name}} is official. Consider switching to a third-party provider before using local routing."
+    "proxyOfficialWarning": "Current provider {{name}} is official. Consider switching to a third-party provider before using local routing.",
+    "claudeDesktopProxyRestartRequired": "Switched successfully. Keep Viber Switch running and restart Claude Desktop to apply changes."
   },
   "confirm": {
     "deleteProvider": "Delete Provider",
     "deleteProviderMessage": "Are you sure you want to delete provider \"{{name}}\"? This action cannot be undone.",
     "removeProvider": "Remove Provider",
-    "removeProviderMessage": "Are you sure you want to remove provider \"{{name}}\" from the configuration?\n\nAfter removal, this provider will no longer be active, but the configuration data will be retained in CC Switch. You can re-add it at any time.",
+    "removeProviderMessage": "Are you sure you want to remove provider \"{{name}}\" from the configuration?\n\nAfter removal, this provider will no longer be active, but the configuration data will be retained in Viber Switch. You can re-add it at any time.",
     "piDefaultProviderWarning": "Pi's global default currently points to this provider. If you continue, Pi will try another available model; use /model to choose one or /login to sign in to another provider.",
     "proxy": {
       "title": "Enable Local Routing",
@@ -404,7 +440,7 @@
     },
     "unifyCodexHistory": {
       "title": "Unified Codex session history",
-      "message": "When enabled, the Codex CLI resume list shows official subscription and third-party sessions together (the Codex desktop app can show all sessions since a recent update and is unaffected). Note: resuming an old session across providers may fail because the other backend cannot decrypt its encrypted_content reasoning.\n\nYou can also migrate your existing official session history into the shared list (backed up to ~/.cc-switch/backups first; you can restore it when turning this off).",
+      "message": "When enabled, the Codex CLI resume list shows official subscription and third-party sessions together (the Codex desktop app can show all sessions since a recent update and is unaffected). Note: resuming an old session across providers may fail because the other backend cannot decrypt its encrypted_content reasoning.\n\nYou can also migrate your existing official session history into the shared list (backed up to the app backup folder first; you can restore it when turning this off).",
       "migrateExisting": "Also migrate existing official session history",
       "confirm": "I understand, enable"
     },
@@ -438,13 +474,13 @@
       "goToApps": "Open Apps",
       "updates": "New versions of your apps",
       "checkToolUpdates": "Check for new versions of your apps at launch",
-      "checkToolUpdatesHelp": "When on, CC Switch checks your installed command-line apps for new versions each time it starts, and shows a dot on Apps in the sidebar if it finds one. Nothing is upgraded automatically.",
+      "checkToolUpdatesHelp": "When on, Viber Switch checks your installed command-line apps for new versions each time it starts, and shows a dot on Apps in the sidebar if it finds one. Nothing is upgraded automatically.",
       "windowAndTerminal": "Window and terminal",
       "trayStyle": "Tray style",
       "trayStylePanel": "Panel",
       "trayStyleMenu": "Menu",
       "trayStyleHelp": "What opens when you click the tray icon (on Windows, left-click always opens the main window and right-click opens the selected style). Panel: each app's in-use provider, quota and usage, with search and switching. Menu: the system's native menu. Takes effect right away.",
-      "minimizeToTrayHelp": "When on, the close button only hides the window and CC Switch keeps running in the system tray (lightweight mode is in the tray menu). When off, the close button quits.",
+      "minimizeToTrayHelp": "When on, the close button only hides the window and Viber Switch keeps running in the system tray (lightweight mode is in the tray menu). When off, the close button quits.",
       "terminalHelp": "The terminal used by “Open terminal” on provider cards. If it isn't available, the system default terminal is used."
     },
     "tabGeneral": "General",
@@ -456,7 +492,8 @@
       "beta": "Beta",
       "copilotDescription": "Manage GitHub Copilot accounts",
       "codexOauthDescription": "Manage ChatGPT accounts",
-      "xaiOauthDescription": "Manage xAI / Grok accounts"
+      "xaiOauthDescription": "Manage xAI / Grok accounts",
+      "title": "OAuth Authentication Center"
     },
     "advanced": {
       "configDir": {
@@ -485,7 +522,7 @@
       },
       "globalProxy": {
         "title": "Global Outbound Proxy",
-        "description": "Configure proxy for CC Switch to access external APIs"
+        "description": "Configure proxy for Viber Switch to access external APIs"
       },
       "data": {
         "title": "Data Management",
@@ -512,7 +549,8 @@
         "mediaFallback": "Unsupported Image Fallback",
         "mediaFallbackDescription": "When a provider does not support image input (it declares text-only capability, or the upstream returns an unsupported-image error), automatically replaces image blocks with an [Unsupported Image] marker so the conversation is not interrupted",
         "mediaHeuristic": "Text-Only Model Preflight",
-        "mediaHeuristicDescription": "Before sending, strips images for models in the built-in confirmed text-only registry. Turning this off only disables the proxy's registry-based preflight; declared text-only handling and upstream-error fallback remain, and Codex model-catalog capability declarations are unchanged"
+        "mediaHeuristicDescription": "Before sending, strips images for models in the built-in confirmed text-only registry. Turning this off only disables the proxy's registry-based preflight; declared text-only handling and upstream-error fallback remain, and Codex model-catalog capability declarations are unchanged",
+        "enabledDescription": "Master switch, all rectification features will be disabled when turned off"
       },
       "optimizer": {
         "title": "Bedrock Request Optimizer",
@@ -527,7 +565,7 @@
         "title": "Application Diagnostic Logs",
         "description": "Control the output level for application diagnostic logs",
         "enabled": "Enable Diagnostic Logs",
-        "enabledDescription": "Controls cc-switch.log; request usage records and crash.log are unaffected",
+        "enabledDescription": "Controls the app runtime log; request usage records and crash.log are unaffected",
         "openLog": "Open log",
         "openLogFailed": "Failed to open the log location: {{error}}",
         "level": "Log Level",
@@ -545,7 +583,8 @@
           "info": "General operation info (default)",
           "debug": "Detailed info including SSE stream and request/response",
           "trace": "All logs, most verbose"
-        }
+        },
+        "levelHint": "Log level descriptions:"
       }
     },
     "language": "Language",
@@ -556,7 +595,7 @@
     "themeDark": "Dark Side of the Moon",
     "themeSystem": "System",
     "importExport": "SQL Import/Export",
-    "importExportHint": "Import or export database SQL backups for migration or restore (import supports only backups exported by CC Switch).",
+    "importExportHint": "Import or export database SQL backups for migration or restore (import supports only backups exported by Viber Switch).",
     "exportConfig": "Export SQL Backup",
     "selectConfigFile": "Select SQL File",
     "noFileSelected": "No configuration file selected.",
@@ -633,15 +672,15 @@
         },
         "codexHistoryUnifyRestore": {
           "name": "Codex session unify restore backups",
-          "hint": "Session copies kept before \"Restore backup\" ran. CC Switch never reads them again."
+          "hint": "Session copies kept before \"Restore backup\" ran. Viber Switch never reads them again."
         },
         "codexHistoryProviderMigration": {
           "name": "Codex session group migration backups",
-          "hint": "Copies kept before session groups were migrated. CC Switch never reads them again."
+          "hint": "Copies kept before session groups were migrated. Viber Switch never reads them again."
         },
         "liveFirstWrite": {
           "name": "Config first-write backups",
-          "hint": "Original client config files from before CC Switch first rewrote them. After deleting, those originals are gone; the next write backs up the file as it is then."
+          "hint": "Original client config files from before Viber Switch first rewrote them. After deleting, those originals are gone; the next write backs up the file as it is then."
         },
         "hermes": {
           "name": "Hermes config backups",
@@ -653,7 +692,7 @@
         },
         "proxyLiveBackup": {
           "name": "Legacy routing takeover backups",
-          "hint": "Config copies moved out of the old routing takeover backups during upgrade. CC Switch never reads them again."
+          "hint": "Config copies moved out of the old routing takeover backups during upgrade. Viber Switch never reads them again."
         },
         "envVars": {
           "name": "Environment variable cleanup backups",
@@ -754,7 +793,10 @@
         "warning": "This will overwrite existing sync data on the remote server",
         "legacyNotice": "Legacy remote data was detected. This upload will write to the new v2/db-v6 path and will not overwrite the legacy path.",
         "confirm": "Confirm Upload"
-      }
+      },
+      "description": "Sync database and skill configurations across devices via WebDAV.",
+      "remoteRootDefault": "Default: cli-switch-sync",
+      "profileDefault": "Default: default"
     },
     "syncType": {
       "label": "Sync Type",
@@ -782,7 +824,7 @@
       "region": "Region",
       "regionPlaceholder": "e.g. us-east-1",
       "bucket": "Bucket",
-      "bucketPlaceholder": "e.g. my-cc-switch-bucket",
+      "bucketPlaceholder": "e.g. my-config-sync-bucket",
       "accessKeyId": "Access Key ID",
       "accessKeyIdPlaceholder": "e.g. AKIA...",
       "secretAccessKey": "Secret Access Key",
@@ -853,7 +895,9 @@
         "createdAt": "Uploaded at",
         "warning": "This will overwrite existing sync data at the S3 path",
         "confirm": "Confirm Upload"
-      }
+      },
+      "remoteRootDefault": "Default: cli-switch-sync",
+      "profileDefault": "Default: default"
     },
     "autoReload": "Data refreshed",
     "languageOptionChinese": "简体中文",
@@ -864,7 +908,7 @@
     "windowBehavior": "Window Behavior",
     "windowBehaviorHint": "Configure window minimize and Claude plugin integration policies.",
     "launchOnStartup": "Launch on Startup",
-    "launchOnStartupDescription": "Automatically run CC Switch when system starts",
+    "launchOnStartupDescription": "Automatically run Viber Switch when system starts",
     "silentStartup": "Silent Startup",
     "silentStartupDescription": "Start in background mode without showing main window",
     "autoLaunchFailed": "Failed to set auto-launch",
@@ -885,7 +929,7 @@
     "codexStackClassicSubagentsDescription": "Must be on when the main agent and a sub-agent use different providers, or the sub-agent cannot receive its task.",
     "codexStackClassicSubagentsForcedV2": "Codex config.toml turns on [features] multi_agent_v2, which takes precedence over this setting, so it has no effect.",
     "codexSessionCompression": "Compress old Codex sessions",
-    "codexSessionCompressionDescription": "When on, Codex compresses session files that haven't changed for 7 days in the background each time it starts, which saves a lot of disk space. Codex decompresses a session automatically when you continue it. CC Switch still lists and counts compressed sessions; the list just doesn't show a preview of their last reply. This is a Codex feature still under development: Codex shows a notice on every start while it's on. Requires a recent Codex version and takes effect after restarting Codex. Turning it off stops compressing; sessions already compressed stay as they are.",
+    "codexSessionCompressionDescription": "When on, Codex compresses session files that haven't changed for 7 days in the background each time it starts, which saves a lot of disk space. Codex decompresses a session automatically when you continue it. Viber Switch still lists and counts compressed sessions; the list just doesn't show a preview of their last reply. This is a Codex feature still under development: Codex shows a notice on every start while it's on. Requires a recent Codex version and takes effect after restarting Codex. Turning it off stops compressing; sessions already compressed stay as they are.",
     "codexSessionCompressionUsage": "Sessions currently use {{size}}",
     "codexSessionCompressionFailed": "Failed to change the Codex session compression setting",
     "unifyCodexHistoryRestoreCompleted": "Official session history restored from backup ({{files}} session files, {{rows}} index rows)",
@@ -937,9 +981,9 @@
     },
     "configDirectoryOverride": "Configuration Directory Override (Advanced)",
     "configDirectoryDescription": "When using Claude Code or Codex in environments like WSL, you can manually specify the configuration directory to the one in WSL to keep provider data consistent with the main environment.",
-    "appConfigDir": "CC Switch Configuration Directory",
-    "appConfigDirDescription": "Customize the storage location for CC Switch configuration (point to cloud sync folder to enable config sync)",
-    "browsePlaceholderApp": "e.g., C:\\Users\\Administrator\\.cc-switch",
+    "appConfigDir": "Viber Switch Configuration Directory",
+    "appConfigDirDescription": "Customize the storage location for Viber Switch configuration (point to cloud sync folder to enable config sync)",
+    "browsePlaceholderApp": "e.g., C:\\Users\\Administrator\\AppData",
     "claudeConfigDir": "Claude Code Configuration Directory",
     "claudeConfigDirDescription": "Override Claude configuration directory (settings.json). Custom directories store .claude.json (MCP) inside the directory; the default ~/.claude directory keeps Claude Code's split ~/.claude.json path.",
     "codexConfigDir": "Codex Configuration Directory",
@@ -974,7 +1018,7 @@
     "checking": "Checking...",
     "upToDate": "Up to Date",
     "aboutHint": "View version information and update status.",
-    "portableMode": "Portable mode: updates require manual download.",
+    "portableMode": "Portable mode.",
     "portableUpdateHint": "Portable mode: the button above downloads the new zip. Extract it and replace your existing cc-switch.exe. Your settings and data live in .cc-switch under your user folder and are not affected.",
     "updateAvailable": "New version available: {{version}}",
     "updateBadge": "Update available",
@@ -986,7 +1030,7 @@
     "viewCurrentReleaseNotes": "View current version release notes",
     "officialWebsite": "Official Website",
     "github": "GitHub",
-    "starPrompt": "If CC Switch has helped you, please star us on GitHub — it means a lot to us",
+    "starPrompt": "If Viber Switch has helped you, please star us on GitHub — it means a lot to us",
     "starOnGithub": "Star on GitHub",
     "manualInstallCommands": "Manual Install Commands",
     "manualUninstallCommands": "Manual uninstall commands",
@@ -1048,7 +1092,7 @@
     "toolUpgradeConfirmBtn": "Confirm upgrade",
     "toolUpgradeUnanchoredHint": "Can't determine which install your command line uses; will run the default upgrade command (may install to the first npm on PATH).",
     "toolUpgradeUnmanagedTitle": "Skipped upgrading these tools",
-    "toolUpgradeUnmanagedDetail": "{{tool}} ({{path}}) wasn't installed by npm or a recognized installer, so CC Switch can't tell how to upgrade it. Upgrade it the way you installed it (e.g. winget, Scoop, or re-running the official install script).",
+    "toolUpgradeUnmanagedDetail": "{{tool}} ({{path}}) wasn't installed by npm or a recognized installer, so Viber Switch can't tell how to upgrade it. Upgrade it the way you installed it (e.g. winget, Scoop, or re-running the official install script).",
     "envBadge": {
       "wsl": "WSL",
       "windows": "Win",
@@ -1062,7 +1106,7 @@
     "importFailedError": "Import config failed: {{message}}",
     "exportFailedError": "Export config failed:",
     "restartRequired": "Restart Required",
-    "restartRequiredMessage": "Modifying the CC Switch configuration directory requires restarting the application to take effect. Restart now?",
+    "restartRequiredMessage": "Modifying the Viber Switch configuration directory requires restarting the application to take effect. Restart now?",
     "restartNow": "Restart Now",
     "restartLater": "Restart Later",
     "restartFailed": "Application restart failed, please manually close and reopen.",
@@ -1109,6 +1153,40 @@
     },
     "data": {
       "location": "Location"
+    },
+    "languageOptionVietnamese": "Tiếng Việt",
+    "skillStorage": {
+      "title": "Skill Storage Location",
+      "description": "Choose where Viber Switch stores the master copies of your skills",
+      "ccSwitch": "Viber Switch",
+      "unified": "~/.agents/skills",
+      "ccSwitchHint": "Skills are stored in the app data directory and synced to each app via symlink or copy.",
+      "unifiedHint": "Skills are stored in ~/.agents/skills/, the Agent Skills open standard. Compatible tools (Claude Code, Codex, Gemini CLI, etc.) discover skills here natively.",
+      "confirmTitle": "Migrate Skill Storage",
+      "confirmMessage": "{{count}} skill(s) will be moved to the new location. Continue?",
+      "migrationSuccess": "Successfully migrated {{count}} skill(s)",
+      "migrationPartial": "Migrated {{migrated}} skill(s), {{errors}} error(s). Check logs for details."
+    },
+    "skillSync": {
+      "title": "Skill Sync Method",
+      "description": "Choose how to sync Skills files",
+      "symlink": "Symlink",
+      "copy": "Copy Files",
+      "symlinkHint": "Symlinks save disk space and enable real-time sync. Note: May require admin privileges or Developer Mode on Windows"
+    },
+    "appUpdate": {
+      "check": "Check for updates",
+      "checking": "Checking for updates…",
+      "upToDate": "You're up to date",
+      "available": "v{{version}} available",
+      "install": "Update now",
+      "downloading": "Downloading update…",
+      "downloadingPct": "Downloading {{pct}}%",
+      "restarting": "Restarting…",
+      "failed": "Update failed",
+      "confirmTitle": "Install update?",
+      "confirmBody": "Download and install v{{version}}, then restart Viber Switch. You don't need to open GitHub.",
+      "toastTitle": "Viber Switch v{{version}} is ready to install"
     }
   },
   "apps": {
@@ -1202,7 +1280,7 @@
     },
     "current": {
       "readFailed": "Could not read Pi's provider configuration",
-      "stateUnavailableHint": "Provider changes are disabled until CC Switch can read Pi's provider configuration."
+      "stateUnavailableHint": "Provider changes are disabled until Viber Switch can read Pi's provider configuration."
     },
     "prompts": {
       "globalTab": "Library",
@@ -1255,7 +1333,7 @@
       "libraryLabel": "Pi prompt library",
       "systemFilesLabel": "Pi system prompt files",
       "templatesLabel": "Pi prompt templates",
-      "externalTitle": "AGENTS.md was changed outside CC Switch",
+      "externalTitle": "AGENTS.md was changed outside Viber Switch",
       "externalDetail": "Its content ({{size}}) differs from every library prompt, so none shows as enabled. It's saved to the library before another one is enabled.",
       "saveToLibrary": "Save to library",
       "reloadAfterDelete": "Open Pi sessions pick this up after /reload while idle.",
@@ -1298,7 +1376,8 @@
     "keyFieldsHint": "The default model (models.default) and the model table it points to follow the provider; everything else is Grok Build global settings and applies to every provider after saving.",
     "inactiveFieldsHint": "Saved in this provider by an older version; switching no longer applies them. Click one to copy its TOML and paste it above if you need it.",
     "inactiveFieldCopied": "Copied",
-    "routeOnlySettingsHint": "The two settings below only apply in routing mode."
+    "routeOnlySettingsHint": "The two settings below only apply in routing mode.",
+    "advancedSectionHint": "Includes upstream format, reasoning overrides and custom User-Agent. Providers using the Chat Completions or Anthropic Messages protocol require routing takeover to be enabled."
   },
   "sessionManager": {
     "searchPlaceholder": "Search titles, folders, first/last messages or session IDs",
@@ -1332,7 +1411,7 @@
     "expandContent": "Expand full content",
     "collapseContent": "Collapse",
     "helpTitle": "Where sessions come from",
-    "helpBody": "CC Switch reads the session records each app keeps on this computer. See “Where sessions are stored” in the ⋯ menu. Claude Desktop has no session records of its own.",
+    "helpBody": "Viber Switch reads the session records each app keeps on this computer. See “Where sessions are stored” in the ⋯ menu. Claude Desktop has no session records of its own.",
     "moreActions": "More session actions",
     "refreshList": "Refresh list",
     "listRefreshed": "Session list refreshed",
@@ -1340,7 +1419,7 @@
     "preferredTerminal": "Preferred terminal",
     "whereMenu": "Where sessions are stored",
     "whereTitle": "Where sessions are stored",
-    "whereLead": "CC Switch reads sessions from these locations. Claude Desktop has no session records of its own.",
+    "whereLead": "Viber Switch reads sessions from these locations. Claude Desktop has no session records of its own.",
     "whereNote": "Apps with a custom config directory in Settings are read from that directory.",
     "appPrefix": "App: ",
     "chooseApp": "Choose app",
@@ -1384,7 +1463,7 @@
     "hermesLimit": "Hermes shows only the latest 500 sessions",
     "emptyApp": "No {{app}} sessions yet",
     "emptyAll": "No sessions yet",
-    "emptyAppHint": "CC Switch reads session data from {{path}}",
+    "emptyAppHint": "Viber Switch reads session data from {{path}}",
     "emptySearch": "No session titles, folders or first/last messages match “{{query}}”",
     "clearSearchAction": "Clear search",
     "backToList": "Back to sessions",
@@ -1573,7 +1652,36 @@
       "rawMatch": "Matches in source",
       "expandContent": "Show full content",
       "collapseContent": "Collapse"
-    }
+    },
+    "title": "Session Manager",
+    "providerFilterAll": "All",
+    "providerFilterTooltip": "Provider filter",
+    "viewModeTooltip": "View mode",
+    "viewModeFlat": "List",
+    "viewModeGrouped": "Grouped",
+    "toggleProviderGroup": "Expand or collapse {{provider}} provider group",
+    "toggleDirectoryGroup": "Expand or collapse {{directory}} directory group",
+    "collapseAllGroups": "Collapse all",
+    "manageBatchTooltip": "Enter batch management",
+    "exitBatchModeTooltip": "Exit batch management",
+    "batchModeHint": "Select sessions to delete",
+    "selectForBatch": "Select session",
+    "selectedCount": "{{count}} selected",
+    "selectAllFiltered": "Select all",
+    "clearFilteredSelection": "Clear selection",
+    "clearSelection": "Clear",
+    "deleteSelected": "Delete",
+    "noSessions": "No sessions found",
+    "selectSession": "Select a session to view details",
+    "projectDirCopied": "Directory copied",
+    "delete": "Delete session",
+    "deleting": "Deleting...",
+    "deleteTooltip": "Permanently delete this local session record",
+    "clickToCopyPath": "Click to copy path",
+    "resume": "Resume Session",
+    "resumeTooltip": "Resume this session in terminal",
+    "copyCommand": "Copy Command",
+    "conversationHistory": "Conversation History"
   },
   "console": {
     "providerSwitchReceived": "Received provider switch event:",
@@ -1748,7 +1856,8 @@
     "stackModelPlaceholder": "e.g. deepseek-v4-pro",
     "stackModelDefault": "Default model",
     "stackLayout": {
-      "noModels": "The model list is empty: this provider won't appear in the model picker once added to the aggregation"
+      "noModels": "The model list is empty: this provider won't appear in the model picker once added to the aggregation",
+      "advancedHint": "Custom User-Agent and request overrides; usually no need to change."
     },
     "modelRoleLabel": "Model role",
     "modelRoleSonnet": "Sonnet",
@@ -1813,7 +1922,21 @@
     "localProxyRequestOverridesHelp": "Applies to the upstream request after format conversion.",
     "apiFormatHelp": "Pick the protocol the provider supports natively: Anthropic Messages is forwarded as is without conversion; routing converts the other three to Anthropic Messages.",
     "directModeFormatInUse": "This card is in use in direct mode: saving it with this format makes requests fail. Switch to routing or Aggregation first.",
-    "directModeFormatSwitch": "This format doesn't work in direct mode; switch to routing or Aggregation to use this card."
+    "directModeFormatSwitch": "This format doesn't work in direct mode; switch to routing or Aggregation to use this card.",
+    "apiFormatHint": "Pick Anthropic Messages when your provider is natively an Anthropic Messages API (direct, no format conversion); pick Chat when it uses Chat Completions; pick Responses when it uses the Responses API; pick Gemini Native when it uses Gemini generateContent. Chat, Responses, and Gemini Native require routing takeover to convert to Anthropic Messages.",
+    "customUserAgentHint": "Only applies in Routing mode; replaces the User-Agent in requests forwarded to the provider API.",
+    "localProxyRequestOverridesHint": "Only applies in Routing mode; applied to the upstream request after format conversion.",
+    "fullUrlEnabled": "Full URL Mode",
+    "fullUrlDisabled": "Mark as Full URL",
+    "fullUrlHint": "💡 Enter the full request URL. This mode requires routing to be enabled, and routing will use the URL as-is without appending a path",
+    "fullUrlHintGeminiNative": "💡 In Gemini Native full URL mode, two inputs are supported: 1. official/structured Gemini URLs, which will still be normalized to the requested model and streaming method; 2. opaque custom relay URLs, which will be used mostly as-is with only query parameters appended",
+    "stackModelsHint": "These models appear in Claude Code's /model menu; picking one sends requests straight to this provider. The first one (★) is this provider's default model: while this provider is the default, Claude Code uses it at startup and for background tasks.",
+    "stackModelMakeDefault": "Make default model",
+    "fallbackModelHint": "A fallback for requests that don't clearly map to Sonnet, Opus, Fable, or Haiku. Recommended for third-party/relay endpoints—otherwise such requests (including Haiku background subtasks) are forwarded under their original Claude model name and may fail if the upstream doesn't host it. Safe to leave blank for official endpoints.",
+    "advancedOptionsHint": "Includes API format, auth field, and model mapping. Defaults work for most use cases.",
+    "fetchedModelsTitle": "Available models ({{count}})",
+    "modelAlreadyAdded": "Already added",
+    "addSelectedModels": "Add selected ({{count}})"
   },
   "copilot": {
     "automaticFormat": "Selected automatically by routing",
@@ -1853,7 +1976,8 @@
     "deploymentType": "GitHub Deployment Type",
     "deploymentGitHubCom": "GitHub.com",
     "deploymentEnterprise": "GitHub Enterprise Server",
-    "enterpriseDomainPlaceholder": "e.g. company.ghe.com"
+    "enterpriseDomainPlaceholder": "e.g. company.ghe.com",
+    "logoutAll": "Logout all accounts"
   },
   "codexOauth": {
     "authStatus": "Auth status",
@@ -1897,7 +2021,9 @@
     "browserLogin": "Browser login",
     "deviceCodeLogin": "Device-code login",
     "openBrowserLogin": "Open browser login",
-    "loginExpired": "Login expired. Please try again."
+    "loginExpired": "Login expired. Please try again.",
+    "loginWithChatGPT": "Sign in with ChatGPT",
+    "reauthTitle": "Some accounts need to sign in again"
   },
   "xaiOauth": {
     "authStatus": "xAI OAuth authentication",
@@ -1929,8 +2055,8 @@
     "remove": {
       "titleOne": "Delete account “{{login}}”?",
       "titleAll": "Delete all {{service}} accounts?",
-      "leadOne": "This deletes the sign-in credentials CC Switch keeps for this account. This can’t be undone.",
-      "leadAll": "This deletes the sign-in credentials CC Switch keeps for these {{count}} accounts. This can’t be undone.",
+      "leadOne": "This deletes the sign-in credentials Viber Switch keeps for this account. This can’t be undone.",
+      "leadAll": "This deletes the sign-in credentials Viber Switch keeps for these {{count}} accounts. This can’t be undone.",
       "brokenOne": "These providers will stop working until you sign in again or pick another account:",
       "brokenAll": "These providers will stop working until you sign in again:",
       "moved": "These providers use the default account and will switch to the new default:",
@@ -2051,7 +2177,28 @@
     "inactiveFieldCopied": "Copied",
     "upstreamFormatCopilotRouteHint": "Every mode requires routing, which injects the Copilot account credentials. A protocol you pick explicitly fails for models that don't support it.",
     "maxOutputTokensWarning": "Don't exceed the real output limit of the model or gateway, or requests return 400.",
-    "routeOnlySettingsHint": "The two settings below only apply in routing and Aggregation modes."
+    "routeOnlySettingsHint": "The two settings below only apply in routing and Aggregation modes.",
+    "extractFailed": "Extract failed: {{error}}",
+    "modelNameHint": "Specify the model to use, will be auto-updated in config.toml",
+    "modelName": "Model Name",
+    "upstreamModelName": "Upstream Model Name",
+    "upstreamModelNameHint": "For Chat format, enter the real upstream model here; routing converts Codex Responses requests to Chat Completions while keeping this model.",
+    "modelNamePlaceholder": "e.g., gpt-5-codex",
+    "contextWindow": "Context Window",
+    "autoCompactLimitHint": "Auto-compacts history when context reaches this token limit",
+    "modelMetadataAdvanced": "Model Metadata Advanced Options",
+    "modelMetadataAdvancedHint": "Overrides Codex metadata for unknown models; clearing a field removes the matching config.toml entry.",
+    "defaultModelNotInCatalog": "This model is not in the model mapping, so the Codex /model menu won't list it (direct requests still work).",
+    "addToModelMapping": "Add to mapping",
+    "modelMappingTitle": "Model Mapping",
+    "modelMappingHint": "Generates Codex model_catalog_json so /model can show these third-party model names; entries are saved exactly as listed. Codex must be restarted to refresh the model list after changes.",
+    "stackModelListHint": "These models appear in Codex's /model menu; picking one sends requests straight to this provider. The one marked ★ is this provider's default model: while this provider is the default, Codex uses it by default. Restart Codex after changes.",
+    "stackDefaultNotInList": "The default model {{model}} is not in the list: Codex still requests it by default, but /model won't show it.",
+    "stackAdvancedHint": "Reasoning, Anthropic-specific options, custom User-Agent and request overrides; usually no need to change.",
+    "catalogDisplayName": "Display Name",
+    "catalogModelId": "Model ID",
+    "reasoningSectionHint": "Preset providers are configured automatically; custom providers are inferred from name/URL. Override manually only when auto-detection is wrong.",
+    "advancedSectionHint": "Includes upstream format, model mapping, reasoning overrides and custom User-Agent. Providers using the Chat Completions protocol require routing takeover to be enabled."
   },
   "geminiConfig": {
     "envFile": "Environment Variables (.env)",
@@ -2092,7 +2239,7 @@
     "headerName": "Header",
     "headerValue": "Value",
     "headerNamePlaceholder": "X-Title",
-    "headerValuePlaceholder": "CC Switch",
+    "headerValuePlaceholder": "Viber Switch",
     "removeHeader": "Remove header",
     "noHeaders": "No custom headers configured",
     "extraOptions": "Extra Options",
@@ -2112,7 +2259,10 @@
     "modelExtraFieldKeyPlaceholder": "variants",
     "sdkOptions": "SDK Options",
     "modelOptionKeyPlaceholder": "provider",
-    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}"
+    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}",
+    "npmPackageHint": "Select the API format for the AI service",
+    "baseUrlHint": "Custom API endpoint URL",
+    "modelsHint": "Configure available models and their display names"
   },
   "providerPreset": {
     "label": "Provider Preset",
@@ -2194,7 +2344,9 @@
       "intl": "Global"
     },
     "planLabel": "Plan",
-    "regionLabel": "Region"
+    "regionLabel": "Region",
+    "unofficial": "Unofficial",
+    "unofficialAriaLabel": "Toggle unofficial provider presets"
   },
   "usage": {
     "title": "Usage Statistics",
@@ -2383,11 +2535,11 @@
     "modelsDevDefaultHint": "Showing the {{shown}} most recently released models (of {{total}}) — type to search all",
     "modelsDevAutoSync": {
       "title": "Automatic models.dev pricing sync",
-      "description": "When enabled, periodically fetch selected prices when CC Switch launches and keep them in your local pricing file.",
+      "description": "When enabled, periodically fetch selected prices when Viber Switch launches and keep them in your local pricing file.",
       "enabled": "Enabled",
       "disabled": "Disabled",
       "enableConfirmTitle": "Enable automatic pricing sync?",
-      "enableConfirmMessage": "After enabling, CC Switch will periodically update prices for the selected models from models.dev when it launches (at most once every 6 hours). Built-in and manually configured prices with the same model ID will be overwritten.",
+      "enableConfirmMessage": "After enabling, Viber Switch will periodically update prices for the selected models from models.dev when it launches (at most once every 6 hours). Built-in and manually configured prices with the same model ID will be overwritten.",
       "enableConfirmAction": "Enable automatic sync",
       "configure": "Choose models",
       "configureTitle": "Choose models for automatic pricing sync",
@@ -2422,10 +2574,15 @@
       "minutesAgo": "Synced {{count}} min ago",
       "syncing": "Syncing…",
       "tip": "Click to sync now",
-      "tipOff": "Auto scan is off. Click to sync now"
+      "tipOff": "Auto scan is off. Click to sync now",
+      "auto": "Session logs · auto scan",
+      "off": "Session logs · auto scan off",
+      "tipAuto": "Session logs are scanned every 60 seconds"
     },
     "refreshMenu": {
-      "label": "Scan every {{seconds}}s"
+      "label": "Scan every {{seconds}}s",
+      "off": "Auto refresh off",
+      "seconds": "{{seconds}}s"
     },
     "dataSources": "Data sources",
     "display": {
@@ -2539,12 +2696,13 @@
       "speedEstimateTooFew": "Under 200 output tokens, so no estimate",
       "noTimingSession": "Session logs have no timing data",
       "noFirstToken": "No first-token timing, so no speed",
-      "providerId": "Provider ID"
+      "providerId": "Provider ID",
+      "sourceSession": "Session log"
     },
     "sources": {
       "scanTitle": "Scan session logs automatically",
       "scanHelpTitle": "What are session logs?",
-      "scanHelp": "The conversation records each app writes on this computer. CC Switch reads usage from them, so you get data even without routing.",
+      "scanHelp": "The conversation records each app writes on this computer. Viber Switch reads usage from them, so you get data even without routing.",
       "coverage": "Covers 7 apps: {{apps}}",
       "cadenceOn": "Scans at startup and every 10 minutes in the background; opening the Usage page scans right away, then at the selected interval",
       "cadenceOff": "Auto scan is off; logs are scanned only when you click Sync Now",
@@ -2588,7 +2746,9 @@
       "title": "Usage settings",
       "pricingSummary": "Set per-model prices per million tokens, or sync them from models.dev",
       "managePricing": "Manage pricing…"
-    }
+    },
+    "refreshOff": "Off",
+    "sortedByRequests": "Sorted by requests"
   },
   "usageScript": {
     "title": "Configure Usage Query",
@@ -2682,7 +2842,7 @@
   },
   "dbUpgrade": {
     "title": "Database version is too new",
-    "description": "This database was created by a newer version of CC Switch. Upgrade the app to continue. Upgrading will not delete your data.",
+    "description": "This database was created by a newer version of Viber Switch. Upgrade the app to continue. Upgrading will not delete your data.",
     "versionInfo": "Database v{{db}} · App supports v{{supported}}",
     "dbPath": "Database file",
     "checking": "Checking for available updates…",
@@ -2728,7 +2888,7 @@
       "deleteConfirm": "Are you sure you want to delete server \"{{id}}\"? This action cannot be undone.",
       "noServers": "No servers yet",
       "enabledApps": "Enabled Apps",
-      "noImportFound": "No MCP servers to import found. All servers are already managed by CC Switch.",
+      "noImportFound": "No MCP servers to import found. All servers are already managed by Viber Switch.",
       "importSuccess": "Successfully imported {{count}} MCP servers",
       "searchPlaceholder": "Search MCP name, description, tag, or command...",
       "searchAriaLabel": "Search managed MCP servers",
@@ -2871,7 +3031,8 @@
         "name": "@upstash/context7-mcp",
         "description": "Context7 documentation search tool providing latest library docs and code examples, with higher limits when configured with a key"
       }
-    }
+    },
+    "unsupported": "{{app}} does not support MCP"
   },
   "prompts": {
     "add": "Add Prompt",
@@ -2886,7 +3047,7 @@
     "name": "Name",
     "namePlaceholder": "e.g. Team coding rules",
     "description": "Note",
-    "descriptionPlaceholder": "Optional, shown only in CC Switch",
+    "descriptionPlaceholder": "Optional, shown only in Viber Switch",
     "content": "Text",
     "contentPlaceholder": "# {{filename}}\n\nStanding instructions for {{appName}}, in Markdown…",
     "loadFailed": "Failed to load prompts",
@@ -2946,7 +3107,7 @@
     "deleteBlocked": "Disable it before deleting",
     "emptyTitle": "No {{app}} prompts yet",
     "emptyTarget": "The enabled prompt is written to {{path}}.",
-    "emptyFile": "{{path}} already has {{size}} of content that isn't in CC Switch yet",
+    "emptyFile": "{{path}} already has {{size}} of content that isn't in Viber Switch yet",
     "importExisting": "Import existing content",
     "formDescription": "Name, note and the text written to {{file}}",
     "requiredMark": "(required)",
@@ -2987,13 +3148,15 @@
       "savedActive": "Saved \"{{name}}\" and overwrote {{path}}",
       "savedActivePi": "Saved \"{{name}}\" and wrote AGENTS.md",
       "deleted": "Deleted \"{{name}}\"",
-      "deletedSub": "Removed from CC Switch only; {{path}} is unchanged",
+      "deletedSub": "Removed from Viber Switch only; {{path}} is unchanged",
       "deletedPiSub": "Removed from the library only; AGENTS.md is unchanged",
       "restored": "Restored \"{{name}}\"",
       "imported": "Imported the content of {{path}}; the file is unchanged",
       "importedPi": "Saved AGENTS.md to the library; the file is unchanged",
       "copied": "Copied \"{{name}}\" to {{apps}}"
-    }
+    },
+    "manage": "Prompts",
+    "title": "{{appName}} Prompt Management"
   },
   "profiles": {
     "switcherAriaLabel": "Project: {{name}}",
@@ -3068,7 +3231,8 @@
       "noSearchResults": "No daily memories match your search.",
       "searching": "Searching...",
       "searchFailed": "Search failed",
-      "matchCount": "{{count}} match(es)"
+      "matchCount": "{{count}} match(es)",
+      "cardDescription": "Browse & manage daily memories"
     }
   },
   "openclaw": {
@@ -3117,7 +3281,8 @@
       "saveSuccess": "Environment variables saved",
       "saveFailed": "Failed to save environment variables",
       "loadFailed": "Failed to load environment variables",
-      "duplicateKey": "Duplicate variable name detected: {{key}}"
+      "duplicateKey": "Duplicate variable name detected: {{key}}",
+      "description": "Manage environment variables in openclaw.json (API keys, custom variables, etc.)"
     },
     "tools": {
       "title": "Tool Permissions",
@@ -3137,7 +3302,8 @@
       "addDeny": "Add Deny",
       "saveSuccess": "Tool permissions saved",
       "saveFailed": "Failed to save tool permissions",
-      "loadFailed": "Failed to load tool permissions"
+      "loadFailed": "Failed to load tool permissions",
+      "description": "Manage tool permissions in openclaw.json (allow/deny lists)"
     },
     "agents": {
       "title": "Agents Config",
@@ -3169,7 +3335,8 @@
       "stringifiedEnvVars": "env.vars should be an object, but the current value looks stringified or malformed.",
       "stringifiedShellEnv": "env.shellEnv should be an object, but the current value looks stringified or malformed.",
       "parseFailed": "openclaw.json could not be parsed as valid JSON5. Fix the file before editing it here."
-    }
+    },
+    "baseUrlHint": "The provider's API endpoint address."
   },
   "hermes": {
     "form": {
@@ -3204,7 +3371,9 @@
       "removeModel": "Remove model",
       "modelsHint": "When activated, the first model becomes the Hermes default.",
       "rateLimitDelay": "Rate limit delay (seconds)",
-      "rateLimitDelayHint": "Minimum delay in seconds between consecutive requests (optional). Leave empty for no limit."
+      "rateLimitDelayHint": "Minimum delay in seconds between consecutive requests (optional). Leave empty for no limit.",
+      "baseUrlHint": "The API endpoint URL for this provider.",
+      "apiModeHint": "Provider API protocol. Choose the format that matches your endpoint."
     },
     "webui": {
       "open": "Open Hermes Web UI",
@@ -3241,7 +3410,8 @@
       "remaining": "{{remaining}} of {{limit}} characters remaining",
       "overLimitBy": "{{over}} characters over the limit — Hermes will truncate on next load",
       "toggledOn": "{{name}} enabled. Takes effect when Hermes restarts or starts a new session.",
-      "toggledOff": "{{name}} disabled. Takes effect when Hermes restarts or starts a new session."
+      "toggledOff": "{{name}} disabled. Takes effect when Hermes restarts or starts a new session.",
+      "title": "Memory"
     }
   },
   "env": {
@@ -3306,7 +3476,7 @@
     "installSuccess": "Skill {{name}} installed",
     "installFailed": "Failed to install",
     "uninstallSuccess": "Skill {{name}} uninstalled",
-    "uninstallPiPreserved": "Pi's copy could not be verified as CC Switch-managed and was left in place: {{path}}",
+    "uninstallPiPreserved": "Pi's copy could not be verified as Viber Switch-managed and was left in place: {{path}}",
     "uninstallPiCleanupIncomplete": "Pi cleanup could not be completed. Check the Pi Skills directory manually for a leftover copy.",
     "uninstallFailed": "Failed to uninstall",
     "update": "Update",
@@ -3388,10 +3558,12 @@
       "searchPlaceholder": "Search skills.sh (min 2 chars)...",
       "installs": "{{count}} installs",
       "loadMore": "Load More",
-      "loading": "Searching skills.sh...",
+      "loading": "Loading skills.sh...",
       "noResults": "No skills found for \"{{query}}\"",
       "error": "Failed to search skills.sh",
-      "poweredBy": "Powered by skills.sh"
+      "poweredBy": "Powered by skills.sh",
+      "trending": "Trending (24h)",
+      "noTrending": "No trending skills available"
     },
     "filter": {
       "placeholder": "Filter by status",
@@ -3404,12 +3576,12 @@
     "noResults": "No matching skills found",
     "noInstalled": "No skills installed",
     "noInstalledDescription": "Discover and install skills from repositories, or import existing skills",
-    "discover": "Discover Skills",
+    "discover": "Community Skills",
     "import": "Import Existing",
-    "importDescription": "Select skills to import into CC Switch unified management",
+    "importDescription": "Select skills to import into Viber Switch unified management",
     "importSuccess": "Successfully imported {{count}} skills",
     "importSelected": "Import Selected ({{count}})",
-    "noUnmanagedFound": "No skills to import found. All skills are already managed by CC Switch.",
+    "noUnmanagedFound": "No skills to import found. All skills are already managed by Viber Switch.",
     "unmanagedAvailable": "Skills available to import",
     "foundIn": "Found in",
     "local": "Local",
@@ -3467,7 +3639,7 @@
       "resyncPartial": "{{count}} apps didn't fully sync: {{apps}}",
       "resyncSkillItem": "{{directory}}: {{error}}",
       "locationTitle": "Keep the master copies in",
-      "locationCcSwitch": "CC Switch folder",
+      "locationCcSwitch": "Viber Switch folder",
       "locationUnified": "Shared folder",
       "openFolder": "Open",
       "openFolderAria": "Open {{path}}",
@@ -3475,7 +3647,7 @@
       "move": "Move and switch",
       "moving": "Moving…",
       "moveConfirmTitle": "Move {{count}} Skills to {{path}}?",
-      "moveConfirmBody": "Each master copy is moved, then the links in every app are pointed at the new location. Don't quit CC Switch until the move finishes.",
+      "moveConfirmBody": "Each master copy is moved, then the links in every app are pointed at the new location. Don't quit Viber Switch until the move finishes.",
       "moveConfirmButton": "Move and switch",
       "moveDone": "Moved {{count}} Skills to {{path}}",
       "movePartial": "Moved {{migrated}} Skills, {{errors}} failed. Check the logs for details.",
@@ -3487,11 +3659,25 @@
       "syncCopyDesc": "Uses more disk space; copied again after each update",
       "moveHint": "Switching moves {{count}} Skills to the new location."
     },
-    "updatesIncomplete": "No updates found, but {{count}} repositories couldn't be read"
+    "updatesIncomplete": "No updates found, but {{count}} repositories couldn't be read",
+    "replace": "Replace",
+    "replacing": "Replacing...",
+    "replaceSuccess": "Skill {{name}} replaced",
+    "replaceFailed": "Failed to replace",
+    "autoUpdateRunning": "Updating in background…",
+    "autoUpdateNever": "Auto-updates daily",
+    "autoUpdateOk": "Auto-updated {{count}}",
+    "autoUpdateFailed": "Auto-update failed ({{count}})",
+    "preview": "Preview skill",
+    "previewTitle": "Skill preview",
+    "frontmatter": "YAML frontmatter",
+    "frontmatterEmpty": "(empty)",
+    "frontmatterMissing": "(no YAML frontmatter)",
+    "previewLoadFailed": "Failed to load skill content: {{error}}"
   },
   "deeplink": {
     "confirmImport": "Confirm Import Provider",
-    "confirmImportDescription": "The following configuration will be imported from deep link into CC Switch",
+    "confirmImportDescription": "The following configuration will be imported from deep link into Viber Switch",
     "importPrompt": "Import Prompt",
     "importPromptDescription": "Please confirm whether to import this system prompt",
     "importMcp": "Import MCP Servers",
@@ -3780,7 +3966,7 @@
         "authTitle": "Codex may still cache the previous account; restart its background server to load the new login",
         "title": "Codex is still using an old model list, so the current models won't show",
         "unverifiedTitle": "Codex apps that were open before the switch may still use the previous account or model list",
-        "unverifiedHint": "CC Switch can't tell whether the desktop app or editor extensions are running. If they aren't open, just close this notice.",
+        "unverifiedHint": "Viber Switch can't tell whether the desktop app or editor extensions are running. If they aren't open, just close this notice.",
         "daemon": "CLI: reopening codex isn't enough; its background daemon needs a restart.",
         "others": "Desktop app: quit it completely and reopen it (⌘Q on macOS; closing the window isn't enough). Editor extensions: reopen the editor window.",
         "restart": "Restart Codex daemon",
@@ -3790,6 +3976,10 @@
         "restarted": "Codex daemon restarted. Reopen codex to load the current account and model list",
         "notRunning": "The Codex daemon isn't running. It will load the current login and model list the next time it starts",
         "failed": "Failed to restart the Codex daemon: {{error}}"
+      },
+      "tooltip": {
+        "active": "{{appLabel}} Stack mode is on: models of the added providers appear in the model list after restarting the client",
+        "inactive": "Enter Stack mode: add several providers and all their models appear in the {{appLabel}} model list"
       }
     },
     "failover": {
@@ -4191,13 +4381,16 @@
     "appsTitle": "Apps: install, upgrade, choose which show in the sidebar",
     "appsHasUpdate": "Apps · updates available",
     "settings": "Settings",
-    "settingsHasUpdate": "Settings · a new CC Switch version is available",
+    "settingsHasUpdate": "Settings · a new Viber Switch version is available",
     "mode": {
       "route": "Routing",
-      "stack": "Aggregation"
+      "stack": "Aggregation",
+      "mapping": "Mapping",
+      "mappingFull": "Model mapping"
     },
     "needsAttention": "Needs attention",
-    "back": "Back"
+    "back": "Back",
+    "todayCost": "Today {{cost}}"
   },
   "appsPage": {
     "showInSidebar": "Show {{name}} in the sidebar",
@@ -4216,7 +4409,7 @@
     "columnVersion": "Version",
     "columnVisible": "Show",
     "visibleHelp": "When off, the app no longer appears in the sidebar, the tray menu, the MCP / Skills app columns, or the app pickers on Prompts and Sessions. It is only hidden: its providers, MCP servers and other settings stay, and its own config files are left untouched.",
-    "desktopHelp": "Claude Desktop is a desktop app and can't be installed or upgraded here; CC Switch connects to it through its config file.",
+    "desktopHelp": "Claude Desktop is a desktop app and can't be installed or upgraded here; Viber Switch connects to it through its config file.",
     "desktopUnsupported": "Not supported on this system",
     "desktopConnected": "Connected",
     "desktopNotConnected": "Not connected",
@@ -4238,6 +4431,20 @@
       "mcode": "Installs with the official script, falls back to npm",
       "agy": "Installs with the official script",
       "omp": "Installs with the official script"
+    },
+    "uninstall": "Uninstall this install",
+    "uninstallConfirmTitle": "Uninstall this install?",
+    "uninstallConfirmDesc": "This removes only the install at {{path}}. The other install stays. If this is the one your terminal uses, the command will switch to the remaining install.",
+    "uninstallConfirmDescFile": "This install wasn't set up by a package manager, so only the executable file {{path}} will be deleted. The other install stays.",
+    "uninstallConfirm": "Uninstall",
+    "uninstallDone": "Uninstalled {{path}}",
+    "uninstallFailed": "Uninstall failed",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "This is the only install; it can't be removed here.",
+      "UNINSTALL_NOT_FOUND": "That install no longer exists. Refresh and try again.",
+      "UNINSTALL_UNSUPPORTED": "This install wasn't set up by a package manager Viber Switch can uninstall.",
+      "UNINSTALL_INCOMPLETE": "The package manager finished but the executable is still there and can't be removed automatically. Delete it by hand.",
+      "UNINSTALL_IN_USE": "This install is in use. Close every running {{tool}} (terminals, editors, background processes) and try again."
     }
   },
   "appPage": {
@@ -4319,21 +4526,22 @@
       "clientConfigChanged": " Client configuration also changed. Restart {{app}} to load the updated configuration.",
       "defaultRemembered": "{{provider}} will be the default provider once you switch to Aggregation.",
       "restartHint": " Restart {{app}} to apply.",
-      "failed": "Couldn't switch: {{detail}}"
+      "failed": "Couldn't switch: {{detail}}",
+      "undo": "Undo"
     },
     "dialog": {
       "routeTitle": "Use routing for {{app}}?",
       "stackTitle": "Use Aggregation for {{app}}?",
       "switchTitle": "Switch {{app}} from “{{from}}” to “{{to}}”?",
-      "routeLead": "Requests go through CC Switch on this machine first, then to the provider you pick.",
+      "routeLead": "Requests go through Viber Switch on this machine first, then to the provider you pick.",
       "stackLead": "The default provider takes requests without a prefix.",
       "routeTo": "Route to",
       "stackDefault": "Default provider",
       "officialOption": "{{name}} (official)",
       "stackOfficialNote": "If you use an official subscription, set the official account as the default provider.",
-      "routeNoteFile": "Rewrites the address and key in {{file}}. The real key stays in CC Switch; other settings are untouched.",
+      "routeNoteFile": "Rewrites the address and key in {{file}}. The real key stays in Viber Switch; other settings are untouched.",
       "routeNoteSwitch": "Changing providers later on the Routing tab won't rewrite the config file.",
-      "routeNoteKeepRunning": "Keep CC Switch running. Quitting writes the direct config back; it reconnects on the next start.",
+      "routeNoteKeepRunning": "Keep Viber Switch running. Quitting writes the direct config back; it reconnects on the next start.",
       "desktopRouteNoteModels": "Claude Desktop's model list becomes the routed provider's models; switching the routed provider later rewrites the config file.",
       "desktopRouteNoteRestart": "{{app}} only reads its config at launch: restart {{app}} after confirming.",
       "desktopRouteNoteKeepRunning": "Keep CC Switch running so {{app}}'s requests can go out.",
@@ -4356,14 +4564,16 @@
       "needsRouteTitle": "{{provider}} needs routing",
       "needsRouteLead": "{{provider}}: {{reason}}. If you switch to it directly, {{app}} won't be able to use it.",
       "switchAnyway": "Switch directly anyway",
-      "routeAndUse": "Start routing and use it"
+      "routeAndUse": "Start routing and use it",
+      "stackToRouteNote": "Aggregated models are withdrawn from /model (the list is kept); a selected aggregated model must be changed back to a regular one."
     },
     "help": {
       "title": "How the connection modes differ",
       "direct": "Direct: CC Switch never touches your requests; the client talks to the chosen provider itself for the most native experience.",
-      "route": "Routing: requests go through CC Switch on this machine, unlocking hot-switching providers, failover, format conversion, and other advanced features.",
+      "route": "Routing: requests go through Viber Switch on this machine, unlocking hot-switching providers, failover, format conversion, and other advanced features.",
       "stack": "Aggregation: models from several providers sit together in /model, so you can switch between them seamlessly inside the client."
-    }
+    },
+    "copyEndpoint": "Copy endpoint URL"
   },
   "providerCard": {
     "status": {
@@ -4371,7 +4581,8 @@
       "routing": "Routing",
       "currentDefault": "Current default",
       "defaultAfterSwitch": "Default after switching",
-      "default": "Default"
+      "default": "Default",
+      "current": "Current"
     },
     "action": {
       "switch": "Switch",
@@ -4399,7 +4610,8 @@
       "noModels": "No models",
       "direct": "Direct",
       "hermesManaged": "Managed by Hermes",
-      "defaultModel": "Default model {{model}}"
+      "defaultModel": "Default model {{model}}",
+      "mapping": "Model mapping"
     },
     "reason": {
       "noRoute": "Official subscriptions don't go through routing; available again in direct mode.",
@@ -4410,7 +4622,8 @@
       "defaultCannotRemove": "The default can't be removed. Make another provider the default first.",
       "inUseCannotDelete": "The provider in use can't be deleted. Switch to another one first.",
       "directDefaultCannotDelete": "Leaving routing switches back to this provider, so it can't be deleted. On the direct page, choose \"Back to direct and use\" on another provider first.",
-      "noFailover": "Official accounts can't join the failover queue: they use the client's own login and can't rotate with other providers."
+      "noFailover": "Official accounts can't join the failover queue: they use the client's own login and can't rotate with other providers.",
+      "currentCannotRemove": "The provider in use can't be removed. Enable another one first."
     },
     "section": {
       "queue": "Queue · by priority ({{count}})",
@@ -4465,7 +4678,9 @@
     "exitAllTitle": "Switch every app back to direct?",
     "exitAllMessage": "Apps in routing or Aggregation mode get their direct config written back, then the routing service stops. Route targets, queues and aggregation lists are kept.",
     "exitAllConfirm": "Switch all back to direct",
-    "failoverHelp": "Tune each app's timeouts, retries and circuit breaker here. Queues are managed on each app's Routing tab."
+    "failoverHelp": "Tune each app's timeouts, retries and circuit breaker here. Queues are managed on each app's Routing tab.",
+    "desktopMode": "Model mapping · kept running automatically",
+    "desktopDetail": "Current provider {{name}}"
   },
   "quota": {
     "tierShort": "{{label}} {{value}}%",
@@ -4507,7 +4722,8 @@
     "windows": {
       "title": "All limits",
       "showAll": "Show all limits"
-    }
+    },
+    "balanceUsedUp": "Balance used up"
   },
   "appMatrix": {
     "clearSearch": "Clear search",
@@ -4557,7 +4773,7 @@
     "failNoticeTitle": "Couldn't write {{app}}'s config",
     "failNoticeBody": "{{error}}. Fix the file, then click Retry.",
     "loadFailed": "Couldn't load the MCP list",
-    "noFilesChanged": "CC Switch didn't change any files.",
+    "noFilesChanged": "Viber Switch didn't change any files.",
     "emptyTitle": "No MCP servers yet",
     "emptyBody": "MCP servers already set up in your apps can be imported",
     "importHelpTitle": "What import reads",
@@ -4577,8 +4793,8 @@
     "disableEverywhere": "Turn off everywhere",
     "deleteEllipsis": "Delete",
     "deleteTitle": "Delete {{id}}?",
-    "deleteBodyApps": "This removes it from CC Switch and from the config files of {{apps}}. This can't be undone.",
-    "deleteBody": "This removes it from CC Switch. This can't be undone.",
+    "deleteBodyApps": "This removes it from Viber Switch and from the config files of {{apps}}. This can't be undone.",
+    "deleteBody": "This removes it from Viber Switch. This can't be undone.",
     "toast": {
       "written": "Written to {{app}}",
       "rowAllOn": "{{id}} is enabled in all {{count}} apps",
@@ -4597,7 +4813,7 @@
       "title": "Import finished",
       "added": "Added {{count}} MCP servers: {{names}}.",
       "none": "No new MCP servers found.",
-      "sameName": "For servers already in the list, only the matching app switches were turned on; the config in CC Switch still wins.",
+      "sameName": "For servers already in the list, only the matching app switches were turned on; the config in Viber Switch still wins.",
       "failedTitle": "Some apps couldn't be read",
       "filesTitle": "Which files were read",
       "claudeNote": " (top-level mcpServers)",
@@ -4697,7 +4913,7 @@
       "metaHint": "Display name, description, tags, homepage, docs",
       "displayName": "Display name",
       "displayNameHelpTitle": "Where the display name shows",
-      "displayNameHelp": "Only shown in CC Switch; not written to app configs.",
+      "displayNameHelp": "Only shown in Viber Switch; not written to app configs.",
       "description": "Description",
       "tags": "Tags",
       "tagsPlaceholder": "Comma-separated, e.g. docs, web",
@@ -4709,7 +4925,7 @@
   "skillsPage": {
     "noun": "Skills",
     "helpTitle": "How Skills sync",
-    "help": "The main copy lives in CC Switch's folder and is synced to the apps you tick. Claude Desktop and OpenClaw don't support Skills, so they have no column.",
+    "help": "The main copy lives in Viber Switch's folder and is synced to the apps you tick. Claude Desktop and OpenClaw don't support Skills, so they have no column.",
     "add": "Add Skill",
     "addMenu": {
       "discover": "Browse in Discover",
@@ -4728,7 +4944,7 @@
     "lastChecked": "Last checked: {{when}}",
     "justNow": "just now",
     "banner": {
-      "unmanaged": "{{count}} Skills on this computer aren't managed by CC Switch.",
+      "unmanaged": "{{count}} Skills on this computer aren't managed by Viber Switch.",
       "reviewImport": "Review and import",
       "ignore": "Ignore",
       "close": "Dismiss"
@@ -4778,7 +4994,7 @@
     "confirm": {
       "uninstallOne": "Uninstall {{name}}?",
       "uninstallMany": "Uninstall {{count}} Skills?",
-      "uninstallBody": "It's removed from every app and the main copy in CC Switch is deleted. A backup is saved to {{path}} first.",
+      "uninstallBody": "It's removed from every app and the main copy in Viber Switch is deleted. A backup is saved to {{path}} first.",
       "uninstallManyButton": "Uninstall {{count}}",
       "updateAll": "Update {{count}} Skills?",
       "updateBody": "Updating replaces the local folder with the repository's content. Local edits are kept only in the backup ({{path}}).",
@@ -4796,7 +5012,8 @@
       "noUpdatesInSelection": "None of the selected Skills have updates",
       "selectionAlreadyOn": "The {{count}} selected Skills are already enabled in {{app}}",
       "selectionAlreadyOff": "None of the {{count}} selected Skills are enabled in {{app}}",
-      "disabledSelection": "Turned off {{count}} {{noun}} in {{app}}"
+      "disabledSelection": "Turned off {{count}} {{noun}} in {{app}}",
+      "copiedDir": "Copied folder name {{dir}}"
     },
     "installTo": {
       "prefix": "Install to: ",
@@ -4848,14 +5065,14 @@
     "import": {
       "title": "Import Skills from this computer",
       "helpTitle": "What counts as already on this computer",
-      "help": "Folders that contain a SKILL.md but aren't managed by CC Switch yet.",
-      "lead": "Importing copies them into CC Switch's folder; the original files stay as they are.",
+      "help": "Folders that contain a SKILL.md but aren't managed by Viber Switch yet.",
+      "lead": "Importing copies them into Viber Switch's folder; the original files stay as they are.",
       "searchPlaceholder": "Search name or location",
       "searchAria": "Search Skills to import",
       "selectAll": "Select all",
       "selectNone": "Select none",
       "foundIn": "Found in: {{places}}",
-      "foundCcSwitch": "CC Switch folder",
+      "foundCcSwitch": "Viber Switch folder",
       "appsTitle": "Enable in these apps after importing",
       "appsHelpTitle": "Which apps are ticked by default",
       "appsHelp": "Apps listed under “Found in” are ticked and only enable the Skills found there; any other app you tick enables every imported Skill. Pi is decided by its folder, so it isn't listed.",
@@ -4874,10 +5091,11 @@
     "headerUpdatesShow": "Show only Skills with updates",
     "headerUpdatesClear": "Show all Skills",
     "updateAllCount": "Update all ({{count}})",
-    "updatingProgress": "Updating {{done}}/{{total}}…"
+    "updatingProgress": "Updating {{done}}/{{total}}…",
+    "copyDir": "Copy folder name"
   },
   "newLayoutNotice": {
-    "title": "CC Switch has a new look",
+    "title": "Viber Switch has a new look",
     "body": "This version redesigns the interface, so a few things have moved:\n• Modes now sit at the top of each app page\n• Usage and Accounts are in the sidebar\nSee the release notes for everything that changed.",
     "viewReleaseNotes": "View release notes",
     "confirm": "Got it"
@@ -4936,7 +5154,8 @@
       "open": "Open the authorization page",
       "note": "The authorization page is open in your browser; this updates on its own when you finish. Mind {{service}}'s terms of use.",
       "browserNote": "The {{service}} sign-in page is open in your browser. Sign in and grant access, and this updates automatically.",
-      "reopen": "Reopen sign-in page"
+      "reopen": "Reopen sign-in page",
+      "login": "Signing in to {{service}} · Waiting for authorization…"
     },
     "toast": {
       "added": "{{service}} account added.",
@@ -4973,7 +5192,9 @@
       "empty": "No Claude accounts yet. Sign in here to switch between multiple subscription accounts.",
       "removeNote": "Only removes the sign-in CC Switch saved for this account; it isn't signed out anywhere else, and Claude Code's current sign-in (~/.claude) is untouched. Cards bound to it switch to Claude Code's current sign-in.",
       "wslUnsupported": "The Claude config folder is in WSL. Adding and switching Claude accounts isn't supported there yet."
-    }
+    },
+    "groupMenu": "More actions for {{service}}",
+    "removeAll": "Delete all accounts"
   },
   "kimi": {
     "oauth": {
@@ -5076,5 +5297,23 @@
       "description": "Configure an endpoint, API key and models. Existing custom providers appear here automatically."
     },
     "deleteSessionHint": "Delete this session in DeepSeek Harness to keep its history consistent."
+  },
+  "agents": {
+    "title": "Agents"
+  },
+  "languagePicker": {
+    "title": "Choose language",
+    "hint": "You can change this later in Settings."
+  },
+  "desktopAccess": {
+    "current": "Current: {{name}} · {{mode}}",
+    "noCurrent": "No provider selected",
+    "helpTitle": "How Claude Desktop connects",
+    "help": "Claude Desktop's connection is set per provider: direct providers are written into Desktop's config; model-mapping providers go through the routing service, which stays running automatically while one is in use.",
+    "service": "Routing service",
+    "running": "Running",
+    "notRunning": "The routing service couldn't start",
+    "changePort": "Change port",
+    "notNeeded": "Routing service: not needed by the current provider"
   }
 }

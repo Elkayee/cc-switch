@@ -3147,7 +3147,7 @@ mod tests {
             None,
         )
         .await;
-        let err = result.expect_err("send 失败必须走 Err 通道（瞬时，前端 reject 后重试）");
+        let err = result.expect_err("send failures must take the Err path");
         assert!(err.contains("Network error"), "err={err}");
     }
 

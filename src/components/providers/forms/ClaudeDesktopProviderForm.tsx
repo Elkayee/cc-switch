@@ -71,7 +71,6 @@ export type ClaudeDesktopProviderFormValues = ProviderFormData & {
   presetId?: string;
   presetCategory?: ProviderCategory;
   isPartner?: boolean;
-  partnerPromotionKey?: string;
   meta?: ProviderMeta;
   providerKey?: string;
   suggestedDefaults?: OpenClawSuggestedDefaults;
@@ -294,7 +293,6 @@ export function ClaudeDesktopProviderForm({
     id: string;
     category?: ProviderCategory;
     isPartner?: boolean;
-    partnerPromotionKey?: string;
     providerType?: string;
     requiresOAuth?: boolean;
   } | null>(null);
@@ -419,7 +417,6 @@ export function ClaudeDesktopProviderForm({
     shouldShowApiKeyLink,
     websiteUrl: apiKeyLinkWebsiteUrl,
     isPartner: apiKeyLinkIsPartner,
-    partnerPromotionKey: apiKeyLinkPromotionKey,
   } = useApiKeyLink({
     appId: "claude-desktop",
     category: apiKeyLinkCategory,
@@ -502,7 +499,6 @@ export function ClaudeDesktopProviderForm({
       id: value,
       category: entry.preset.category,
       isPartner: entry.preset.isPartner,
-      partnerPromotionKey: entry.preset.partnerPromotionKey,
       providerType: entry.preset.providerType,
       requiresOAuth: entry.preset.requiresOAuth,
     });
@@ -936,27 +932,28 @@ export function ClaudeDesktopProviderForm({
       presetId: activePreset?.id,
       presetCategory: activePreset?.category,
       isPartner: activePreset?.isPartner,
-      partnerPromotionKey: activePreset?.partnerPromotionKey,
     });
   };
 
   const renderActionButtons = (onAdd: () => void, addLabel: string) => (
     <div className="flex gap-1">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={handleFetchModels}
-        disabled={isFetchingModels}
-        className="h-7 gap-1"
-      >
-        {isFetchingModels ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        ) : (
-          <Download className="h-3.5 w-3.5" />
-        )}
-        {t("providerForm.fetchModels", { defaultValue: "获取模型" })}
-      </Button>
+      {!usesManagedOAuth && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleFetchModels}
+          disabled={isFetchingModels}
+          className="h-7 gap-1"
+        >
+          {isFetchingModels ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Download className="h-3.5 w-3.5" />
+          )}
+          {t("providerForm.fetchModels", { defaultValue: "获取模型" })}
+        </Button>
+      )}
       <Button
         type="button"
         variant="outline"
@@ -975,7 +972,7 @@ export function ClaudeDesktopProviderForm({
       <form
         id="provider-form"
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-6"
+        className="space-y-2 rounded-[8px] p-2 border border-border-default"
       >
         {!initialData && (
           <ProviderPresetSelector
@@ -990,7 +987,7 @@ export function ClaudeDesktopProviderForm({
         <BasicFormFields form={form} />
 
         {isOfficial && (
-          <div className="rounded-lg border border-border bg-subtle p-3 text-sm text-fg-2">
+          <div className="rounded-[8px] border border-border-default bg-muted/20 p-2 text-[12.35px] leading-[1.3] text-muted-foreground">
             {t("claudeDesktop.officialNotice", {
               defaultValue:
                 "Claude Desktop 官方供应商使用应用内置的 1P 登录，无需配置 API Key 和接口地址。",
@@ -1001,7 +998,7 @@ export function ClaudeDesktopProviderForm({
         {!isOfficial && (
           <>
             {usesManagedOAuth ? (
-              <div className="rounded-lg border border-border bg-subtle p-3">
+              <div className="rounded-[8px] border border-border-default bg-muted/20 p-2">
                 {activeProviderType === "github_copilot" ? (
                   <CopilotAuthSection
                     mode="select"
@@ -1042,7 +1039,6 @@ export function ClaudeDesktopProviderForm({
                 shouldShowLink={shouldShowApiKeyLink}
                 websiteUrl={apiKeyLinkWebsiteUrl}
                 isPartner={apiKeyLinkIsPartner}
-                partnerPromotionKey={apiKeyLinkPromotionKey}
               />
             )}
 
@@ -1064,7 +1060,7 @@ export function ClaudeDesktopProviderForm({
               showManageButton={false}
             />
 
-            <div className="space-y-4 border-l border-border pl-3">
+            <div className="space-y-2 border-l border-border-default pl-2">
               <div className="flex items-stretch justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-1 pr-3">
                   <Label>
@@ -1082,7 +1078,7 @@ export function ClaudeDesktopProviderForm({
                 <div className="flex shrink-0 items-center gap-2 border-l border-border pl-4">
                   <Label
                     htmlFor="claude-desktop-model-mode"
-                    className="text-sm font-normal text-fg-2"
+                    className="text-[12.35px] leading-[1.3] font-normal text-muted-foreground"
                   >
                     {t("claudeDesktop.modelModeLabel", {
                       defaultValue: "接入方式",
@@ -1121,7 +1117,7 @@ export function ClaudeDesktopProviderForm({
               </div>
 
               {needsModelMapping && (
-                <div className="space-y-4 border-t border-border pt-4">
+                <div className="space-y-2 border-t border-border-default pt-2">
                   {activeProviderType !== "xai_oauth" && (
                     <div className="space-y-2">
                       <Label>
@@ -1208,7 +1204,7 @@ export function ClaudeDesktopProviderForm({
                           })}
                         </Button>
                       </div>
-                      <p className="text-xs leading-relaxed text-fg-2">
+                      <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
                         {t("claudeDesktop.routeMapHint", {
                           defaultValue:
                             "为 Sonnet、Opus、Haiku 三档分别填写实际请求模型；菜单显示名可写 DeepSeek、Kimi 等品牌名。留空的档会自动沿用 Sonnet（或第一个已填档）的模型，确保子 agent 调用的 Haiku 始终可用。",
@@ -1216,7 +1212,7 @@ export function ClaudeDesktopProviderForm({
                       </p>
                     </div>
 
-                    <div className="hidden grid-cols-[140px_1fr_1fr_116px] gap-2 px-1 text-xs font-medium text-fg-2 md:grid">
+                    <div className="hidden grid-cols-[140px_1fr_1fr_116px] items-center gap-2 text-[12.35px] leading-[1.3] font-medium text-muted-foreground md:grid">
                       <span>
                         {t("claudeDesktop.routeModelLabel", {
                           defaultValue: "模型角色",
@@ -1268,9 +1264,9 @@ export function ClaudeDesktopProviderForm({
                       return (
                         <div
                           key={route.rowId}
-                          className="grid grid-cols-1 gap-2 md:grid-cols-[140px_1fr_1fr_116px]"
+                          className="grid grid-cols-1 items-center gap-2 md:grid-cols-[140px_1fr_1fr_116px]"
                         >
-                          <div className="flex h-9 items-center rounded-md border border-input bg-subtle px-3 text-sm font-medium text-fg-2">
+                          <div className="flex h-6 items-center rounded-[4px] border border-border-default bg-muted px-2 text-[12.35px] leading-[1.3] font-medium text-muted-foreground">
                             {roleLabel}
                           </div>
                           <Input
@@ -1305,7 +1301,7 @@ export function ClaudeDesktopProviderForm({
                               />
                             )}
                           </div>
-                          <label className="flex h-9 items-center gap-2 text-sm text-fg-2">
+                          <label className="flex h-6 items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground">
                             <Checkbox
                               checked={route.supports1m}
                               onCheckedChange={(checked) =>
@@ -1350,7 +1346,7 @@ export function ClaudeDesktopProviderForm({
                     )}
                   </div>
 
-                  <p className="text-xs leading-relaxed text-fg-2">
+                  <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
                     {t("claudeDesktop.directModelListHint", {
                       defaultValue:
                         "配置 Claude Desktop 可用的 Sonnet、Opus、Haiku 模型。留空时 Claude Desktop 会自动读取 /v1/models；勾选 1M 会声明支持 1M 上下文。",
@@ -1384,7 +1380,7 @@ export function ClaudeDesktopProviderForm({
                               />
                             )}
                           </div>
-                          <label className="flex h-9 items-center gap-2 text-sm text-fg-2">
+                          <label className="flex h-6 items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground">
                             <Checkbox
                               checked={route.supports1m}
                               onCheckedChange={(checked) =>

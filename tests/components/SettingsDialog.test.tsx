@@ -144,9 +144,6 @@ vi.mock("@/components/settings/BackupListSection", () => ({
 vi.mock("@/components/settings/LogConfigPanel", () => ({
   LogConfigPanel: () => <div>log-config-panel</div>,
 }));
-vi.mock("@/components/settings/ProxyTabContent", () => ({
-  ProxyTabContent: () => <div>proxy-tab-content</div>,
-}));
 vi.mock("@/components/settings/GlobalProxySettings", () => ({
   GlobalProxySettings: () => <div>global-proxy-settings</div>,
 }));

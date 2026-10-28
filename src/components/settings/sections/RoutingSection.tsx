@@ -199,15 +199,15 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
     <>
       <SettingsBlock title={t("routingSettings.service")}>
         <SettingsCard>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2 px-2 py-2">
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1 text-body font-medium text-fg-1">
+              <div className="flex items-center gap-1 text-ui font-medium text-foreground">
                 {t("routingSettings.serviceName")}
                 <HelpTip title={t("routingSettings.serviceName")}>
                   {t("routingSettings.serviceHelp")}
                 </HelpTip>
               </div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-caption text-fg-2">
+              <div className="mt-0.5 flex items-center gap-2 text-ui text-muted-foreground">
                 <span
                   aria-hidden="true"
                   className={cn(
@@ -223,7 +223,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
               </div>
             </div>
             {running && (
-              <dl className="flex gap-6 text-end">
+              <dl className="flex gap-2 text-end">
                 {[
                   [
                     t("routingSettings.totalRequests"),
@@ -239,8 +239,8 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                   ],
                 ].map(([label, value]) => (
                   <div key={String(label)}>
-                    <dt className="text-caption text-fg-2">{label}</dt>
-                    <dd className="m-0 text-strong font-semibold tabular-nums text-fg-1">
+                    <dt className="text-ui text-muted-foreground">{label}</dt>
+                    <dd className="m-0 text-ui font-medium font-semibold tabular-nums text-foreground">
                       {typeof value === "number"
                         ? value.toLocaleString()
                         : value}
@@ -253,7 +253,6 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
               <DisabledReason reason={stopReason} align="end">
                 <Button
                   variant="neutral"
-                  size="regular"
                   disabled={isPending}
                   onClick={() => void stopProxyServer()}
                 >
@@ -263,7 +262,6 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
             ) : (
               <Button
                 variant="neutral"
-                size="regular"
                 disabled={isPending}
                 onClick={() => void startProxyServer()}
               >
@@ -275,9 +273,9 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
           <SettingsRow
             label={t("routingSettings.listen")}
             control={
-              <div className="flex items-start gap-3">
-                <label className="space-y-1">
-                  <span className="block text-caption font-medium text-fg-2">
+              <div className="flex items-start gap-2">
+                <label className="block space-y-1 text-[12.35px] leading-[1.3]">
+                  <span className="block text-ui font-medium text-muted-foreground">
                     {t("routingSettings.address")}
                   </span>
                   <Input
@@ -288,15 +286,17 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                   />
                   <span
                     className={cn(
-                      "block text-caption",
-                      addressError ? "text-danger-text" : "text-fg-3",
+                      "block text-[12.35px] leading-[1.3]",
+                      addressError
+                        ? "text-danger-text"
+                        : "text-muted-foreground",
                     )}
                   >
                     {addressError ?? t("routingSettings.addressHint")}
                   </span>
                 </label>
-                <label className="space-y-1">
-                  <span className="block text-caption font-medium text-fg-2">
+                <label className="block space-y-1 text-[12.35px] leading-[1.3]">
+                  <span className="block text-ui font-medium text-muted-foreground">
                     {t("routingSettings.port")}
                   </span>
                   <Input
@@ -308,8 +308,8 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                   />
                   <span
                     className={cn(
-                      "block text-caption",
-                      portError ? "text-danger-text" : "text-fg-3",
+                      "block text-[12.35px] leading-[1.3]",
+                      portError ? "text-danger-text" : "text-muted-foreground",
                     )}
                   >
                     {portError ?? "1024–65535"}
@@ -317,14 +317,13 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
                 </label>
                 <Button
                   variant="neutral"
-                  size="regular"
                   // 和输入框顶边对齐：上面的小标题 18 + 间距 4
                   className="mt-[22px]"
                   disabled={!listenDirty || updateConfig.isPending}
                   onClick={() => void saveListen()}
                 >
                   {updateConfig.isPending && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   )}
                   {t("routingSettings.saveAndRestart")}
                 </Button>
@@ -390,7 +389,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
         title={t("routingSettings.usingApps", { count: usingCount })}
       >
         {usingCount === 0 ? (
-          <div className="rounded-panel border border-dashed border-border px-4 py-3 text-caption text-fg-3">
+          <div className="rounded-[8px] border border-dashed border-border px-2 py-2 text-ui text-muted-foreground">
             {t("routingSettings.noApps")}
           </div>
         ) : (
@@ -412,11 +411,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
           </SettingsCard>
         )}
         {usingApps.length > 0 && (
-          <Button
-            variant="neutral"
-            size="regular"
-            onClick={() => setConfirmExitAll(true)}
-          >
+          <Button variant="neutral" onClick={() => setConfirmExitAll(true)}>
             {t("routingSettings.exitAll")}
           </Button>
         )}
@@ -429,7 +424,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
           body: t("routingSettings.failoverHelp"),
         }}
       >
-        <div className="space-y-4 rounded-panel border border-border bg-surface p-5">
+        <div className="space-y-2 rounded-[8px] border border-border bg-card p-2">
           <SegmentedControl
             size="sm"
             aria-label={t("settings.advanced.failover.title")}
@@ -451,7 +446,7 @@ export function RoutingSection({ onOpenApp }: RoutingSectionProps) {
           body: t("settings.advanced.rectifier.description"),
         }}
       >
-        <div className="rounded-panel border border-border bg-surface p-5">
+        <div className="rounded-[8px] border border-border bg-card p-2">
           <RectifierConfigPanel />
         </div>
       </SettingsBlock>
@@ -488,23 +483,23 @@ function UsingAppRow({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5">
-      <AppGlyph app={app} size={18} badgeClassName="bg-surface" />
+    <div className="flex items-center gap-2 px-2 py-2">
+      <AppGlyph app={app} size={18} badgeClassName="bg-card" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-body font-medium text-fg-1">
+        <div className="flex items-center gap-2 text-ui font-medium text-foreground">
           {APP_DISPLAY_NAME[app]}
-          <span className="text-fg-3">·</span>
+          <span className="text-muted-foreground">·</span>
           <span
             aria-hidden="true"
             className={cn("h-1.5 w-1.5 rounded-full", dotClass)}
           />
-          <span className="font-normal text-fg-2">{modeLabel}</span>
+          <span className="font-normal text-muted-foreground">{modeLabel}</span>
         </div>
-        <div className="truncate text-caption text-fg-2">{detail}</div>
+        <div className="truncate text-ui text-muted-foreground">{detail}</div>
       </div>
       <Button variant="quiet" size="compact" onClick={onOpen}>
         {t("routingSettings.goTo")}
-        <ChevronRight className="h-3.5 w-3.5" />
+        <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
   );

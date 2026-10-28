@@ -183,7 +183,9 @@ const AgentsDefaultsPanel: React.FC = () => {
   if (isLoading) {
     return (
       <div className="px-6 pt-4 pb-8 flex items-center justify-center min-h-[200px]">
-        <div className="text-sm text-fg-2">{t("common.loading")}</div>
+        <div className="text-[12.35px] leading-[1.3] text-fg-2">
+          {t("common.loading")}
+        </div>
       </div>
     );
   }
@@ -197,7 +199,7 @@ const AgentsDefaultsPanel: React.FC = () => {
 
   return (
     <div className="px-6 pt-4 pb-8">
-      <p className="text-sm text-fg-2 mb-6">
+      <p className="text-[12.35px] leading-[1.3] text-fg-2 mb-6">
         {t("openclaw.agents.description")}
       </p>
 
@@ -219,8 +221,8 @@ const AgentsDefaultsPanel: React.FC = () => {
       )}
 
       {/* Model Configuration Card */}
-      <div className="rounded-xl border border-border bg-surface p-5 mb-4">
-        <h3 className="text-sm font-medium mb-4">
+      <div className="rounded-[8px] border border-border bg-surface p-5 mb-4">
+        <h3 className="text-[12.35px] leading-[1.3] font-medium mb-4">
           {t("openclaw.agents.modelSection")}
         </h3>
 
@@ -231,7 +233,7 @@ const AgentsDefaultsPanel: React.FC = () => {
               {t("openclaw.agents.primaryModel")}
             </Label>
             {noModels ? (
-              <p className="text-xs text-fg-2 italic">
+              <p className="text-[12.35px] leading-[1.3] text-fg-2 italic">
                 {t("openclaw.agents.noModels", {
                   defaultValue:
                     "No configured provider models. Please add an OpenClaw provider first.",
@@ -244,7 +246,7 @@ const AgentsDefaultsPanel: React.FC = () => {
                   setPrimaryModel(v === UNSET_SENTINEL ? "" : v)
                 }
               >
-                <SelectTrigger className="font-mono text-xs">
+                <SelectTrigger className="font-mono text-[12.35px] leading-[1.3]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -259,7 +261,7 @@ const AgentsDefaultsPanel: React.FC = () => {
                 </SelectContent>
               </Select>
             )}
-            <p className="text-xs text-fg-2 mt-1">
+            <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1">
               {t("openclaw.agents.primaryModelHint")}
             </p>
           </div>
@@ -271,7 +273,7 @@ const AgentsDefaultsPanel: React.FC = () => {
             </Label>
 
             {fallbacks.length === 0 && !noModels && (
-              <p className="text-xs text-fg-2 italic mb-2">
+              <p className="text-[12.35px] leading-[1.3] text-fg-2 italic mb-2">
                 {t("openclaw.agents.fallbackModelsHint")}
               </p>
             )}
@@ -290,7 +292,7 @@ const AgentsDefaultsPanel: React.FC = () => {
                         )
                       }
                     >
-                      <SelectTrigger className="font-mono text-xs flex-1">
+                      <SelectTrigger className="font-mono text-[12.35px] leading-[1.3] flex-1">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -338,8 +340,8 @@ const AgentsDefaultsPanel: React.FC = () => {
       </div>
 
       {/* Runtime Parameters Card */}
-      <div className="rounded-xl border border-border bg-surface p-5 mb-4">
-        <h3 className="text-sm font-medium mb-4">
+      <div className="rounded-[8px] border border-border bg-surface p-5 mb-4">
+        <h3 className="text-[12.35px] leading-[1.3] font-medium mb-4">
           {t("openclaw.agents.runtimeSection")}
         </h3>
 
@@ -352,7 +354,7 @@ const AgentsDefaultsPanel: React.FC = () => {
               value={workspace}
               onChange={(e) => setWorkspace(e.target.value)}
               placeholder="~/projects"
-              className="font-mono text-xs"
+              className="font-mono text-[12.35px] leading-[1.3]"
             />
           </div>
 
@@ -365,7 +367,7 @@ const AgentsDefaultsPanel: React.FC = () => {
               value={timeout}
               onChange={(e) => setTimeout_(e.target.value)}
               placeholder="300"
-              className="font-mono text-xs"
+              className="font-mono text-[12.35px] leading-[1.3]"
             />
           </div>
 
@@ -378,7 +380,7 @@ const AgentsDefaultsPanel: React.FC = () => {
               value={contextTokens}
               onChange={(e) => setContextTokens(e.target.value)}
               placeholder="200000"
-              className="font-mono text-xs"
+              className="font-mono text-[12.35px] leading-[1.3]"
             />
           </div>
 
@@ -391,7 +393,7 @@ const AgentsDefaultsPanel: React.FC = () => {
               value={maxConcurrent}
               onChange={(e) => setMaxConcurrent(e.target.value)}
               placeholder="4"
-              className="font-mono text-xs"
+              className="font-mono text-[12.35px] leading-[1.3]"
             />
           </div>
         </div>

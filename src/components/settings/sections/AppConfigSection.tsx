@@ -107,8 +107,7 @@ export function AppConfigSection({
         label=""
         value={
           settings[DIRECTORY_FIELD[app] as keyof SettingsFormState] as
-            | string
-            | undefined
+            string | undefined
         }
         resolvedValue={resolvedDirs[app]}
         placeholder={t(DIRECTORY_PLACEHOLDER[app])}
@@ -127,7 +126,7 @@ export function AppConfigSection({
         disabled={isSaving}
         onClick={() => void onSaveDirectories()}
       >
-        {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+        {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
         {t("common.save")}
       </Button>
     ) : null;
@@ -145,7 +144,7 @@ export function AppConfigSection({
         <SettingsBlock
           key={app}
           id={`app-config-${app}`}
-          className="rounded-panel"
+          className="rounded-[8px]"
           title={blockTitle(app)}
           actions={saveButton(app)}
         >

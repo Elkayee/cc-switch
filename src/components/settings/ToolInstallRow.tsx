@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import type { ToolInstallation } from "@/lib/api/settings";
 
@@ -5,15 +6,22 @@ import type { ToolInstallation } from "@/lib/api/settings";
  * 单处工具安装的信息行：来源徽章 + 路径 + 版本（或「无法运行」）+「默认」标记。
  * 冲突诊断列表与升级确认对话框共用，确保两处的视觉与「默认」判定始终一致。
  */
-export function ToolInstallRow({ inst }: { inst: ToolInstallation }) {
+export function ToolInstallRow({
+  inst,
+  action,
+}: {
+  inst: ToolInstallation;
+  /** 行尾操作（如卸载按钮） */
+  action?: ReactNode;
+}) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-1.5 text-badge">
-      <span className="shrink-0 rounded bg-surface px-1 py-0.5 font-mono text-fg-2">
+    <div className="flex items-center gap-1 text-ui">
+      <span className="inline-flex h-4 min-w-[32px] shrink-0 items-center rounded-[3px] bg-background/80 px-1 font-mono text-muted-foreground">
         {inst.source}
       </span>
       <span
-        className="min-w-0 flex-1 truncate font-mono text-fg-2"
+        className="min-w-0 flex-1 truncate font-mono text-ui text-muted-foreground"
         title={inst.path}
       >
         {inst.path}
@@ -21,17 +29,18 @@ export function ToolInstallRow({ inst }: { inst: ToolInstallation }) {
       <span
         className={
           inst.runnable
-            ? "shrink-0 font-mono text-fg-1"
-            : "shrink-0 text-warning-text"
+            ? "shrink-0 font-mono text-ui text-foreground"
+            : "shrink-0 text-ui text-yellow-600 dark:text-yellow-400"
         }
       >
         {inst.runnable ? inst.version : t("settings.toolConflictNotRunnable")}
       </span>
       {inst.is_path_default && (
-        <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-1 py-0.5 text-badge text-primary">
+        <span className="inline-flex h-4 min-w-[32px] shrink-0 items-center rounded-[3px] border border-primary/30 bg-primary/10 px-1 text-ui text-primary">
           {t("settings.toolConflictDefault")}
         </span>
       )}
+      {action}
     </div>
   );
 }

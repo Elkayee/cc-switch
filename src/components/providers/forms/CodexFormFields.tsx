@@ -170,7 +170,6 @@ interface CodexFormFieldsProps {
   shouldShowApiKeyLink: boolean;
   websiteUrl: string;
   isPartner?: boolean;
-  partnerPromotionKey?: string;
   isCodexOauthPreset?: boolean;
   selectedCodexAccountId?: string | null;
   onCodexAccountSelect?: (accountId: string | null) => void;
@@ -516,8 +515,9 @@ function ReasoningLevelsEditor({
     <Popover modal open={open} onOpenChange={setOpen}>
       <HoverTip content={triggerTip}>
         <PopoverTrigger asChild>
-          <button
+          <Button
             type="button"
+            variant="outline"
             role="combobox"
             aria-expanded={open}
             // 和同一行的 Input、Select 同一套外观，行高才对得齐。
@@ -532,7 +532,7 @@ function ReasoningLevelsEditor({
               {triggerLabel}
             </span>
             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-          </button>
+          </Button>
         </PopoverTrigger>
       </HoverTip>
       <PopoverContent
@@ -593,7 +593,7 @@ function ReasoningLevelsEditor({
                 )
               }
             >
-              <SelectTrigger className="mt-1 h-8 w-full">
+              <SelectTrigger className="mt-1 w-full">
                 <SelectValue
                   placeholder={t(
                     "codexConfig.defaultReasoningLevelPlaceholder",
@@ -641,7 +641,6 @@ export function CodexFormFields({
   shouldShowApiKeyLink,
   websiteUrl,
   isPartner,
-  partnerPromotionKey,
   isCodexOauthPreset = false,
   selectedCodexAccountId,
   onCodexAccountSelect,
@@ -1671,7 +1670,7 @@ export function CodexFormFields({
           defaultValue: "替换转发到供应商的请求里的 User-Agent。",
         })}
       />
-      <div className="border-t border-border pt-3">
+      <div className="border-t border-border-default pt-3">
         <LocalProxyRequestOverridesField
           headersJson={localProxyHeadersOverride}
           bodyJson={localProxyBodyOverride}
@@ -1896,7 +1895,6 @@ export function CodexFormFields({
           shouldShowLink={shouldShowApiKeyLink}
           websiteUrl={websiteUrl}
           isPartner={isPartner}
-          partnerPromotionKey={partnerPromotionKey}
           placeholder={{
             official: t("providerForm.codexOfficialNoApiKey", {
               defaultValue: "官方供应商无需 API Key",
@@ -2314,7 +2312,7 @@ export function CodexFormFields({
                   type="button"
                   variant="link"
                   size="sm"
-                  className="h-auto p-0 text-xs"
+                  className="h-auto p-0 text-ui"
                   onClick={handleAddSubagentModelToCatalog}
                 >
                   {t("codexConfig.addToModelList", {
@@ -2392,14 +2390,13 @@ export function CodexFormFields({
         <Collapsible
           open={advancedExpanded}
           onOpenChange={setAdvancedExpanded}
-          className="rounded-lg border border-border p-4"
+          className="rounded-[8px] border border-border-default p-2"
         >
           <CollapsibleTrigger asChild>
             <Button
               type="button"
               variant={null}
-              size="sm"
-              className="h-8 w-full justify-start gap-1.5 px-0 text-sm font-medium text-fg-1 hover:opacity-70 active:scale-100"
+              className="h-6 w-full justify-start gap-2 px-0 text-[12.35px] leading-[1.3] font-medium text-foreground hover:opacity-70 active:scale-100"
             >
               {advancedExpanded ? (
                 <ChevronDown className="h-4 w-4" />
@@ -2428,7 +2425,7 @@ export function CodexFormFields({
               <div
                 className={cn(
                   "space-y-3",
-                  shouldShowSpeedTest && "border-t border-border pt-3",
+                  shouldShowSpeedTest && "border-t border-border-default pt-3",
                 )}
               >
                 {reasoningFields}
@@ -2438,9 +2435,9 @@ export function CodexFormFields({
             {userAgentAndOverrides && (
               <div
                 className={cn(
-                  "space-y-3",
+                  "space-y-2",
                   (shouldShowSpeedTest || (isChatFormat && canEditReasoning)) &&
-                    "border-t border-border pt-3",
+                    "border-t border-border-default pt-3",
                 )}
               >
                 {userAgentAndOverrides}

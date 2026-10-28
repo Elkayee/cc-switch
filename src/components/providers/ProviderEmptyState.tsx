@@ -59,9 +59,9 @@ export function ProviderEmptyState({
         </p>
       )}
       {(onImport || onCreate) && (
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
           {onImport && (
-            <Button variant="neutral" size="regular" onClick={onImport}>
+            <Button variant="neutral" onClick={onImport}>
               <Download className="h-4 w-4" />
               {appId === "claude-desktop"
                 ? t("provider.importFromClaude")
@@ -69,7 +69,7 @@ export function ProviderEmptyState({
             </Button>
           )}
           {onCreate && (
-            <Button variant="neutral" size="regular" onClick={onCreate}>
+            <Button variant="neutral" onClick={onCreate}>
               <Plus className="h-4 w-4" />
               {t("provider.addProvider")}
             </Button>

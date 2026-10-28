@@ -1,5 +1,5 @@
 import type { AppId } from "@/lib/api";
-import type { Provider } from "@/types";
+import type { Provider, ProviderCategory } from "@/types";
 import {
   PRESET_FAMILIES,
   PRESET_REGION_KEYS,
@@ -356,6 +356,66 @@ export function matchPresetRow(
   return row.versions.some((entry) => presetMatches(entry, query, t))
     ? { versions: [] }
     : null;
+}
+
+// ─── 官方公司 / 非官方：非官方默认折叠 ─────────────────────────────────────────
+
+const OFFICIAL_COMPANY_CATEGORIES: ReadonlySet<ProviderCategory> = new Set([
+  "official",
+  "cn_official",
+  "cloud_provider",
+]);
+
+/** category 不是官方，但本身就是一线厂商 / 官方入口的预设（按名称认） */
+const OFFICIAL_COMPANY_NAMES = new Set([
+  "gemini native",
+  "github copilot",
+  "codex",
+  "command code",
+  "xai (grok)",
+  "nvidia",
+  "opencode go",
+  "siliconflow",
+  "siliconflow en",
+  "modelscope",
+  "openrouter",
+]);
+
+/** 官方公司预设常驻显示；聚合 / 转售 / 第三方折叠在「非官方」里 */
+export function isOfficialCompanyPreset(preset: AnyPreset): boolean {
+  if ("isOfficial" in preset && preset.isOfficial) return true;
+  if (preset.category && OFFICIAL_COMPANY_CATEGORIES.has(preset.category)) {
+    return true;
+  }
+  return OFFICIAL_COMPANY_NAMES.has(preset.name.trim().toLowerCase());
+}
+
+/** 合成的一行只要有一个版本是官方公司预设就算官方 */
+export function isOfficialCompanyRow(row: PresetRowItem): boolean {
+  return row.versions.some((entry) => isOfficialCompanyPreset(entry.preset));
+}
+
+export function partitionPresetEntries(entries: PresetEntry[]): {
+  official: PresetEntry[];
+  unofficial: PresetEntry[];
+} {
+  const official: PresetEntry[] = [];
+  const unofficial: PresetEntry[] = [];
+  for (const entry of entries) {
+    (isOfficialCompanyPreset(entry.preset) ? official : unofficial).push(entry);
+  }
+  return { official, unofficial };
+}
+
+export function partitionPresetRows<T extends { row: PresetRowItem }>(
+  items: T[],
+): { official: T[]; unofficial: T[] } {
+  const official: T[] = [];
+  const unofficial: T[] = [];
+  for (const item of items) {
+    (isOfficialCompanyRow(item.row) ? official : unofficial).push(item);
+  }
+  return { official, unofficial };
 }
 
 // ─── 「全部」按分类分段 ──────────────────────────────────────────────────────

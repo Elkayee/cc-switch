@@ -15,6 +15,7 @@ import type { AppId } from "@/lib/api/types";
 
 const m = vi.hoisted(() => ({
   install: vi.fn(),
+  uninstall: vi.fn(),
   addRepo: vi.fn(),
   refetchDiscoverable: vi.fn(),
   discoverable: [] as DiscoverableSkill[],
@@ -83,6 +84,7 @@ vi.mock("@/hooks/useSkills", () => ({
   useDiscoverableSkillsFailures: () => ({ data: m.failures }),
   useInstalledSkills: () => ({ data: m.installed, isLoading: false }),
   useInstallSkill: () => ({ mutateAsync: m.install }),
+  useUninstallSkill: () => ({ mutateAsync: m.uninstall }),
   useSkillRepos: () => ({ data: m.repos, isLoading: false, refetch: vi.fn() }),
   useAddSkillRepo: () => ({ mutateAsync: m.addRepo }),
   useRemoveSkillRepo: () => ({ mutateAsync: vi.fn() }),
@@ -155,11 +157,23 @@ function renderPage(
   return { installTo, onShowInstalled };
 }
 
+// 默认来源是 skills.sh（fork）；要测仓库列表得先切到「仓库」
+async function renderRepos(
+  overrides: Partial<React.ComponentProps<typeof SkillsPage>> = {},
+) {
+  const result = renderPage(overrides);
+  await userEvent.click(
+    screen.getByRole("button", { name: "skillsPage.discover.sourceRepos" }),
+  );
+  return result;
+}
+
 describe("SkillsPage (Discover)", () => {
   beforeEach(() => {
     m.install.mockReset().mockImplementation(async ({ skill }) => ({
       id: skill.key,
     }));
+    m.uninstall.mockReset().mockResolvedValue({});
     m.addRepo.mockReset().mockResolvedValue(true);
     m.refetchDiscoverable.mockReset();
     m.discoverable = [];
@@ -245,9 +259,9 @@ describe("SkillsPage (Discover)", () => {
     expect(screen.getByText("skills.skillssh.loading")).toBeInTheDocument();
   });
 
-  it("stays on repositories when they return no skills, so a retry is possible", () => {
+  it("stays on repositories when they return no skills, so a retry is possible", async () => {
     m.repos = [makeRepo()];
-    renderPage();
+    await renderRepos();
     expect(
       screen.getByRole("button", { name: "skillsPage.discover.sourceRepos" }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -271,7 +285,7 @@ describe("SkillsPage (Discover)", () => {
         }),
       },
     ];
-    renderPage();
+    await renderRepos();
 
     // 读到的照常列出，横幅说哪些没读到
     expect(screen.getByText("repo-skill")).toBeInTheDocument();
@@ -291,12 +305,12 @@ describe("SkillsPage (Discover)", () => {
     ).toBeInTheDocument();
   });
 
-  it("calls it a read failure, not an empty repository, when every repository failed", () => {
+  it("calls it a read failure, not an empty repository, when every repository failed", async () => {
     m.repos = [makeRepo()];
     m.failures = [
       { owner: "owner-a", name: "repo-a", branch: "main", error: "timeout" },
     ];
-    renderPage();
+    await renderRepos();
     expect(
       screen.getByText("skillsPage.discover.loadFailed"),
     ).toBeInTheDocument();
@@ -339,7 +353,7 @@ describe("SkillsPage (Discover)", () => {
         updatedAt: 1,
       },
     ];
-    const { onShowInstalled } = renderPage();
+    const { onShowInstalled } = await renderRepos();
     await userEvent.click(
       screen.getByRole("button", { name: "skillsPage.discover.installedAria" }),
     );
@@ -363,7 +377,7 @@ describe("SkillsPage (Discover)", () => {
     m.repos = [makeRepo()];
     m.discoverable = [makeDiscoverable()];
     m.install.mockRejectedValueOnce(new Error("timeout"));
-    renderPage();
+    await renderRepos();
     await userEvent.click(
       screen.getByRole("button", { name: "skillsPage.discover.installAria" }),
     );
@@ -380,7 +394,7 @@ describe("SkillsPage (Discover)", () => {
   it("turns a repository off through add_skill_repo with enabled=false", async () => {
     m.repos = [makeRepo(), makeRepo({ owner: "b", name: "c" })];
     m.discoverable = [makeDiscoverable()];
-    renderPage();
+    await renderRepos();
     await userEvent.click(
       screen.getByRole("button", { name: /skillsPage.repos.buttonAll/ }),
     );
@@ -396,5 +410,79 @@ describe("SkillsPage (Discover)", () => {
         enabled: false,
       }),
     );
+  });
+  it("defaults to skills.sh on the left and shows trending without searching", async () => {
+    m.repos = [makeRepo()];
+    setSearchResult("", 0, {
+      skills: [
+        makeSkillsSh({
+          key: "vercel-labs/skills/find-skills",
+          name: "find-skills",
+          directory: "find-skills",
+          repoOwner: "vercel-labs",
+          repoName: "skills",
+          installs: 3572189,
+        }),
+      ],
+      totalCount: 1,
+      query: "",
+    });
+    renderPage();
+
+    expect(await screen.findByText("find-skills")).toBeInTheDocument();
+    expect(screen.getByText("skills.skillssh.trending")).toBeInTheDocument();
+    const skillsSh = screen.getByRole("button", { name: "skills.sh" });
+    const repos = screen.getByRole("button", {
+      name: "skillsPage.discover.sourceRepos",
+    });
+    expect(
+      skillsSh.compareDocumentPosition(repos) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("replaces the skill occupying the directory, then installs the incoming one", async () => {
+    m.installed = [
+      {
+        id: "old-dev-browser",
+        name: "dev-browser",
+        directory: "dev-browser",
+        apps: {
+          claude: true,
+          codex: false,
+          gemini: false,
+          opencode: false,
+          openclaw: false,
+          hermes: false,
+          pi: false,
+        },
+        installedAt: 0,
+        updatedAt: 0,
+      },
+    ];
+    setSearchResult("", 0, {
+      skills: [
+        makeSkillsSh({
+          key: "dev-browser:sawyerhood:dev-browser",
+          name: "dev-browser",
+          directory: "dev-browser",
+          repoOwner: "sawyerhood",
+          repoName: "dev-browser",
+        }),
+      ],
+      totalCount: 1,
+      query: "",
+    });
+    renderPage();
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /skills\.replace/ }),
+    );
+
+    await waitFor(() => {
+      expect(m.uninstall).toHaveBeenCalledWith("old-dev-browser");
+      expect(m.install).toHaveBeenCalledTimes(1);
+    });
+    expect(m.install.mock.calls[0][0].skill.repoOwner).toBe("sawyerhood");
   });
 });

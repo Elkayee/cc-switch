@@ -5,7 +5,7 @@ import { z } from "zod";
  */
 function parseJsonError(error: unknown): string {
   if (!(error instanceof SyntaxError)) {
-    return "配置 JSON 格式错误";
+    return "Invalid config JSON";
   }
 
   const message = error.message;
@@ -14,7 +14,7 @@ function parseJsonError(error: unknown): string {
   const positionMatch = message.match(/at position (\d+)/i);
   if (positionMatch) {
     const position = parseInt(positionMatch[1], 10);
-    return `JSON 格式错误：${message.split(" in JSON")[0]}（位置：${position}）`;
+    return `Invalid JSON: ${message.split(" in JSON")[0]} (position ${position})`;
   }
 
   // Firefox: "JSON.parse: unexpected character at line 1 column 23"
@@ -22,26 +22,24 @@ function parseJsonError(error: unknown): string {
   if (lineColumnMatch) {
     const line = lineColumnMatch[1];
     const column = lineColumnMatch[2];
-    return `JSON 格式错误：第 ${line} 行，第 ${column} 列`;
+    return `Invalid JSON: line ${line}, column ${column}`;
   }
 
   // 通用情况：提取关键错误信息
   const cleanMessage = message
     .replace(/^JSON\.parse:\s*/i, "")
-    .replace(/^Unexpected\s+/i, "意外的 ")
-    .replace(/token/gi, "符号")
-    .replace(/Expected/gi, "预期");
+    .replace(/^JSON\.parse:\s*/i, "");
 
-  return `JSON 格式错误：${cleanMessage}`;
+  return `Invalid JSON: ${cleanMessage}`;
 }
 
 export const providerSchema = z.object({
   name: z.string(), // 必填校验移至 handleSubmit 中用 toast 提示
-  websiteUrl: z.string().url("请输入有效的网址").optional().or(z.literal("")),
+  websiteUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
   notes: z.string().optional(),
   settingsConfig: z
     .string()
-    .min(1, "请填写配置内容")
+    .min(1, "Config content is required")
     .superRefine((value, ctx) => {
       try {
         JSON.parse(value);

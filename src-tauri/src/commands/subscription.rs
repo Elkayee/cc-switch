@@ -17,7 +17,7 @@ use crate::store::AppState;
 /// `useUsageCacheBridge` 盲写回 query 缓存，抹掉本该保留的旧值）。
 #[tauri::command]
 pub async fn get_subscription_quota(
-    app: tauri::AppHandle,
+    app: tauri::AppHandle<crate::AppRuntime>,
     state: State<'_, AppState>,
     tool: String,
 ) -> Result<SubscriptionQuota, String> {

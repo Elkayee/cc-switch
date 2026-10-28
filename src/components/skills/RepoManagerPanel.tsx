@@ -116,7 +116,7 @@ export function RepoManagerPanel({
           >
             <h3
               id="sk-repo-add-title"
-              className="m-0 text-body font-semibold text-fg-1"
+              className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-1"
             >
               {t("skills.addRepo")}
             </h3>
@@ -173,16 +173,16 @@ export function RepoManagerPanel({
           >
             <h3
               id="sk-repo-list-title"
-              className="m-0 text-body font-semibold text-fg-1"
+              className="m-0 text-[12.35px] leading-[1.3] font-semibold text-fg-1"
             >
               {t("skills.repo.list")}
             </h3>
             {repos.length === 0 ? (
-              <p className="m-0 rounded-panel border border-border px-4 py-6 text-center text-body text-fg-2">
+              <p className="m-0 rounded-[8px] border border-border px-4 py-6 text-center text-[12.35px] leading-[1.3] text-fg-2">
                 {t("skills.repo.empty")}
               </p>
             ) : (
-              <ul className="m-0 list-none rounded-panel border border-border p-0">
+              <ul className="m-0 list-none rounded-[8px] border border-border p-0">
                 {repos.map((repo, index) => {
                   const id = `${repo.owner}/${repo.name}`;
                   const checkboxId = `sk-repo-manage-${index}`;
@@ -190,7 +190,7 @@ export function RepoManagerPanel({
                     <li
                       key={id}
                       className={cn(
-                        "flex min-h-12 items-center gap-2.5 py-1.5 pe-2 ps-3.5",
+                        "flex min-h-12 items-center gap-2 py-1.5 pe-2 ps-3",
                         index > 0 && "border-t border-border",
                       )}
                     >
@@ -209,10 +209,10 @@ export function RepoManagerPanel({
                         />
                       )}
                       <div className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate font-mono text-caption text-fg-1">
+                        <span className="truncate font-mono text-[12.35px] leading-[1.3] text-fg-1">
                           {id}
                         </span>
-                        <span className="text-caption text-fg-2">
+                        <span className="text-[12.35px] leading-[1.3] text-fg-2">
                           {repo.branch || "main"}
                           {" · "}
                           {repo.enabled

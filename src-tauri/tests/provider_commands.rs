@@ -627,7 +627,7 @@ fn switch_provider_missing_provider_returns_error() {
 
     let err_str = err.to_string();
     assert!(
-        err_str.contains("供应商不存在")
+        err_str.contains("Provider not found")
             || err_str.contains("Provider not found")
             || err_str.contains("missing-provider"),
         "error message should mention missing provider, got: {err_str}"

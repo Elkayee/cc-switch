@@ -20,26 +20,26 @@ use std::str::FromStr;
 fn invalid_json_format_error(error: serde_json::Error) -> String {
     let lang = settings::get_settings()
         .language
-        .unwrap_or_else(|| "zh".to_string());
+        .unwrap_or_else(|| "en".to_string());
 
     match lang.as_str() {
         "en" => format!("Invalid JSON format: {error}"),
         "tr" => format!("Geçersiz JSON biçimi: {error}"),
         "ja" => format!("JSON形式が無効です: {error}"),
-        _ => format!("无效的 JSON 格式: {error}"),
+        _ => format!("Invalid JSON format: {error}"),
     }
 }
 
 fn invalid_toml_format_error(error: toml_edit::TomlError) -> String {
     let lang = settings::get_settings()
         .language
-        .unwrap_or_else(|| "zh".to_string());
+        .unwrap_or_else(|| "en".to_string());
 
     match lang.as_str() {
         "en" => format!("Invalid TOML format: {error}"),
         "tr" => format!("Geçersiz TOML biçimi: {error}"),
         "ja" => format!("TOML形式が無効です: {error}"),
-        _ => format!("无效的 TOML 格式: {error}"),
+        _ => format!("Invalid TOML format: {error}"),
     }
 }
 
@@ -225,7 +225,15 @@ pub async fn get_config_dir(app: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn open_config_folder(handle: AppHandle, app: String) -> Result<bool, String> {
+pub async fn get_dir_suffix() -> Result<Option<String>, String> {
+    Ok(crate::config::dir_suffix().map(str::to_string))
+}
+
+#[tauri::command]
+pub async fn open_config_folder(
+    handle: AppHandle<crate::AppRuntime>,
+    app: String,
+) -> Result<bool, String> {
     let config_dir = match AppType::from_str(&app).map_err(|e| e.to_string())? {
         AppType::Claude => config::get_claude_config_dir(),
         AppType::ClaudeDesktop => {
@@ -249,20 +257,21 @@ pub async fn open_config_folder(handle: AppHandle, app: String) -> Result<bool, 
     };
 
     if !config_dir.exists() {
-        std::fs::create_dir_all(&config_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+        std::fs::create_dir_all(&config_dir)
+            .map_err(|e| format!("Failed to create directory: {e}"))?;
     }
 
     handle
         .opener()
         .open_path(config_dir.to_string_lossy().to_string(), None::<String>)
-        .map_err(|e| format!("打开文件夹失败: {e}"))?;
+        .map_err(|e| format!("Failed to open folder: {e}"))?;
 
     Ok(true)
 }
 
 #[tauri::command]
 pub async fn pick_directory(
-    app: AppHandle,
+    app: AppHandle<crate::AppRuntime>,
     #[allow(non_snake_case)] defaultPath: Option<String>,
 ) -> Result<Option<String>, String> {
     let initial = defaultPath
@@ -277,14 +286,14 @@ pub async fn pick_directory(
         builder.blocking_pick_folder()
     })
     .await
-    .map_err(|e| format!("弹出目录选择器失败: {e}"))?;
+    .map_err(|e| format!("Failed to open directory picker: {e}"))?;
 
     match result {
         Some(file_path) => {
             let resolved = file_path
                 .simplified()
                 .into_path()
-                .map_err(|e| format!("解析选择的目录失败: {e}"))?;
+                .map_err(|e| format!("Failed to parse selected directory: {e}"))?;
             Ok(Some(resolved.to_string_lossy().to_string()))
         }
         None => Ok(None),
@@ -298,17 +307,18 @@ pub async fn get_app_config_path() -> Result<String, String> {
 }
 
 #[tauri::command]
-pub async fn open_app_config_folder(handle: AppHandle) -> Result<bool, String> {
+pub async fn open_app_config_folder(handle: AppHandle<crate::AppRuntime>) -> Result<bool, String> {
     let config_dir = config::get_app_config_dir();
 
     if !config_dir.exists() {
-        std::fs::create_dir_all(&config_dir).map_err(|e| format!("创建目录失败: {e}"))?;
+        std::fs::create_dir_all(&config_dir)
+            .map_err(|e| format!("Failed to create directory: {e}"))?;
     }
 
     handle
         .opener()
         .open_path(config_dir.to_string_lossy().to_string(), None::<String>)
-        .map_err(|e| format!("打开文件夹失败: {e}"))?;
+        .map_err(|e| format!("Failed to open folder: {e}"))?;
 
     Ok(true)
 }

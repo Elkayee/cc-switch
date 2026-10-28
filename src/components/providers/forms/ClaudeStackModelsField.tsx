@@ -136,7 +136,7 @@ export function ClaudeStackModelsField({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-0.5">
@@ -168,13 +168,12 @@ export function ClaudeStackModelsField({
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() =>
                 onRowsChange([...rows, createClaudeStackModelRow()])
               }
-              className="h-7 gap-1"
+              className="gap-2"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
               {t("providerForm.addStackModel", { defaultValue: "手动添加" })}
             </Button>
           </div>
@@ -182,7 +181,7 @@ export function ClaudeStackModelsField({
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-xs leading-relaxed text-fg-2">
+        <p className="text-[12.35px] leading-[1.3] text-muted-foreground">
           {t("providerForm.stackModelsEmpty", {
             defaultValue:
               "未配置模型：把这家加入聚合后，模型选择器里不会多出它的模型",
@@ -251,7 +250,7 @@ export function ClaudeStackModelsField({
                     />
                   )}
                 </div>
-                <label className="flex h-9 items-center gap-2 text-sm text-fg-2">
+                <label className="flex h-6 items-center gap-2 text-[12.35px] leading-[1.3] text-muted-foreground">
                   <Checkbox
                     checked={
                       row.oneM === true || hasClaudeOneMMarker(row.model)
@@ -276,7 +275,7 @@ export function ClaudeStackModelsField({
                       )
                     }
                     aria-label={t("common.delete")}
-                    className="h-9 w-9 text-fg-2 hover:text-destructive"
+                    className="text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

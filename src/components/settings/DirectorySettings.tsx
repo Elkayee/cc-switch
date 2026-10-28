@@ -55,21 +55,22 @@ export function DirectorySettings({
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6">
-      {/* CC Switch 配置目录 - 独立区块 */}
-      <section className="space-y-4">
+    <div className="space-y-2">
+      {/* Cli-Switch 配置目录 - 独立区块 */}
+      <section className="space-y-2">
         <header className="space-y-1">
-          <h3 className="text-sm font-medium">{t("settings.appConfigDir")}</h3>
-          <p className="text-xs text-fg-2">
+          <h3 className="text-ui font-semibold">
+            {t("settings.appConfigDir")}
+          </h3>
+          <p className="text-ui text-muted-foreground">
             {t("settings.appConfigDirDescription")}
           </p>
         </header>
 
         <div className="flex items-center gap-2">
           <Input
-            value={appConfigDir ?? resolvedDirs.appConfig ?? ""}
+            value={resolvedDirs.appConfig || appConfigDir || ""}
             placeholder={t("settings.browsePlaceholderApp")}
-            className="text-xs"
             onChange={(event) => onAppConfigChange(event.target.value)}
           />
           <HoverTip content={t("settings.browseDirectory")}>
@@ -98,9 +99,9 @@ export function DirectorySettings({
       </section>
 
       {/* Claude/Codex 配置目录 - 独立区块 */}
-      <section className="space-y-4">
+      <section className="space-y-2">
         <header className="flex items-center gap-1">
-          <h3 className="text-sm font-medium">
+          <h3 className="text-ui font-semibold">
             {t("settings.configDirectoryOverride")}
           </h3>
           <HelpTip title={t("settings.configDirectoryOverride")}>
@@ -234,19 +235,19 @@ export function DirectoryInput({
 }: DirectoryInputProps) {
   const { t } = useTranslation();
   const displayValue = useMemo(
-    () => value ?? resolvedValue ?? "",
+    () => resolvedValue || value || "",
     [value, resolvedValue],
   );
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       {label || description ? (
         <div className="space-y-1">
           {label ? (
-            <p className="text-xs font-medium text-fg-1">{label}</p>
+            <p className="text-ui font-semibold text-foreground">{label}</p>
           ) : null}
           {description ? (
-            <p className="text-xs text-fg-2">{description}</p>
+            <p className="text-ui text-muted-foreground">{description}</p>
           ) : null}
         </div>
       ) : null}
@@ -254,7 +255,6 @@ export function DirectoryInput({
         <Input
           value={displayValue}
           placeholder={placeholder}
-          className="text-xs"
           onChange={(event) => onChange(event.target.value)}
         />
         <HoverTip content={t("settings.browseDirectory")}>

@@ -182,7 +182,7 @@ pub(crate) fn build_local_snapshot(
     let tmp = tempdir().map_err(|e| {
         io_context_localized(
             "sync.snapshot_tmpdir_failed",
-            "创建快照临时目录失败",
+            "Failed to create temporary directory for snapshot",
             "Failed to create temporary directory for snapshot",
             e,
         )
@@ -259,7 +259,10 @@ pub(crate) fn validate_manifest_compat(
     if manifest.format != PROTOCOL_FORMAT {
         return Err(localized(
             "sync.manifest_format_incompatible",
-            format!("远端 manifest 格式不兼容: {}", manifest.format),
+            format!(
+                "Remote manifest format is incompatible: {}",
+                manifest.format
+            ),
             format!(
                 "Remote manifest format is incompatible: {}",
                 manifest.format
@@ -282,7 +285,7 @@ pub(crate) fn validate_manifest_compat(
     let Some(db_compat_version) = effective_db_compat_version(manifest, layout) else {
         return Err(localized(
             "sync.manifest_db_version_missing",
-            "远端 manifest 缺少数据库兼容版本",
+            "Remote manifest is missing the database compatibility version.",
             "Remote manifest is missing the database compatibility version.",
         ));
     };
@@ -321,7 +324,10 @@ pub(crate) fn validate_artifact_size_limit(artifact_name: &str, size: u64) -> Re
         let max_mb = MAX_SYNC_ARTIFACT_BYTES / 1024 / 1024;
         return Err(localized(
             "sync.artifact_too_large",
-            format!("artifact {artifact_name} 超过下载上限（{} MB）", max_mb),
+            format!(
+                "artifact {artifact_name} exceeds download limit ({} MB)",
+                max_mb
+            ),
             format!(
                 "Artifact {artifact_name} exceeds download limit ({} MB)",
                 max_mb
@@ -383,7 +389,7 @@ pub(crate) fn apply_snapshot(
     let sql_str = std::str::from_utf8(db_sql).map_err(|e| {
         localized(
             "sync.sql_not_utf8",
-            format!("SQL 非 UTF-8: {e}"),
+            format!("SQL is not UTF-8: {e}"),
             format!("SQL is not valid UTF-8: {e}"),
         )
     })?;
@@ -720,7 +726,9 @@ mod tests {
         let err = validate_artifact_size_limit("skills.zip", MAX_SYNC_ARTIFACT_BYTES + 1)
             .expect_err("artifact larger than limit should be rejected");
         assert!(
-            err.to_string().contains("too large") || err.to_string().contains("超过"),
+            err.to_string().contains("too large")
+                || err.to_string().contains("exceeds")
+                || err.to_string().contains("超过"),
             "unexpected error: {err}"
         );
     }

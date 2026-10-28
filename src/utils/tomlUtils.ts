@@ -52,7 +52,7 @@ export const mcpServerToToml = (server: McpServerSpec): string => {
  */
 export const tomlToMcpServer = (tomlText: string): McpServerSpec => {
   if (!tomlText.trim()) {
-    throw new Error("TOML 内容不能为空");
+    throw new Error("TOML content cannot be empty");
   }
 
   const parsed = parseToml(normalizeTomlText(tomlText));
@@ -90,7 +90,7 @@ export const tomlToMcpServer = (tomlText: string): McpServerSpec => {
   }
 
   throw new Error(
-    "无法识别的 TOML 格式。请提供单个 MCP 服务器配置，或使用 [mcp_servers.<id>] 格式",
+    "Unrecognized TOML format. Provide a single MCP server config, or use [mcp_servers.<id>]",
   );
 };
 
@@ -100,7 +100,7 @@ export const tomlToMcpServer = (tomlText: string): McpServerSpec => {
  */
 function normalizeServerConfig(config: any): McpServerSpec {
   if (!config || typeof config !== "object") {
-    throw new Error("服务器配置必须是对象");
+    throw new Error("Server config must be an object");
   }
 
   const type = (config.type as string) || "stdio";
@@ -110,7 +110,7 @@ function normalizeServerConfig(config: any): McpServerSpec {
 
   if (type === "stdio") {
     if (!config.command || typeof config.command !== "string") {
-      throw new Error("stdio 类型的 MCP 服务器必须包含 command 字段");
+      throw new Error("stdio MCP servers must include a command field");
     }
 
     const server: McpServerSpec = {
@@ -148,7 +148,7 @@ function normalizeServerConfig(config: any): McpServerSpec {
     return server;
   } else if (type === "http" || type === "sse") {
     if (!config.url || typeof config.url !== "string") {
-      throw new Error(`${type} 类型的 MCP 服务器必须包含 url 字段`);
+      throw new Error(`${type} MCP servers must include a url field`);
     }
 
     const server: McpServerSpec = {
@@ -177,7 +177,7 @@ function normalizeServerConfig(config: any): McpServerSpec {
 
     return server;
   } else {
-    throw new Error(`不支持的 MCP 服务器类型: ${type}`);
+    throw new Error(`Unsupported MCP server type: ${type}`);
   }
 }
 

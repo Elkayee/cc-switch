@@ -155,11 +155,12 @@ function ModelCombobox({
   return (
     <Popover modal open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="flex flex-1 h-8 items-center justify-between whitespace-nowrap rounded-md border border-border bg-surface px-3 py-1 text-sm shadow-sm ring-offset-background focus:outline-none focus-visible:outline-none focus:border-border focus-visible:border-border focus:ring-0 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-6 flex-1 min-w-0 justify-between"
         >
           <span className={cn("truncate", !value && "text-fg-2")}>
             {selectedLabel || placeholderText}
@@ -176,7 +177,7 @@ function ModelCombobox({
             )}
             <ChevronsUpDown className="h-3.5 w-3.5 opacity-50" />
           </span>
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
@@ -497,7 +498,7 @@ export function OmoFormFields({
         }
       >
         <SelectTrigger
-          className="w-28 min-w-0 h-8 overflow-hidden text-xs shrink-0"
+          className="w-28 min-w-0 overflow-hidden shrink-0"
           title={selectedVariantLabel}
         >
           <span className="min-w-0 flex-1 truncate text-left">
@@ -711,10 +712,10 @@ export function OmoFormFields({
           }
         }}
         placeholder={ADVANCED_PLACEHOLDER}
-        className="font-mono text-xs min-h-[130px] py-3"
+        className="font-mono"
       />
       {showHint && (
-        <p className="text-badge text-fg-2 mt-1">
+        <p className="text-[12.35px] leading-[1.3] text-fg-2 mt-1">
           {t("omo.advancedJsonHint", {
             defaultValue:
               "temperature, top_p, budgetTokens, prompt_append, permission, etc. Leave empty for defaults",
@@ -851,8 +852,7 @@ export function OmoFormFields({
         {};
       const importedCategories =
         (data.categories as
-          | Record<string, Record<string, unknown>>
-          | undefined) || {};
+          Record<string, Record<string, unknown>> | undefined) || {};
 
       onAgentsChange(importedAgents);
       if (!isSlim && onCategoriesChange) {
@@ -913,16 +913,18 @@ export function OmoFormFields({
       <div key={key} className="border-b border-border/30 last:border-b-0">
         <div className="flex items-center gap-2 py-1.5">
           <div className="w-32 shrink-0">
-            <div className="flex items-center gap-1 text-sm font-medium">
+            <div className="flex items-center gap-1 text-[12.35px] leading-[1.3] font-medium">
               {def.display}
               <span className="relative inline-flex group/tip">
                 <HelpCircle className="h-3.5 w-3.5 text-fg-3 hover:text-fg-2 cursor-help shrink-0" />
-                <span className="invisible opacity-0 group-hover/tip:visible group-hover/tip:opacity-100 transition-opacity duration-150 absolute left-0 top-full mt-1 z-50 w-[260px] rounded-md bg-popover text-popover-foreground border border-border shadow-md px-3 py-2 text-xs leading-relaxed font-normal pointer-events-none">
+                <span className="invisible opacity-0 group-hover/tip:visible group-hover/tip:opacity-100 transition-opacity duration-150 absolute left-0 top-full mt-1 z-50 w-[260px] rounded-[4px] bg-popover text-popover-foreground border border-border shadow-md px-3 py-2 text-[12.35px] leading-[1.3] font-normal pointer-events-none">
                   {t(def.tooltipKey)}
                 </span>
               </span>
             </div>
-            <div className="text-xs text-fg-2 truncate">{t(def.descKey)}</div>
+            <div className="text-[12.35px] leading-[1.3] text-fg-2 truncate">
+              {t(def.descKey)}
+            </div>
           </div>
           {renderModelSelect(
             currentModel,
@@ -1015,7 +1017,7 @@ export function OmoFormFields({
             value={item.key}
             onCommit={(value) => updateCustom({ key: value })}
             placeholder={keyPlaceholder}
-            className="w-32 shrink-0 h-8 text-sm text-primary"
+            className="w-32 shrink-0 h-8 text-[12.35px] leading-[1.3] text-primary"
           />
           {renderModelSelect(item.model, (value) =>
             updateCustom({ model: value }),
@@ -1085,9 +1087,10 @@ export function OmoFormFields({
     badge?: React.ReactNode | string;
     action?: React.ReactNode;
   }) => (
-    <button
+    <Button
       type="button"
-      className="flex items-center justify-between w-full py-2 px-3 text-left"
+      variant="ghost"
+      className="h-auto w-full justify-between py-2 px-3"
       onClick={onToggle}
     >
       <div className="flex items-center gap-2">
@@ -1096,9 +1099,11 @@ export function OmoFormFields({
         ) : (
           <ChevronRight className="h-4 w-4 text-fg-2" />
         )}
-        <Label className="text-sm font-semibold cursor-pointer">{title}</Label>
+        <Label className="text-[12.35px] leading-[1.3] font-semibold cursor-pointer">
+          {title}
+        </Label>
         {typeof badge === "string" ? (
-          <Badge variant="outline" className="text-badge h-5">
+          <Badge variant="outline" className="text-[12.35px] leading-[1.3] h-5">
             {badge}
           </Badge>
         ) : (
@@ -1106,7 +1111,7 @@ export function OmoFormFields({
         )}
       </div>
       {action && <div onClick={(e) => e.stopPropagation()}>{action}</div>}
-    </button>
+    </Button>
   );
 
   const renderModelSection = ({
@@ -1126,7 +1131,7 @@ export function OmoFormFields({
     maxHeightClass?: string;
     children: React.ReactNode;
   }) => (
-    <div className="rounded-lg border border-border/60">
+    <div className="rounded-[8px] border border-border/60">
       <SectionHeader
         title={title}
         isOpen={isOpen}
@@ -1150,7 +1155,7 @@ export function OmoFormFields({
       type="button"
       variant="ghost"
       size="sm"
-      className="h-6 text-xs"
+      className="h-6 text-[12.35px] leading-[1.3]"
       onClick={onClick}
     >
       <Plus className="h-3.5 w-3.5 mr-1" />
@@ -1161,7 +1166,7 @@ export function OmoFormFields({
   const renderCustomDivider = (label: string) => (
     <div className="flex items-center gap-2 py-2">
       <div className="flex-1 border-t border-border/40" />
-      <span className="text-badge text-fg-2">{label}</span>
+      <span className="text-[12.35px] leading-[1.3] text-fg-2">{label}</span>
       <div className="flex-1 border-t border-border/40" />
     </div>
   );
@@ -1185,7 +1190,7 @@ export function OmoFormFields({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-semibold">
+        <Label className="text-[12.35px] leading-[1.3] font-semibold">
           {t("omo.modelConfiguration", { defaultValue: "Model Configuration" })}
         </Label>
         <div className="flex items-center gap-1.5">
@@ -1193,7 +1198,7 @@ export function OmoFormFields({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-xs"
+            className="h-7 text-[12.35px] leading-[1.3]"
             disabled={readLocalFile.isPending}
             onClick={handleImportFromLocal}
           >
@@ -1208,7 +1213,7 @@ export function OmoFormFields({
             type="button"
             variant="outline"
             size="sm"
-            className="h-7 text-xs"
+            className="h-7 text-[12.35px] leading-[1.3]"
             onClick={handleFillAllRecommended}
           >
             <Wand2 className="h-3.5 w-3.5 mr-1" />
@@ -1217,7 +1222,7 @@ export function OmoFormFields({
         </div>
       </div>
 
-      <div className="text-xs text-fg-2">
+      <div className="text-[12.35px] leading-[1.3] text-fg-2">
         {t("omo.configSummary", {
           agents: configuredAgentCount,
           categories: configuredCategoryCount,
@@ -1235,7 +1240,7 @@ export function OmoFormFields({
           <span className="ml-1 text-primary/70">
             · {t("omo.source", { defaultValue: "from:" })}
             {""}
-            <span className="font-mono text-badge">
+            <span className="font-mono text-[12.35px] leading-[1.3]">
               {localFilePath.replace(/^.*\//, "")}
             </span>
           </span>
@@ -1309,7 +1314,7 @@ export function OmoFormFields({
           !otherFieldsOpen && otherFieldsStr.trim() ? (
             <Badge
               variant="secondary"
-              className="text-badge h-5 font-mono max-w-[200px] truncate"
+              className="text-[12.35px] leading-[1.3] h-5 font-mono max-w-[200px] truncate"
             >
               {otherFieldsStr.trim().slice(0, 40)}
               {otherFieldsStr.trim().length > 40 ? "..." : ""}
@@ -1322,10 +1327,10 @@ export function OmoFormFields({
               value={otherFieldsStr}
               onChange={(e) => onOtherFieldsStrChange(e.target.value)}
               placeholder='{ "custom_key": "value" }'
-              className="font-mono text-xs min-h-[60px]"
+              className="font-mono"
             />
             {isSlim && (
-              <p className="mt-1 text-badge text-fg-2">
+              <p className="mt-1 text-[12.35px] leading-[1.3] text-fg-2">
                 {t("omo.slimOtherFieldsHint", {
                   defaultValue:
                     "Use this area for top-level OMO Slim config such as council, fallback, multiplexer, disabled_mcps, and todoContinuation.",

@@ -20,6 +20,8 @@ pub(super) fn candidates(
             exited_with_error: false,
             source: "wsl".into(),
             is_path_default: true,
+            can_uninstall: true,
+            uninstall_removes_file: false,
         };
         return Ok(vec![ToolUninstallCandidate {
             install,

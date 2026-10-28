@@ -104,7 +104,7 @@ pub(crate) fn load_sync_cursors(db: &Database) -> Result<HashMap<String, SyncCur
                     last_tail_fingerprint
              FROM session_log_sync",
         )
-        .map_err(|e| AppError::Database(format!("预取同步游标失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to prefetch sync cursor: {e}")))?;
     let rows = stmt.query_map([], |row| {
         Ok((
             row.get::<_, String>(0)?,
@@ -118,7 +118,7 @@ pub(crate) fn load_sync_cursors(db: &Database) -> Result<HashMap<String, SyncCur
         ))
     });
     rows.and_then(|rows| rows.collect::<Result<HashMap<_, _>, _>>())
-        .map_err(|e| AppError::Database(format!("预取同步游标失败: {e}")))
+        .map_err(|e| AppError::Database(format!("Failed to prefetch sync cursor: {e}")))
 }
 
 fn merge_sync_step(
@@ -128,7 +128,9 @@ fn merge_sync_step(
 ) {
     match step {
         Ok(result) => aggregate.merge(result),
-        Err(error) => aggregate.errors.push(format!("{name} 同步失败: {error}")),
+        Err(error) => aggregate
+            .errors
+            .push(format!("Failed to {name} sync: {error}")),
     }
 }
 
@@ -589,10 +591,10 @@ fn read_tail_before(file: &mut fs::File, end: i64) -> Result<Vec<u8>, AppError> 
     let len = end.clamp(0, TAIL_FINGERPRINT_BYTES);
     let mut tail = vec![0u8; len as usize];
     file.seek(SeekFrom::Start((end - len) as u64))
-        .map_err(|e| AppError::Config(format!("无法定位文件偏移: {e}")))?;
+        .map_err(|e| AppError::Config(format!("Cannot seek file offset: {e}")))?;
     if len > 0 {
         file.read_exact(&mut tail)
-            .map_err(|e| AppError::Config(format!("无法读取游标边界尾部: {e}")))?;
+            .map_err(|e| AppError::Config(format!("Cannot read cursor boundary tail: {e}")))?;
     }
     Ok(tail)
 }
@@ -633,7 +635,7 @@ fn sync_single_file(
 
     // 获取文件元数据
     let metadata = fs::metadata(file_path)
-        .map_err(|e| AppError::Config(format!("无法读取文件元数据: {e}")))?;
+        .map_err(|e| AppError::Config(format!("Cannot read file metadata: {e}")))?;
     let file_modified = metadata_modified_nanos(&metadata);
     let file_size = metadata.len() as i64;
 
@@ -646,8 +648,8 @@ fn sync_single_file(
         return Ok(ClaudeFileSync::default());
     }
 
-    let mut file =
-        fs::File::open(file_path).map_err(|e| AppError::Config(format!("无法打开文件: {e}")))?;
+    let mut file = fs::File::open(file_path)
+        .map_err(|e| AppError::Config(format!("Cannot open file: {e}")))?;
 
     // 非追加变化检测（仅字节游标路径）。检出后游标钉到当前 EOF、旧偏移
     // 一概不重放（见函数文档：重放会把已剪明细双算进汇总）。指纹为 NULL
@@ -717,9 +719,9 @@ fn sync_single_file(
     let mut skipped_legacy_lines: i64 = 0;
     while skipped_legacy_lines < legacy_lines {
         buf.clear();
-        let read = reader
-            .read_until(b'\n', &mut buf)
-            .map_err(|e| AppError::Config(format!("转换旧行号游标失败: {e}")))?;
+        let read = reader.read_until(b'\n', &mut buf).map_err(|e| {
+            AppError::Config(format!("Failed to convert legacy line-number cursor: {e}"))
+        })?;
         if read == 0 {
             break;
         }
@@ -936,8 +938,11 @@ fn sync_single_file(
         committed_offset,
         Some(fingerprint),
     )?;
-    tx.commit()
-        .map_err(|e| AppError::Database(format!("提交会话用量导入事务失败: {e}")))?;
+    tx.commit().map_err(|e| {
+        AppError::Database(format!(
+            "Failed to commit session-usage import transaction: {e}"
+        ))
+    })?;
 
     Ok(ClaudeFileSync {
         imported,
@@ -977,7 +982,7 @@ fn update_claude_sync_state_on_conn(
             tail_fingerprint
         ])
     })
-    .map_err(|e| AppError::Database(format!("更新同步状态失败: {e}")))?;
+    .map_err(|e| AppError::Database(format!("Failed to update sync status: {e}")))?;
     Ok(())
 }
 
@@ -1040,7 +1045,7 @@ pub(crate) fn update_sync_state_on_conn(
          VALUES (?1, ?2, ?3, ?4)",
     )
     .and_then(|mut stmt| stmt.execute(rusqlite::params![file_path, last_modified, last_offset, now]))
-    .map_err(|e| AppError::Database(format!("更新同步状态失败: {e}")))?;
+    .map_err(|e| AppError::Database(format!("Failed to update sync status: {e}")))?;
     Ok(())
 }
 
@@ -1322,7 +1327,7 @@ fn upsert_session_log_entry_on_conn(
                 "session_log",      // data_source
             ],
         )
-        .map_err(|e| AppError::Database(format!("插入会话日志失败: {e}")))?;
+        .map_err(|e| AppError::Database(format!("Failed to insert session log: {e}")))?;
 
     Ok(if inserted_rows > 0 {
         SessionRowOutcome::Inserted

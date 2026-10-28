@@ -26,9 +26,10 @@ import {
 } from "./utils";
 
 const rowIconButton =
-  "inline-flex h-7 w-7 items-center justify-center rounded-control text-fg-2 transition-colors hover:bg-selected hover:text-fg-1";
+  "inline-flex h-6 w-6 items-center justify-center rounded-[4px] text-fg-2 transition-colors hover:bg-selected hover:text-fg-1";
 
-export const sessionMenuItemClass = "h-8 rounded-control px-2.5 text-body";
+export const sessionMenuItemClass =
+  "h-6 rounded-[4px] px-2 text-[12.35px] leading-[1.3]";
 
 interface SessionItemProps {
   session: SessionMeta;
@@ -122,7 +123,7 @@ export function SessionItem({
   return (
     <div
       className={cn(
-        "group relative flex h-14 items-center gap-2.5 bg-surface pe-3 ps-4 transition-colors hover:bg-subtle focus-within:bg-subtle",
+        "group relative flex h-10 items-center gap-2 bg-surface px-2 transition-colors hover:bg-subtle focus-within:bg-subtle",
         bordered && "border-t border-border",
         menuOpen && "bg-subtle",
       )}
@@ -177,7 +178,7 @@ export function SessionItem({
         </>
       )}
 
-      <div className="pointer-events-none flex min-w-0 flex-1 flex-col">
+      <div className="pointer-events-none flex min-w-0 flex-1 flex-col text-[12.35px] leading-[1.3]">
         <div className="flex min-w-0 items-center gap-2">
           {showAppIcon && appId && (
             <AppGlyph
@@ -188,7 +189,7 @@ export function SessionItem({
           )}
           <span
             className={cn(
-              "min-w-0 truncate text-body font-medium text-fg-1",
+              "min-w-0 truncate text-[12.35px] leading-[1.3] font-medium text-fg-1",
               untitled && "font-mono",
             )}
           >
@@ -199,7 +200,7 @@ export function SessionItem({
           <div
             id={metaId}
             className={cn(
-              "flex min-h-[18px] min-w-0 items-center gap-1.5 whitespace-nowrap text-caption text-fg-2",
+              "flex min-h-[18px] min-w-0 items-center gap-1.5 whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-2",
               showAppIcon && "ps-6",
             )}
           >
@@ -223,7 +224,7 @@ export function SessionItem({
               </span>
             )}
             {archived && (
-              <span className="inline-flex h-[18px] shrink-0 items-center rounded-full border border-border-strong px-1.5 text-badge text-fg-2">
+              <span className="inline-flex h-[18px] shrink-0 items-center rounded-full border border-border-strong px-1.5 text-[12.35px] leading-[1.3] text-fg-2">
                 {t("sessionManager.archived", { defaultValue: "已归档" })}
               </span>
             )}
@@ -236,11 +237,11 @@ export function SessionItem({
         )}
       </div>
 
-      <div className="relative w-[92px] shrink-0 self-stretch">
+      <div className="relative w-24 shrink-0 self-stretch">
         <span
           className={cn(
-            "pointer-events-none absolute end-0 whitespace-nowrap text-caption tabular-nums text-fg-2",
-            hasMeta ? "top-[9px]" : "top-[18px]",
+            "pointer-events-none absolute end-0 whitespace-nowrap text-[12.35px] leading-[1.3] tabular-nums text-fg-2",
+            hasMeta ? "top-1" : "top-3",
             !selectionMode &&
               "group-focus-within:invisible group-hover:invisible",
             !selectionMode && menuOpen && "invisible",
@@ -251,7 +252,7 @@ export function SessionItem({
         {!selectionMode && (
           <div
             className={cn(
-              "absolute -end-0.5 top-3.5 z-[1] flex gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100",
+              "absolute -end-0.5 top-2 z-[1] flex gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100",
               menuOpen && "opacity-100",
             )}
           >
@@ -315,7 +316,7 @@ export function SessionItem({
               </HoverTip>
               <DropdownMenuContent
                 align="end"
-                className="w-[210px] rounded-panel p-1 shadow-v7-md"
+                className="w-[210px] rounded-[8px] p-1 shadow-sm"
               >
                 <DropdownMenuItem
                   className={sessionMenuItemClass}
@@ -348,7 +349,7 @@ export function SessionItem({
                   })}
                 </DropdownMenuItem>
                 {deleteReason && (
-                  <p className="px-2.5 pb-1.5 text-caption text-fg-2">
+                  <p className="px-2 pb-1.5 text-[12.35px] leading-[1.3] text-fg-2">
                     {deleteReason}
                   </p>
                 )}

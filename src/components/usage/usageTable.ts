@@ -2,9 +2,9 @@ import { useEffect, useLayoutEffect, useState } from "react";
 
 /**
  * 用量统计里几张表（请求日志、供应商、模型、定价）共用的样式：
- * 列头 12px --text-2，行高 36，分隔线 --border；表格区自己横向滚动，页面不溢出。
- * 表格放在带边框的面板里，首尾列各留 16px，和面板页签、指标条的内边距对齐；列与列之间 24px。
- * 层次：页签栏（白）→ 表头（浅底）→ 表体（白，行高 40）→ 翻页栏（浅底），表头和翻页栏夹住表体。
+ * 列头紧凑（--text-2），行高 32，分隔线 --border；表格区自己横向滚动，页面不溢出。
+ * 表格放在带边框的面板里，首尾列各留 16px，和面板页签、指标条的内边距对齐；列与列之间 16px。
+ * 层次：页签栏（白）→ 表头（浅底）→ 表体（白，行高 32）→ 翻页栏（浅底），表头和翻页栏夹住表体。
  * 最后一行不画底线，翻页栏自己带顶线；没有翻页栏时由面板边框收口，不会出现双线。
  * 所有列（含数字列）一律左对齐，列头和内容同一规则。
  * 分隔线画在单元格上（border-separate）：合并边框模式下，固定列的底色会盖住行线。
@@ -12,23 +12,23 @@ import { useEffect, useLayoutEffect, useState } from "react";
 export const usageTable = {
   /** 外层：窄窗口时表格在这里横向滚动 */
   scroller: "w-full overflow-x-auto",
-  table: "w-full border-separate border-spacing-0 text-body tabular-nums",
+  table: "w-full border-separate border-spacing-0 text-ui tabular-nums",
   headRow:
-    "h-9 bg-subtle text-caption text-fg-2 [&>th]:border-b [&>th]:border-border",
-  th: "whitespace-nowrap px-3 text-start font-medium first:ps-4 last:pe-4",
+    "h-7 bg-subtle text-ui text-fg-2 [&>th]:border-b [&>th]:border-border",
+  th: "whitespace-nowrap px-2 text-start font-medium first:ps-4 last:pe-4",
   // 不可点的行不加 group：固定列的悬停变色（group-hover）只跟着可点的行走
-  row: "h-10 [&:not(:last-child)>td]:border-b [&>td]:border-border",
+  row: "h-8 [&:not(:last-child)>td]:border-b [&>td]:border-border",
   rowInteractive:
-    "group h-10 cursor-pointer transition-colors hover:bg-subtle [&:not(:last-child)>td]:border-b [&>td]:border-border",
-  td: "whitespace-nowrap px-3 first:ps-4 last:pe-4",
-  /** 列组之间多留的间距（请求日志按身份 / 成本 / Tokens / 性能分组）：组内列距 24px，换组处 40px */
-  groupGap: "ps-7",
-  /** 请求日志列多，收紧一档：组内列距 16px，换组处 32px（叠在 th / td / groupGap 之后，首尾 16px 不变） */
-  denseCell: "px-2 first:ps-4 last:pe-4",
-  denseGroupGap: "ps-6",
-  mono: "font-mono text-caption",
+    "group h-8 cursor-pointer transition-colors hover:bg-subtle [&:not(:last-child)>td]:border-b [&>td]:border-border",
+  td: "whitespace-nowrap px-2 first:ps-4 last:pe-4",
+  /** 列组之间多留的间距（请求日志按身份 / 成本 / Tokens / 性能分组）：组内列距 16px，换组处 28px */
+  groupGap: "ps-5",
+  /** 请求日志列多，收紧一档：组内列距 12px，换组处 24px（叠在 th / td / groupGap 之后，首尾 16px 不变） */
+  denseCell: "px-1.5 first:ps-4 last:pe-4",
+  denseGroupGap: "ps-4",
+  mono: "font-mono text-ui",
   muted: "text-fg-3",
-  empty: "py-10 text-center text-body text-fg-3",
+  empty: "py-8 text-center text-ui text-fg-3",
   skeleton: "h-[240px] animate-pulse rounded-panel bg-subtle",
 } as const;
 

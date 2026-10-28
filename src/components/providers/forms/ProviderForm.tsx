@@ -391,7 +391,6 @@ function ProviderFormFull({
     id: string;
     category?: ProviderCategory;
     isPartner?: boolean;
-    partnerPromotionKey?: string;
     suggestedDefaults?: OpenClawSuggestedDefaults;
   } | null>(null);
   const [isEndpointModalOpen, setIsEndpointModalOpen] = useState(false);
@@ -1885,13 +1884,6 @@ function ProviderFormFull({
         };
       }
 
-      if (activePreset?.partnerPromotionKey) {
-        mergedMeta = {
-          ...(mergedMeta ?? {}),
-          partnerPromotionKey: activePreset.partnerPromotionKey,
-        };
-      }
-
       if (mergedMeta !== undefined) {
         payload.meta = mergedMeta;
       }
@@ -2084,7 +2076,6 @@ function ProviderFormFull({
     shouldShowApiKeyLink: shouldShowClaudeApiKeyLink,
     websiteUrl: claudeWebsiteUrl,
     isPartner: isClaudePartner,
-    partnerPromotionKey: claudePartnerPromotionKey,
   } = useApiKeyLink({
     appId: "claude",
     category,
@@ -2098,7 +2089,6 @@ function ProviderFormFull({
     shouldShowApiKeyLink: shouldShowCodexApiKeyLink,
     websiteUrl: codexWebsiteUrl,
     isPartner: isCodexPartner,
-    partnerPromotionKey: codexPartnerPromotionKey,
   } = useApiKeyLink({
     appId: "codex",
     category,
@@ -2126,7 +2116,6 @@ function ProviderFormFull({
     shouldShowApiKeyLink: shouldShowOpencodeApiKeyLink,
     websiteUrl: opencodeWebsiteUrl,
     isPartner: isOpencodePartner,
-    partnerPromotionKey: opencodePartnerPromotionKey,
   } = useApiKeyLink({
     appId: "opencode",
     category,
@@ -2141,7 +2130,6 @@ function ProviderFormFull({
     shouldShowApiKeyLink: shouldShowOpenclawApiKeyLink,
     websiteUrl: openclawWebsiteUrl,
     isPartner: isOpenclawPartner,
-    partnerPromotionKey: openclawPartnerPromotionKey,
   } = useApiKeyLink({
     appId: "openclaw",
     category,
@@ -2156,7 +2144,6 @@ function ProviderFormFull({
     shouldShowApiKeyLink: shouldShowHermesApiKeyLink,
     websiteUrl: hermesWebsiteUrl,
     isPartner: isHermesPartner,
-    partnerPromotionKey: hermesPartnerPromotionKey,
   } = useApiKeyLink({
     appId: "hermes",
     category,
@@ -2223,7 +2210,6 @@ function ProviderFormFull({
       id: value,
       category: entry.preset.category,
       isPartner: entry.preset.isPartner,
-      partnerPromotionKey: entry.preset.partnerPromotionKey,
     });
 
     if (appId === "codex") {
@@ -2316,7 +2302,6 @@ function ProviderFormFull({
         id: value,
         category: preset.category,
         isPartner: preset.isPartner,
-        partnerPromotionKey: preset.partnerPromotionKey,
         suggestedDefaults: preset.suggestedDefaults,
       });
 
@@ -2403,7 +2388,7 @@ function ProviderFormFull({
         <form
           id="provider-form"
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-6"
+          className="space-y-2 rounded-[8px] p-2 border border-border-default"
         >
           {!initialData && (
             <ProviderPresetSelector
@@ -2449,12 +2434,12 @@ function ProviderFormFull({
                     opencodeForm.opencodeProviderKey,
                   ) &&
                     !isProviderKeyLocked && (
-                      <p className="text-xs text-destructive">
+                      <p className="text-ui text-destructive">
                         {t("opencode.providerKeyDuplicate")}
                       </p>
                     )}
                   {isOpencodeProviderKeyInvalid && (
-                    <p className="text-xs text-destructive">
+                    <p className="text-ui text-destructive">
                       {t("opencode.providerKeyInvalid")}
                     </p>
                   )}
@@ -2464,7 +2449,7 @@ function ProviderFormFull({
                     ) && !isProviderKeyLocked
                   ) &&
                     !isOpencodeProviderKeyInvalid && (
-                      <p className="text-xs text-fg-2">
+                      <p className="text-ui text-muted-foreground">
                         {isProviderKeyLocked
                           ? t("opencode.providerKeyLockedHint", {
                               defaultValue:
@@ -2506,7 +2491,7 @@ function ProviderFormFull({
                     openclawForm.openclawProviderKey,
                   ) &&
                     !isProviderKeyLocked && (
-                      <p className="text-xs text-destructive">
+                      <p className="text-ui text-destructive">
                         {t("openclaw.providerKeyDuplicate")}
                       </p>
                     )}
@@ -2514,7 +2499,7 @@ function ProviderFormFull({
                     !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(
                       openclawForm.openclawProviderKey,
                     ) && (
-                      <p className="text-xs text-destructive">
+                      <p className="text-ui text-destructive">
                         {t("openclaw.providerKeyInvalid")}
                       </p>
                     )}
@@ -2527,7 +2512,7 @@ function ProviderFormFull({
                       /^[a-z0-9]+(-[a-z0-9]+)*$/.test(
                         openclawForm.openclawProviderKey,
                       )) && (
-                      <p className="text-xs text-fg-2">
+                      <p className="text-ui text-muted-foreground">
                         {isProviderKeyLocked
                           ? t("openclaw.providerKeyLockedHint", {
                               defaultValue:
@@ -2573,7 +2558,7 @@ function ProviderFormFull({
                     hermesForm.hermesProviderKey,
                   ) &&
                     !isProviderKeyLocked && (
-                      <p className="text-xs text-destructive">
+                      <p className="text-ui text-destructive">
                         {t("hermes.form.providerKeyDuplicate")}
                       </p>
                     )}
@@ -2581,7 +2566,7 @@ function ProviderFormFull({
                     !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(
                       hermesForm.hermesProviderKey,
                     ) && (
-                      <p className="text-xs text-destructive">
+                      <p className="text-ui text-destructive">
                         {t("hermes.form.providerKeyInvalid")}
                       </p>
                     )}
@@ -2608,7 +2593,7 @@ function ProviderFormFull({
                       /^[a-z0-9]+(-[a-z0-9]+)*$/.test(
                         hermesForm.hermesProviderKey,
                       )) && (
-                      <p className="text-xs text-fg-2">
+                      <p className="text-ui text-muted-foreground">
                         {isProviderKeyLocked
                           ? t("hermes.form.providerKeyLockedHint", {
                               defaultValue:
@@ -2639,7 +2624,6 @@ function ProviderFormFull({
               shouldShowApiKeyLink={shouldShowClaudeApiKeyLink}
               websiteUrl={claudeWebsiteUrl}
               isPartner={isClaudePartner}
-              partnerPromotionKey={claudePartnerPromotionKey}
               isCopilotPreset={isCopilotProvider}
               isCodexOauthPreset={isClaudeCodexOauthProvider}
               isXaiOauthPreset={isXaiOauthProvider}
@@ -2740,7 +2724,6 @@ function ProviderFormFull({
               shouldShowApiKeyLink={shouldShowCodexApiKeyLink}
               websiteUrl={codexWebsiteUrl}
               isPartner={isCodexPartner}
-              partnerPromotionKey={codexPartnerPromotionKey}
               isCodexOauthPreset={isCodexOfficialProvider}
               selectedCodexAccountId={selectedCodexAccountId}
               onCodexAccountSelect={setSelectedCodexAccountId}
@@ -2860,7 +2843,6 @@ function ProviderFormFull({
               shouldShowApiKeyLink={shouldShowOpencodeApiKeyLink}
               websiteUrl={opencodeWebsiteUrl}
               isPartner={isOpencodePartner}
-              partnerPromotionKey={opencodePartnerPromotionKey}
               baseUrl={opencodeForm.opencodeBaseUrl}
               onBaseUrlChange={opencodeForm.handleOpencodeBaseUrlChange}
               headers={opencodeForm.opencodeHeaders}
@@ -2905,7 +2887,6 @@ function ProviderFormFull({
               shouldShowApiKeyLink={shouldShowOpenclawApiKeyLink}
               websiteUrl={openclawWebsiteUrl}
               isPartner={isOpenclawPartner}
-              partnerPromotionKey={openclawPartnerPromotionKey}
               api={openclawForm.openclawApi}
               onApiChange={openclawForm.handleOpenclawApiChange}
               models={openclawForm.openclawModels}
@@ -2926,7 +2907,6 @@ function ProviderFormFull({
               shouldShowApiKeyLink={shouldShowHermesApiKeyLink}
               websiteUrl={hermesWebsiteUrl}
               isPartner={isHermesPartner}
-              partnerPromotionKey={hermesPartnerPromotionKey}
               apiMode={hermesForm.hermesApiMode}
               onApiModeChange={hermesForm.handleHermesApiModeChange}
               models={hermesForm.hermesModels}
@@ -2993,7 +2973,7 @@ function ProviderFormFull({
                   {t("provider.configJson")}
                 </Label>
                 {isNativeOpencode && (
-                  <p className="text-sm text-fg-2">
+                  <p className="text-ui text-muted-foreground">
                     {t("opencode.nativeConfigHint")}
                   </p>
                 )}

@@ -178,8 +178,8 @@ describe("Pi provider presets", () => {
       supportsDeveloperRole: false,
     };
     for (const name of [
-      "千问AI平台",
-      "千问AI平台 Token Plan",
+      "Qwen AI",
+      "Qwen AI Token Plan",
       "QwenCloud",
       "QwenCloud Token Plan",
     ]) {

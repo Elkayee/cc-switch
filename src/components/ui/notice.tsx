@@ -11,16 +11,11 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * 通知条（v7 AUTHORING「通知条」）：圆角 10，左侧 16px 图标，不用左边框强调色。
+ * Notice bar: left 16px icon, no left accent border (fork compact sizing).
  * 应用页的通知槽（NoticeSlot）里排成一列，按严重程度从上到下。
  */
 export type NoticeTone =
-  | "neutral"
-  | "warning"
-  | "danger"
-  | "route"
-  | "stack"
-  | "direct";
+  "neutral" | "warning" | "danger" | "route" | "stack" | "direct";
 
 const TONE: Record<
   NoticeTone,
@@ -72,7 +67,7 @@ export function Notice({
   return (
     <div
       className={cn(
-        "flex gap-2.5 rounded-panel py-2.5 pe-3.5 ps-[19px] text-body text-fg-1",
+        "flex gap-2 rounded-[8px] px-2 py-2 text-[12.35px] leading-[1.3] text-fg-1",
         // 只有一行时整行上下居中；有第二行时图标对齐第一行
         children ? "items-start" : "items-center",
         style.box,
@@ -87,7 +82,9 @@ export function Notice({
       <div className="min-w-0 flex-1">
         <div>{title}</div>
         {children ? (
-          <div className="mt-0.5 text-caption text-fg-2">{children}</div>
+          <div className="mt-1 text-[12.35px] leading-[1.3] text-fg-2">
+            {children}
+          </div>
         ) : null}
       </div>
       {actions ? (
@@ -100,7 +97,7 @@ export function Notice({
           type="button"
           aria-label={dismissLabel}
           onClick={onDismiss}
-          className="-me-1 inline-flex h-6 w-6 shrink-0 items-center justify-center self-center rounded-control text-fg-2 transition-colors hover:bg-black/5 hover:text-fg-1 dark:hover:bg-white/10"
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center self-center rounded-[3px] text-fg-2 transition-colors hover:bg-black/5 hover:text-fg-1 dark:hover:bg-white/10"
         >
           <X className="h-4 w-4" strokeWidth={1.5} />
         </button>

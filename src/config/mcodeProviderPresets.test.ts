@@ -43,8 +43,7 @@ describe("mcodeProviderPresets", () => {
     });
     expect(deepseek[0]).not.toHaveProperty("thinking");
 
-    const qwen =
-      mcodePreset("千问AI平台")!.settingsConfig.models["qwen3.8-max"];
+    const qwen = mcodePreset("Qwen AI")!.settingsConfig.models["qwen3.8-max"];
     expect(qwen.compat).toEqual({
       thinkingFormat: "qwen",
       supportsDeveloperRole: false,
@@ -63,10 +62,10 @@ describe("mcodeProviderPresets", () => {
   it("inherits both Volcengine plans with their own endpoints", () => {
     const baseUrl = (name: string) =>
       mcodePreset(name)?.settingsConfig.options.baseURL;
-    expect(baseUrl("火山 Agent Plan")).toBe(
+    expect(baseUrl("Volcengine Agent Plan")).toBe(
       "https://ark.cn-beijing.volces.com/api/plan/v3",
     );
-    expect(baseUrl("火山 Coding Plan")).toBe(
+    expect(baseUrl("Volcengine Coding Plan")).toBe(
       "https://ark.cn-beijing.volces.com/api/coding/v3",
     );
   });

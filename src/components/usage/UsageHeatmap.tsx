@@ -318,7 +318,7 @@ export function UsageHeatmap({
     <section
       ref={sectionRef}
       aria-labelledby="usage-heatmap-title"
-      className="relative px-4 pb-3 pt-5"
+      className="relative px-4 pb-2 pt-4"
     >
       <div>
         <h2
@@ -334,19 +334,19 @@ export function UsageHeatmap({
 
       {isLoading ? (
         <div className="flex h-[150px] items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-fg-3" />
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
         visibleSpans.map((span, index) => (
           <div
             key={dayKey(span.start)}
-            className={index === 0 ? "mt-3" : "mt-4"}
+            className={index === 0 ? "mt-2" : "mt-2"}
           >
             <div className="flex flex-wrap items-baseline gap-x-2">
-              <h3 className="m-0 text-body font-semibold tabular-nums text-fg-1">
+              <h3 className="m-0 text-ui font-semibold tabular-nums text-foreground">
                 {`${formatDay(span.start)} – ${formatDay(span.end)}`}
               </h3>
-              <span className="text-caption tabular-nums text-fg-3">
+              <span className="text-ui tabular-nums text-muted-foreground">
                 {t("usage.heatmap.spanSummary", {
                   tokens: formatTokensShort(span.totals.tokens, language),
                   requests: formatTokensShort(span.totals.requests, language),
@@ -355,7 +355,7 @@ export function UsageHeatmap({
               </span>
             </div>
             <div
-              className="mt-1.5 grid items-center gap-[3px]"
+              className="mt-2 grid items-center gap-[3px]"
               style={{
                 gridTemplateColumns: `max-content repeat(${WEEKS}, minmax(0, 1fr))`,
               }}
@@ -364,7 +364,7 @@ export function UsageHeatmap({
               {span.weeks.map((_, w) => (
                 <span
                   key={`m${w}`}
-                  className="h-4 overflow-visible whitespace-nowrap text-badge leading-4 text-fg-3"
+                  className="h-4 overflow-visible whitespace-nowrap text-ui leading-4 text-muted-foreground"
                 >
                   {span.monthLabels[w] != null
                     ? new Date(
@@ -377,7 +377,7 @@ export function UsageHeatmap({
               ))}
               {weekdayLabels.map((label, d) => (
                 <Fragment key={`r${d}`}>
-                  <span className="pe-1.5 text-badge leading-none text-fg-3">
+                  <span className="pe-2 text-ui leading-none text-muted-foreground">
                     {d % 2 === 0 ? label : ""}
                   </span>
                   {span.weeks.map((column) => {
@@ -439,7 +439,7 @@ export function UsageHeatmap({
         </div>
       )}
 
-      <div className="mt-2 flex items-center gap-1.5 text-badge text-fg-3">
+      <div className="mt-2 flex items-center gap-2 text-ui text-muted-foreground">
         {!isLoading && earlierCount > 0 && (
           <Button
             type="button"
@@ -447,7 +447,7 @@ export function UsageHeatmap({
             size="compact"
             aria-expanded={showEarlier}
             onClick={() => setShowEarlier((open) => !open)}
-            className="-ms-2 gap-1 pe-2 ps-2 text-caption text-fg-2"
+            className="-ms-2 gap-1 pe-2 ps-2 text-ui text-muted-foreground"
           >
             {showEarlier
               ? t("usage.heatmap.showLess")

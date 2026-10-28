@@ -1,8 +1,8 @@
 //! 托盘菜单（v7）
 //!
-//! 结构：问题区（出问题才有）→ 反馈行（托盘里刚做完要重启才生效的操作）→ 打开 CC Switch →
+//! 结构：问题区（出问题才有）→ 反馈行（托盘里刚做完要重启才生效的操作）→ 打开 Viber Switch →
 //! 切换式应用的子菜单（Claude Code、Claude Desktop、Codex、Gemini CLI、Grok Build；在「应用」页
-//! 隐藏的不列）→ 轻量模式 → 打开官方网站 / 退出 CC Switch。累加式应用（OpenCode / OpenClaw /
+//! 隐藏的不列）→ 轻量模式 → 打开官方网站 / 退出 Viber Switch。累加式应用（OpenCode / OpenClaw /
 //! Hermes / Pi / MiniMax Code）不进托盘；托盘里不切模式、不启停路由服务。
 //!
 //! 分三层：`collect_*` 从数据库和设备状态读出快照，`build_menu_model` 把快照变成纯数据的菜单
@@ -74,7 +74,7 @@ const WARN_BELOW_PERCENT: f64 = 20.0;
 
 /// 每个应用行的子菜单句柄，额度更新时就地改标题而不是整菜单重建（整建会关掉 macOS 上
 /// 正开着的菜单）。`create_tray_menu` 每次重建都整表覆盖写入。
-static TRAY_SECTION_SUBMENUS: Lazy<Mutex<HashMap<AppType, Submenu<tauri::Wry>>>> =
+static TRAY_SECTION_SUBMENUS: Lazy<Mutex<HashMap<AppType, Submenu<crate::AppRuntime>>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
 // ─── 文案 ────────────────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@ pub struct TrayTexts {
     pub quota_used: bool,
 }
 
-/// 将系统区域标识映射为托盘支持的语言码。
+/// Map a system locale to a tray language code.
 ///
 /// 镜像前端 `i18n/getInitialLanguage` 的判定顺序，确保首次安装
 /// （`settings.language` 尚未写入）时托盘语言与界面语言一致：
@@ -177,23 +177,23 @@ fn map_locale_to_tray_language(locale: &str) -> &'static str {
     }
 }
 
-/// 读取系统区域并映射为托盘语言码；取不到区域时回退到 `zh`。
+/// Read the system locale and map it to a tray language code; `en` if unknown.
 fn detect_system_tray_language() -> &'static str {
     sys_locale::get_locale()
         .as_deref()
         .map(map_locale_to_tray_language)
-        .unwrap_or("zh")
+        .unwrap_or("en")
 }
 
 impl TrayTexts {
     pub fn from_language(language: &str) -> Self {
         match language {
             "en" => Self {
-                show_main: "Open CC Switch",
+                show_main: "Open Viber Switch",
                 open_website: "Open official website",
                 lightweight_mode: "Lightweight mode",
-                quit: "Quit CC Switch",
-                quit_stops_routing: "Quit CC Switch (stops the routing service)",
+                quit: "Quit Viber Switch",
+                quit_stops_routing: "Quit Viber Switch (stops the routing service)",
                 projects_label: "Projects",
                 no_project_label: "No project",
                 header_direct: "Direct",
@@ -214,8 +214,8 @@ impl TrayTexts {
                 problem_attach_failed:
                     "{app}: {mode} couldn't reconnect at startup; back to direct",
                 problem_switch_failed: "{app} didn't switch: {reason}",
-                problem_more: "{count} more issues — open CC Switch to see them",
-                tooltip_problem: "CC Switch · Needs attention: {problem}",
+                problem_more: "{count} more issues — open Viber Switch to see them",
+                tooltip_problem: "Viber Switch · Needs attention: {problem}",
                 feedback_switched: "{app} switched to {name}. Restart {app} to apply",
                 feedback_stack_default:
                     "{app}'s default provider is now {name}. Restart {app} to apply",
@@ -248,11 +248,11 @@ impl TrayTexts {
             // 在有人翻译前显示英文，而不是让所有改托盘的提交都必须补土耳其语。
             "tr" => {
                 let mut texts = Self::from_language("en");
-                texts.show_main = "CC Switch'i aç";
+                texts.show_main = "Viber Switch'i aç";
                 texts.open_website = "Resmî web sitesini aç";
                 texts.lightweight_mode = "Hafif mod";
-                texts.quit = "CC Switch'ten çık";
-                texts.quit_stops_routing = "CC Switch'ten çık (yönlendirme hizmeti durur)";
+                texts.quit = "Viber Switch'ten çık";
+                texts.quit_stops_routing = "Viber Switch'ten çık (yönlendirme hizmeti durur)";
                 texts.projects_label = "Projeler";
                 texts.no_project_label = "Proje yok";
                 texts.header_direct = "Doğrudan";
@@ -272,8 +272,8 @@ impl TrayTexts {
                 texts.problem_service_down = "Yönlendirme hizmeti çalışmıyor (port {port})";
                 texts.problem_attach_failed = "{app}: {mode} başlangıçta yeniden bağlanamadı; doğrudan bağlantıya dönüldü";
                 texts.problem_switch_failed = "{app} geçiş yapamadı: {reason}";
-                texts.problem_more = "{count} sorun daha var — görmek için CC Switch'i açın";
-                texts.tooltip_problem = "CC Switch · İlgilenilmesi gerekiyor: {problem}";
+                texts.problem_more = "{count} sorun daha var — görmek için Viber Switch'i açın";
+                texts.tooltip_problem = "Viber Switch · İlgilenilmesi gerekiyor: {problem}";
                 texts.feedback_switched = "{app}, {name} sağlayıcısına geçti. Uygulamak için {app} uygulamasını yeniden başlatın";
                 texts.feedback_stack_default = "{app} için varsayılan sağlayıcı artık {name}. Uygulamak için {app} uygulamasını yeniden başlatın";
                 texts.feedback_profile = "{name} projesi {app} uygulamasına uygulandı";
@@ -302,11 +302,11 @@ impl TrayTexts {
                 texts
             }
             "ja" => Self {
-                show_main: "CC Switch を開く",
+                show_main: "Viber Switch を開く",
                 open_website: "公式サイトを開く",
                 lightweight_mode: "軽量モード",
-                quit: "CC Switch を終了",
-                quit_stops_routing: "CC Switch を終了（ルーティングサービスが停止します）",
+                quit: "Viber Switch を終了",
+                quit_stops_routing: "Viber Switch を終了（ルーティングサービスが停止します）",
                 projects_label: "プロジェクト",
                 no_project_label: "プロジェクトを使用しない",
                 header_direct: "直接接続",
@@ -327,8 +327,8 @@ impl TrayTexts {
                 problem_attach_failed: "{app}：前回の{mode}に再接続できず、直接接続に戻りました",
                 problem_switch_failed: "{app} を切り替えられませんでした：{reason}",
                 problem_more:
-                    "ほかに {count} 件の問題があります。CC Switch を開いて確認してください",
-                tooltip_problem: "CC Switch · 対応が必要：{problem}",
+                    "ほかに {count} 件の問題があります。Viber Switch を開いて確認してください",
+                tooltip_problem: "Viber Switch · 対応が必要：{problem}",
                 feedback_switched:
                     "{app} を {name} に切り替えました。反映するには {app} を再起動してください",
                 feedback_stack_default: "{app} のデフォルトのプロバイダーを {name} に変更しました。反映するには {app} を再起動してください",
@@ -358,11 +358,11 @@ impl TrayTexts {
                 quota_used: false,
             },
             "zh-TW" => Self {
-                show_main: "開啟 CC Switch",
+                show_main: "開啟 Viber Switch",
                 open_website: "開啟官方網站",
                 lightweight_mode: "輕量模式",
-                quit: "退出 CC Switch",
-                quit_stops_routing: "退出 CC Switch（路由服務會停止）",
+                quit: "退出 Viber Switch",
+                quit_stops_routing: "退出 Viber Switch（路由服務會停止）",
                 projects_label: "專案",
                 no_project_label: "不使用專案",
                 header_direct: "直連",
@@ -382,8 +382,8 @@ impl TrayTexts {
                 problem_service_down: "路由服務沒在執行（連接埠 {port}）",
                 problem_attach_failed: "{app}：上次的{mode}沒能接上，已回到直連",
                 problem_switch_failed: "{app} 沒切換成功：{reason}",
-                problem_more: "還有 {count} 個問題，開啟 CC Switch 查看",
-                tooltip_problem: "CC Switch · 需要處理：{problem}",
+                problem_more: "還有 {count} 個問題，開啟 Viber Switch 查看",
+                tooltip_problem: "Viber Switch · 需要處理：{problem}",
                 feedback_switched: "{app} 已切換到 {name}，重新啟動 {app} 後生效",
                 feedback_stack_default: "{app} 的預設供應商改為 {name}，重新啟動 {app} 後生效",
                 feedback_profile: "已把專案「{name}」套用到 {app}",
@@ -411,12 +411,12 @@ impl TrayTexts {
                 date_format: "%-m 月 %-d 日",
                 quota_used: false,
             },
-            _ => Self {
-                show_main: "打开 CC Switch",
+            "zh" => Self {
+                show_main: "打开 Viber Switch",
                 open_website: "打开官方网站",
                 lightweight_mode: "轻量模式",
-                quit: "退出 CC Switch",
-                quit_stops_routing: "退出 CC Switch（路由服务会停止）",
+                quit: "退出 Viber Switch",
+                quit_stops_routing: "退出 Viber Switch（路由服务会停止）",
                 projects_label: "项目",
                 no_project_label: "不使用项目",
                 header_direct: "直连",
@@ -436,8 +436,8 @@ impl TrayTexts {
                 problem_service_down: "路由服务没在运行（端口 {port}）",
                 problem_attach_failed: "{app}：上次的{mode}没能接上，已回到直连",
                 problem_switch_failed: "{app} 没切换成功：{reason}",
-                problem_more: "还有 {count} 个问题，打开 CC Switch 查看",
-                tooltip_problem: "CC Switch · 需要处理：{problem}",
+                problem_more: "还有 {count} 个问题，打开 Viber Switch 查看",
+                tooltip_problem: "Viber Switch · 需要处理：{problem}",
                 feedback_switched: "{app} 已切换到 {name}，重启 {app} 后生效",
                 feedback_stack_default: "{app} 的默认供应商改为 {name}，重启 {app} 后生效",
                 feedback_profile: "已把项目「{name}」用到 {app}",
@@ -465,6 +465,8 @@ impl TrayTexts {
                 date_format: "%-m 月 %-d 日",
                 quota_used: false,
             },
+            // 其余语言（含 vi）回落到英文。
+            _ => Self::from_language("en"),
         }
     }
 
@@ -1341,7 +1343,7 @@ fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 }
 
 /// 启动流程走完：记下启动时退回直连的应用，重建一次菜单。
-pub fn mark_startup_settled(app: &tauri::AppHandle) {
+pub fn mark_startup_settled(app: &tauri::AppHandle<crate::AppRuntime>) {
     {
         let mut failures = lock(&ATTACH_FAILURES);
         for failure in crate::mode::controller::startup_attach_failures_snapshot() {
@@ -1368,7 +1370,7 @@ fn clear_app_problems(app: &AppType) -> bool {
 
 /// 主界面打开了某个应用的页面：这个应用的问题行算处理过了（规格 5.5「打开过对应页面」）。
 #[tauri::command]
-pub fn tray_app_page_seen(app: tauri::AppHandle, app_type: String) {
+pub fn tray_app_page_seen(app: tauri::AppHandle<crate::AppRuntime>, app_type: String) {
     let Ok(app_type) = app_type.parse::<AppType>() else {
         return;
     };
@@ -1498,7 +1500,7 @@ fn switch_feedback(app: &AppType, mode: TrayMode, name: String) -> Option<TrayFe
 }
 
 /// 记下最近一次托盘操作的结果（覆盖上一条）。调用方随后会重建菜单。
-fn record_feedback(app: &tauri::AppHandle, feedback: TrayFeedback) {
+fn record_feedback(app: &tauri::AppHandle<crate::AppRuntime>, feedback: TrayFeedback) {
     *lock(&FEEDBACK) = Some(FeedbackRecord {
         feedback,
         at: std::time::Instant::now(),
@@ -1929,7 +1931,7 @@ fn build_menu_model(
         menu.push(TrayEntry::Separator);
     }
 
-    // 窗口找不回来时托盘是唯一入口，「打开 CC Switch」一直放在最上面。
+    // 窗口找不回来时托盘是唯一入口，「打开 Viber Switch」一直放在最上面。
     menu.push(TrayEntry::item("show_main", texts.show_main));
     menu.push(TrayEntry::Separator);
 
@@ -2337,10 +2339,10 @@ fn menu_error(e: impl std::fmt::Display) -> AppError {
 }
 
 fn attach_entry(
-    app: &tauri::AppHandle,
+    app: &tauri::AppHandle<crate::AppRuntime>,
     entry: &TrayEntry,
-    handles: &mut HashMap<AppType, Submenu<tauri::Wry>>,
-) -> Result<Option<MenuItemKind<tauri::Wry>>, AppError> {
+    handles: &mut HashMap<AppType, Submenu<crate::AppRuntime>>,
+) -> Result<Option<MenuItemKind<crate::AppRuntime>>, AppError> {
     Ok(Some(match entry {
         TrayEntry::Separator => return Ok(None),
         TrayEntry::Item { id, text, enabled } => MenuItemKind::MenuItem(
@@ -2380,9 +2382,9 @@ fn attach_entry(
 
 /// 创建动态托盘菜单
 pub fn create_tray_menu(
-    app: &tauri::AppHandle,
+    app: &tauri::AppHandle<crate::AppRuntime>,
     app_state: &AppState,
-) -> Result<Menu<tauri::Wry>, AppError> {
+) -> Result<Menu<crate::AppRuntime>, AppError> {
     let texts = TrayTexts::current();
     let model = collect_model(app_state, &texts)?;
 
@@ -2439,7 +2441,7 @@ const DOT_RING_RADIUS: f32 = 0.21;
 
 /// 托盘平时的图标和它是不是 macOS 模板图：macOS 用单色模板图（跟随菜单栏深浅色），读不到时
 /// 和其它平台一样用应用图标。读一次缓存起来，出问题 / 恢复时在它上面加减圆点。
-pub fn base_tray_icon(app: &tauri::AppHandle) -> Option<(Image<'static>, bool)> {
+pub fn base_tray_icon(app: &tauri::AppHandle<crate::AppRuntime>) -> Option<(Image<'static>, bool)> {
     static BASE: OnceLock<Option<(Image<'static>, bool)>> = OnceLock::new();
     BASE.get_or_init(|| {
         #[cfg(target_os = "macos")]
@@ -2503,10 +2505,10 @@ fn icon_with_problem_dot(icon: &Image<'_>, template: bool) -> Image<'static> {
     Image::new_owned(rgba, width, height)
 }
 
-/// 悬停提示：平时 `CC Switch`，出问题时 `CC Switch · 需要处理：<问题区第一条>`。额度不算问题。
+/// 悬停提示：平时 `Viber Switch`，出问题时 `Viber Switch · 需要处理：<问题区第一条>`。额度不算问题。
 fn tray_tooltip(texts: &TrayTexts, problems: &[TrayProblem]) -> String {
     match problems.first() {
-        None => "CC Switch".to_string(),
+        None => "Viber Switch".to_string(),
         Some(problem) => truncate_chars(
             &fill(
                 texts.tooltip_problem,
@@ -2522,7 +2524,11 @@ static APPLIED_INDICATOR: Lazy<Mutex<Option<(bool, String)>>> = Lazy::new(|| Mut
 
 /// 问题区有内容时托盘图标加圆点、悬停提示写第一条问题；问题都消失后换回原图标和提示。只在
 /// 变了时才动（Linux 每次换图标都要写临时文件）。
-fn update_problem_indicator(app: &tauri::AppHandle, texts: &TrayTexts, problems: &[TrayProblem]) {
+fn update_problem_indicator(
+    app: &tauri::AppHandle<crate::AppRuntime>,
+    texts: &TrayTexts,
+    problems: &[TrayProblem],
+) {
     // 启动时第一次建菜单那会儿托盘图标还没建，等下一次重建。
     let Some(tray) = app.tray_by_id(TRAY_ID) else {
         return;
@@ -2565,7 +2571,7 @@ fn update_problem_indicator(app: &tauri::AppHandle, texts: &TrayTexts, problems:
 
 /// 就地更新各应用行的标题（额度变化时走这条），避免 `set_menu` 关掉用户正开着的菜单。
 /// 句柄由上一次 `create_tray_menu` 填充；为空（从未构建过菜单）时无事发生。
-fn update_tray_usage_labels(app: &tauri::AppHandle) {
+fn update_tray_usage_labels(app: &tauri::AppHandle<crate::AppRuntime>) {
     // Linux（AppIndicator）上 `Submenu::set_text` 不稳，标题会变空（#3385）：一律整菜单重建。
     #[cfg(target_os = "linux")]
     {
@@ -2601,7 +2607,15 @@ fn update_tray_usage_labels(app: &tauri::AppHandle) {
     }
 }
 
-pub fn refresh_tray_menu(app: &tauri::AppHandle) {
+pub fn refresh_tray_menu(app: &tauri::AppHandle<crate::AppRuntime>) {
+    // Skip the expensive menu build entirely when there is no tray to update.
+    // In npm/server mode the tray is never registered (MockRuntime), so
+    // create_tray_menu would waste ~2 min posting 100+ tasks to the mock event
+    // loop (1 task/second).
+    if app.tray_by_id(TRAY_ID).is_none() {
+        return;
+    }
+
     if let Some(state) = app.try_state::<AppState>() {
         if crate::tray_panel::uses_native_menu() {
             match create_tray_menu(app, state.inner()) {
@@ -2644,6 +2658,15 @@ pub fn apply_tray_style(app: &tauri::AppHandle) {
 
 /// 托盘图标的鼠标事件。Windows 第三方托盘下 `tray_compat` 补发的点击也走这里。
 pub fn handle_tray_icon_event(tray: &TrayIcon, event: TrayIconEvent) {
+    if let TrayIconEvent::DoubleClick {
+        button: MouseButton::Left,
+        ..
+    } = &event
+    {
+        crate::tray_panel::hide_panel(tray.app_handle());
+        show_main_window(tray.app_handle());
+        return;
+    }
     if let TrayIconEvent::Click {
         button: button @ (MouseButton::Left | MouseButton::Right),
         button_state: MouseButtonState::Up,
@@ -2687,7 +2710,7 @@ pub fn native_menu_on_left_click(native: bool) -> bool {
 
 /// 悬停到托盘图标时：问题区该出现 / 该消失了（路由服务停了、又起来了）、反馈行显示过了或到点了，
 /// 就重建菜单。只在变了时重建，菜单还没打开，不会被关掉。
-pub fn refresh_tray_if_problems_changed(app: &tauri::AppHandle) {
+pub fn refresh_tray_if_problems_changed(app: &tauri::AppHandle<crate::AppRuntime>) {
     static LAST_CHECK: Mutex<Option<std::time::Instant>> = Mutex::new(None);
     {
         let mut last = lock(&LAST_CHECK);
@@ -2701,12 +2724,12 @@ pub fn refresh_tray_if_problems_changed(app: &tauri::AppHandle) {
 
 /// 路由服务启动 / 停止之后：圆点、问题区、「退出」的后果可能要跟着变。在后台线程比对，
 /// 变了才重建（调用方可能在异步任务里，也可能正等着主线程）。
-pub fn schedule_tray_status_check(app: &tauri::AppHandle) {
+pub fn schedule_tray_status_check(app: &tauri::AppHandle<crate::AppRuntime>) {
     let app = app.clone();
     tauri::async_runtime::spawn_blocking(move || refresh_tray_if_status_changed(&app));
 }
 
-fn refresh_tray_if_status_changed(app: &tauri::AppHandle) {
+fn refresh_tray_if_status_changed(app: &tauri::AppHandle<crate::AppRuntime>) {
     let Some(state) = app.try_state::<AppState>() else {
         return;
     };
@@ -2791,7 +2814,7 @@ pub fn take_tray_navigation() -> Option<TrayNavigation> {
     lock(&PENDING_NAVIGATION).take()
 }
 
-fn navigate(app: &tauri::AppHandle, navigation: TrayNavigation) {
+fn navigate(app: &tauri::AppHandle<crate::AppRuntime>, navigation: TrayNavigation) {
     if let Some(app_type) = navigation
         .app
         .as_deref()
@@ -2814,7 +2837,7 @@ fn navigate(app: &tauri::AppHandle, navigation: TrayNavigation) {
 }
 
 /// 显示并聚焦主窗口；轻量模式下重建窗口。
-pub fn show_main_window(app: &tauri::AppHandle) {
+pub fn show_main_window(app: &tauri::AppHandle<crate::AppRuntime>) {
     if let Some(window) = app.get_webview_window("main") {
         #[cfg(target_os = "windows")]
         {
@@ -2843,7 +2866,10 @@ pub fn show_main_window(app: &tauri::AppHandle) {
 /// 事件 id 形如 `profile_<scope>_<uuid>`（同一项目在各应用子菜单里各有一项，
 /// 应用时只作用于该分组）；`profile_none_<scope>` 表示某分组"不使用项目"
 /// （只清该分组标记，不动配置）。
-pub fn handle_profile_tray_event(app: &tauri::AppHandle, event_id: &str) -> bool {
+pub fn handle_profile_tray_event(
+    app: &tauri::AppHandle<crate::AppRuntime>,
+    event_id: &str,
+) -> bool {
     let Some(suffix) = event_id.strip_prefix("profile_") else {
         return false;
     };
@@ -2931,7 +2957,10 @@ pub fn handle_profile_tray_event(app: &tauri::AppHandle, event_id: &str) -> bool
 }
 
 /// 处理供应商托盘事件（`prov:<应用>:<供应商 id>`）
-pub fn handle_provider_tray_event(app: &tauri::AppHandle, event_id: &str) -> bool {
+pub fn handle_provider_tray_event(
+    app: &tauri::AppHandle<crate::AppRuntime>,
+    event_id: &str,
+) -> bool {
     let Some(rest) = event_id.strip_prefix("prov:") else {
         return false;
     };
@@ -2991,7 +3020,7 @@ enum ClickOutcome {
 /// 点一家供应商：切换照旧走 `ProviderService::switch`（里面先拿切换锁再看模式）。不再先关掉
 /// 自动故障转移（#6022）；点已勾着的那家不再写一次客户端文件。
 fn handle_provider_click(
-    app: &tauri::AppHandle,
+    app: &tauri::AppHandle<crate::AppRuntime>,
     app_type: &AppType,
     provider_id: &str,
 ) -> Result<ClickOutcome, AppError> {
@@ -3029,7 +3058,7 @@ fn handle_provider_click(
     })
 }
 
-fn emit_switched(app: &tauri::AppHandle, app_type: &AppType, provider_id: &str) {
+fn emit_switched(app: &tauri::AppHandle<crate::AppRuntime>, app_type: &AppType, provider_id: &str) {
     let proxy_enabled = crate::mode::current::is_proxy(app_type);
     let auto_failover = app
         .try_state::<AppState>()
@@ -3050,7 +3079,7 @@ fn emit_switched(app: &tauri::AppHandle, app_type: &AppType, provider_id: &str) 
 }
 
 #[cfg(target_os = "macos")]
-pub fn apply_tray_policy(app: &tauri::AppHandle, dock_visible: bool) {
+pub fn apply_tray_policy(app: &tauri::AppHandle<crate::AppRuntime>, dock_visible: bool) {
     use tauri::ActivationPolicy;
 
     let desired_policy = if dock_visible {
@@ -3069,13 +3098,13 @@ pub fn apply_tray_policy(app: &tauri::AppHandle, dock_visible: bool) {
 }
 
 /// 处理托盘菜单事件
-pub fn handle_tray_menu_event(app: &tauri::AppHandle, event_id: &str) {
+pub fn handle_tray_menu_event(app: &tauri::AppHandle<crate::AppRuntime>, event_id: &str) {
     log::info!("处理托盘菜单事件: {event_id}");
 
     match event_id {
         "show_main" => show_main_window(app),
         "open_website" => {
-            if let Err(e) = app.opener().open_url("https://ccswitch.io", None::<String>) {
+            if let Err(e) = app.opener().open_url("https://viber.vn", None::<String>) {
                 log::error!("打开官方网站失败: {e}");
             }
         }
@@ -3119,7 +3148,7 @@ const MIN_TRAY_USAGE_REFRESH_INTERVAL: std::time::Duration = std::time::Duration
 /// `refresh_tray_menu` 整建，避免用户打开中的菜单被 macOS 系统关闭。
 static TRAY_REBUILD_SCHEDULED: AtomicBool = AtomicBool::new(false);
 
-pub fn schedule_tray_refresh(app: &tauri::AppHandle) {
+pub fn schedule_tray_refresh(app: &tauri::AppHandle<crate::AppRuntime>) {
     if TRAY_REBUILD_SCHEDULED.swap(true, Ordering::AcqRel) {
         return;
     }
@@ -3141,7 +3170,7 @@ pub fn schedule_tray_refresh(app: &tauri::AppHandle) {
 /// 刷新面与 `usage_view` 的展示面严格对齐 —— 每次悬停最多发
 /// `TRAY_APPS.len()` 个用量查询；按供应商用量开关查询，Codex 托管账号
 /// 未保存开关时与卡片一致默认启用。
-pub(crate) async fn refresh_all_usage_in_tray(app: &tauri::AppHandle) {
+pub(crate) async fn refresh_all_usage_in_tray(app: &tauri::AppHandle<crate::AppRuntime>) {
     use crate::commands::CopilotAuthState;
     use futures::future::join_all;
 
@@ -3421,7 +3450,7 @@ mod tests {
     #[test]
     fn locale_unknown_falls_back_to_en() {
         // 与前端 getInitialLanguage 保持一致：认不出的语言用英文，区域为空才用默认的 zh。
-        for locale in ["de-DE", "fr", "ko-KR"] {
+        for locale in ["de-DE", "fr", "ko-KR", "vi-VN", "vi"] {
             assert_eq!(
                 map_locale_to_tray_language(locale),
                 "en",
@@ -3429,6 +3458,13 @@ mod tests {
             );
         }
         assert_eq!(map_locale_to_tray_language(""), "zh");
+    }
+
+    #[test]
+    fn unknown_tray_language_uses_english_texts() {
+        let en = TrayTexts::from_language("en");
+        assert_eq!(TrayTexts::from_language("vi").show_main, en.show_main);
+        assert_eq!(TrayTexts::from_language("de").quit, en.quit);
     }
 
     #[test]
@@ -4196,7 +4232,7 @@ mod tests {
         assert_eq!(
             texts_of(&menu),
             [
-                "打开 CC Switch",
+                "打开 Viber Switch",
                 "---",
                 "Claude Code · Kimi For Coding",
                 "Grok Build · 添加供应商…",
@@ -4204,7 +4240,7 @@ mod tests {
                 "轻量模式",
                 "---",
                 "打开官方网站",
-                "退出 CC Switch",
+                "退出 Viber Switch",
             ]
         );
         assert!(matches!(&menu[3], TrayEntry::Item { id, .. } if id == "nav:add:grokbuild"));
@@ -4390,7 +4426,7 @@ mod tests {
             matches!(&menu[0], TrayEntry::Item { id, enabled: true, .. } if id == "nav:settings:routing")
         );
         assert_eq!(text_of(&menu[1]), "---");
-        assert_eq!(text_of(&menu[2]), "打开 CC Switch");
+        assert_eq!(text_of(&menu[2]), "打开 Viber Switch");
         assert_eq!(
             text_of(&menu[4]),
             "Claude Desktop · 路由 · Kimi For Coding · 需要处理"
@@ -4419,7 +4455,7 @@ mod tests {
             [
                 "路由服务没在运行（端口 15721）",
                 "Claude Code：上次的路由没能接上，已回到直连",
-                "还有 1 个问题，打开 CC Switch 查看",
+                "还有 1 个问题，打开 Viber Switch 查看",
                 "---"
             ]
         );
@@ -4563,11 +4599,14 @@ mod tests {
                 other => panic!("last entry is not quit: {other:?}"),
             }
         };
-        assert_eq!(quit_text(&zh(), false), "退出 CC Switch");
-        assert_eq!(quit_text(&zh(), true), "退出 CC Switch（路由服务会停止）");
+        assert_eq!(quit_text(&zh(), false), "退出 Viber Switch");
+        assert_eq!(
+            quit_text(&zh(), true),
+            "退出 Viber Switch（路由服务会停止）"
+        );
         assert_eq!(
             quit_text(&en(), true),
-            "Quit CC Switch (stops the routing service)"
+            "Quit Viber Switch (stops the routing service)"
         );
         for language in ["zh", "zh-TW", "en", "ja", "tr"] {
             let texts = TrayTexts::from_language(language);
@@ -4593,7 +4632,7 @@ mod tests {
 
     #[test]
     fn tooltip_names_the_first_problem_and_is_plain_otherwise() {
-        assert_eq!(tray_tooltip(&zh(), &[]), "CC Switch");
+        assert_eq!(tray_tooltip(&zh(), &[]), "Viber Switch");
         let problems = [
             TrayProblem::ServiceDown { port: 15721 },
             TrayProblem::SwitchFailed {
@@ -4603,7 +4642,7 @@ mod tests {
         ];
         assert_eq!(
             tray_tooltip(&zh(), &problems),
-            "CC Switch · 需要处理：路由服务没在运行（端口 15721）"
+            "Viber Switch · 需要处理：路由服务没在运行（端口 15721）"
         );
         let long = [TrayProblem::SwitchFailed {
             app: AppType::Codex,
@@ -4694,7 +4733,7 @@ mod tests {
                 "路由服务没在运行（端口 15721）",
                 "Codex 已切换到 DeepSeek，重启 Codex 后生效",
                 "---",
-                "打开 CC Switch",
+                "打开 Viber Switch",
             ]
         );
         assert!(matches!(&menu[1], TrayEntry::Item { enabled: false, .. }));
@@ -4712,7 +4751,7 @@ mod tests {
             [
                 "Codex 的默认供应商改为 Kimi For Coding，重启 Codex 后生效",
                 "---",
-                "打开 CC Switch",
+                "打开 Viber Switch",
             ]
         );
         assert_eq!(

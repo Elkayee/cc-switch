@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "CC Switch",
+    "title": "Viber Switch",
     "description": "Claude Code・Codex・Gemini CLI のためのオールインワンアシスタント"
   },
   "common": {
@@ -53,9 +53,9 @@
     "required": "必須"
   },
   "firstRunNotice": {
-    "title": "CC Switch へようこそ",
-    "bodyDefault": "CC Switch は Claude Code / Codex / Gemini CLI の複数プロバイダーをワンクリックで切り替えられるツールです。すでにこれらのツールを設定済みの場合、CC Switch は現在の設定を「default」という名前のプロバイダーとして自動的に保存するので、既存の設定が失われることはありません。",
-    "bodyOfficial": "リストには「Official（公式）」プリセットも用意されており、公式バージョンに戻したくなったらクリックするだけで切り替えられます。切り替える前に現在の設定は自動で default にバックアップされるので、自由に行き来できます。これが CC Switch の仕組みです 😊",
+    "title": "Viber Switch へようこそ",
+    "bodyDefault": "Viber Switch は Claude Code / Codex / Gemini CLI の複数プロバイダーをワンクリックで切り替えられるツールです。すでにこれらのツールを設定済みの場合、Viber Switch は現在の設定を「default」という名前のプロバイダーとして自動的に保存するので、既存の設定が失われることはありません。",
+    "bodyOfficial": "リストには「Official（公式）」プリセットも用意されており、公式バージョンに戻したくなったらクリックするだけで切り替えられます。切り替える前に現在の設定は自動で default にバックアップされるので、自由に行き来できます。これが Viber Switch の仕組みです 😊",
     "confirm": "了解しました"
   },
   "apiKeyInput": {
@@ -82,7 +82,8 @@
     "disableAutoModeServerHelp": "ゲートウェイはサーバー側チェックに対応していないため、auto mode はセッションごとに一度「対象外」の通知で止まり、Enter を押すとローカルチェックに切り替わります。オンにすると最初からローカルチェックを使い、通知は出ません。公式エンドポイントではオンにしないでください。",
     "keyFieldsHint": "エンドポイント、キー、モデル、コンテキストウィンドウ、互換スイッチはプロバイダーの切り替えに従います。それ以外のフィールドは Claude Code のグローバル設定で、保存するとすべてのプロバイダーに適用されます。",
     "inactiveFieldsHint": "旧バージョンがこのプロバイダーに保存した設定で、切り替えでは反映されなくなりました。クリックすると上に追加され、保存後はすべてのプロバイダーに適用されます。",
-    "addToGlobalSettings": "グローバル設定に追加"
+    "addToGlobalSettings": "グローバル設定に追加",
+    "enableTodoTools": "Todo ツールを有効化"
   },
   "header": {
     "viewOnGithub": "GitHub で見る",
@@ -119,8 +120,8 @@
     "stackBadgeNoModels": "モデルが設定されていないため、モデル選択には表示されません",
     "stackSaved": "保存しました。{{client}} を再起動すると反映されます",
     "stackSavedLive": "保存しました。{{client}} にすぐ反映されます",
-    "stackReselectHint": "CC Switch がクライアント設定を書き換えるたびに、モデル選択で集約したモデルを選び直してください",
-    "stackPartial": "一部だけ書き込まれました。次の操作時または CC Switch の再起動時に完了します",
+    "stackReselectHint": "Viber Switch がクライアント設定を書き換えるたびに、モデル選択で集約したモデルを選び直してください",
+    "stackPartial": "一部だけ書き込まれました。次の操作時または Viber Switch の再起動時に完了します",
     "stackFailed": "集約したモデルの保存に失敗しました：{{error}}",
     "stackDefaultCannotRemove": "デフォルトのプロバイダーは削除できません。先に別のプロバイダーをデフォルトに設定してください",
     "stackDefaultHint": "デフォルトのプロバイダーです：一覧の先頭のモデルが Claude Code の起動時とバックグラウンドタスクを担当します",
@@ -139,9 +140,9 @@
       "nothingUsable": "Codex 内蔵の一覧：使えるモデルがありません。Codex を最新版に更新してください"
     },
     "routeOwnsCatalog": "ルーティング先のプロバイダーが独自のモデルカタログファイル（model_catalog_json）を使っているため、集約したモデルは Codex に表示されません",
-    "adoptCatalog": "CC Switch のモデルカタログを使う",
-    "adoptCatalogDone": "CC Switch のモデルカタログに切り替えました。Codex を再起動すると反映されます",
-    "adoptCatalogFailed": "CC Switch のモデルカタログへの切り替えに失敗しました：{{error}}",
+    "adoptCatalog": "Viber Switch のモデルカタログを使う",
+    "adoptCatalogDone": "Viber Switch のモデルカタログに切り替えました。Codex を再起動すると反映されます",
+    "adoptCatalogFailed": "Viber Switch のモデルカタログへの切り替えに失敗しました：{{error}}",
     "noRoutingSupport": "ルーティング非対応",
     "blockedByProxyHint": "ルーティングモードでは公式プロバイダーに切り替えできません",
     "editProvider": "プロバイダーを編集",
@@ -270,7 +271,39 @@
     "formSubtitleStack": "{{app}}（集約モード）",
     "editCurrentNoticeFile": "使用中のプロバイダーです。保存するとすぐに",
     "editCurrentNoticeFileEnd": " に書き込まれ、次のリクエストから反映されます。",
-    "editCurrentNotice": "使用中のプロバイダーです。保存するとすぐに反映され、次のリクエストから新しい設定が使われます。"
+    "editCurrentNotice": "使用中のプロバイダーです。保存するとすぐに反映され、次のリクエストから新しい設定が使われます。",
+    "copyProxyUrl": "プロキシ URL をコピー",
+    "connect": {
+      "title": "接続: {{name}}",
+      "desc": "CC Switch プロキシを使うか、上流プロバイダーに直接接続できます。",
+      "proxyTitle": "CC Switch プロキシ",
+      "proxyUrl": "プロキシ URL",
+      "proxyHint": "クライアントの接続先にこれを指定します。実際のキーは CC Switch に残るため、ダミーのキー（例: PROXY_MANAGED）で動作します。",
+      "upstreamTitle": "上流（直接）",
+      "baseUrl": "Base URL",
+      "apiKey": "API キー",
+      "model": "モデル",
+      "copyField": "{{name}}をコピー",
+      "show": "表示",
+      "hide": "非表示",
+      "notSet": "未設定",
+      "endpoint": "エンドポイント（完全な URL）",
+      "fullEndpoint": "完全なエンドポイント",
+      "apiKeyEnv": "API キー（環境変数）",
+      "nativeLogin": "Codex CLI の ChatGPT ログイン",
+      "nativeHint": "Codex CLI 自身の ChatGPT ログインを使います。CC Switch には API キーは保存されません。",
+      "defaultAccount": "{{name}}（デフォルトアカウント）",
+      "noAccount": "ログイン中のアカウントがありません",
+      "needsReauth": "再ログインが必要です: リフレッシュ資格情報が無効です。",
+      "managedHint": "固定の API キーはありません。この OAuth トークンは CC Switch が保持・更新し、プロキシだけがリクエストに付与します。このプロバイダーは上のプロキシ URL 経由で接続してください。",
+      "oauthHint": "以下が のアクセストークンです。有効期限が短く、残り 1 時間を切ると CC Switch が更新します。コピーし直さず、トークン URL から新しいものを取得してください。",
+      "token": "アクセストークン",
+      "tokenUntil": "アクセストークン（{{time}} まで有効）",
+      "tokenUrl": "トークン URL（GET）",
+      "tokenUrlHint": "GET は現在のトークンをプレーンテキストで返します（本文がそのままトークン、有効期限は X-Token-Expires-At ヘッダー）。上流がそのトークンに 401 を返したら、ヘッダー X-Invalid-Token: <そのトークン> を付けて再度呼ぶと新しいトークンが得られます: curl -H \"X-Invalid-Token: <token>\" <URL>。そのトークンが保存中のものと一致する場合のみ更新され、アカウントごとに 30 秒に 1 回までです（その場合レスポンスに Retry-After ヘッダー が付きます）。ローカルの非ブラウザ呼び出しのみ。",
+      "requiredHeaders": "必須ヘッダー",
+      "requiredHeadersHint": "トークンと一緒にこれらのヘッダーを送ってください（Authorization: Bearer <token>）。トークン URL は X-Upstream-<名前> レスポンスヘッダーで返します。"
+    }
   },
   "claudeCode": {
     "needsRouting": "ルーティングが必要",
@@ -332,7 +365,9 @@
         "inactive": "モデルマッピングや形式変換が必要なプロバイダー向けに Claude Desktop ローカルルーティングを起動します。設定アドレス: {{address}}:{{port}}"
       },
       "stopBlockedByTakeover": "ルーティングモードのアプリが他にもあります。それらを直接接続に戻してから、ルーティングサービスを停止してください。"
-    }
+    },
+    "modelMappingOffHint": "プロバイダーが Claude Desktop の三つの役割 ID（claude-sonnet-* / claude-opus-* / claude-haiku-*）を受け付ける場合のみ直結できます。それ以外のモデル名（claude-3-5-sonnet-… などの旧式 ID を含む）は「モデルマッピング」を選択してください。",
+    "modelMappingOnHint": "Claude Desktop は claude-sonnet-* / claude-opus-* / claude-haiku-* の三つの役割 ID のみ受け付けます。「モデルマッピング」を選択すると、Viber Switch がこの三役割をプロバイダーの実モデルにマッピングし、使用中はローカルルーティングを起動したままにします。"
   },
   "notifications": {
     "providerAdded": "プロバイダーを追加しました",
@@ -384,13 +419,14 @@
     "codexAuthCleanupFailed": "切り替えは成功しましたが、auth.json を削除できませんでした。公式ログイン資格情報がディスクに残っています。完全に削除するには Codex 設定ディレクトリの auth.json を手動で削除してください",
     "windowControlFailed": "ウィンドウ操作に失敗しました: {{error}}",
     "officialBlockedByProxy": "ローカルルーティングモード中は公式プロバイダーに切り替えできません。ルーティング経由で公式 API にアクセスするとアカウントが停止される可能性があります。",
-    "proxyOfficialWarning": "現在のプロバイダー {{name}} は公式です。ローカルルーティングを使用する前にサードパーティプロバイダーに切り替えてください。"
+    "proxyOfficialWarning": "現在のプロバイダー {{name}} は公式です。ローカルルーティングを使用する前にサードパーティプロバイダーに切り替えてください。",
+    "claudeDesktopProxyRestartRequired": "切り替えました。Viber Switch を起動したまま Claude Desktop を再起動してください"
   },
   "confirm": {
     "deleteProvider": "プロバイダーを削除",
     "deleteProviderMessage": "プロバイダー「{{name}}」を削除してもよろしいですか？この操作は元に戻せません。",
     "removeProvider": "プロバイダーを解除",
-    "removeProviderMessage": "プロバイダー「{{name}}」を設定から解除してもよろしいですか？\n\n解除後、このプロバイダーは無効になりますが、設定データは CC Switch に保持されます。いつでも再追加できます。",
+    "removeProviderMessage": "プロバイダー「{{name}}」を設定から解除してもよろしいですか？\n\n解除後、このプロバイダーは無効になりますが、設定データは Viber Switch に保持されます。いつでも再追加できます。",
     "piDefaultProviderWarning": "Pi のグローバルデフォルトは現在このプロバイダーを参照しています。続行すると、Pi は別の利用可能なモデルを試します。/model で再選択するか、/login で別のプロバイダーにログインできます。",
     "proxy": {
       "title": "ローカルルーティングの有効化",
@@ -404,7 +440,7 @@
     },
     "unifyCodexHistory": {
       "title": "Codex セッション履歴を統一",
-      "message": "オンにすると、Codex CLI の resume 一覧に公式サブスクリプションとサードパーティのセッションがまとめて表示されます（Codex デスクトップ版はアップデートで全セッションを表示できるようになったため影響しません）。注意：プロバイダーをまたいで古いセッションを再開すると、相手のバックエンドが encrypted_content の推論内容を復号できず失敗する場合があります。\n\n既存の公式セッション履歴を共有一覧へ移行することもできます（移行前に ~/.cc-switch/backups へ自動バックアップし、オフにする際に復元を選べます）。",
+      "message": "オンにすると、Codex CLI の resume 一覧に公式サブスクリプションとサードパーティのセッションがまとめて表示されます（Codex デスクトップ版はアップデートで全セッションを表示できるようになったため影響しません）。注意：プロバイダーをまたいで古いセッションを再開すると、相手のバックエンドが encrypted_content の推論内容を復号できず失敗する場合があります。\n\n既存の公式セッション履歴を共有一覧へ移行することもできます（移行前に アプリのバックアップフォルダ へ自動バックアップし、オフにする際に復元を選べます）。",
       "migrateExisting": "既存の公式セッション履歴も移行する",
       "confirm": "理解しました、オンにする"
     },
@@ -438,13 +474,13 @@
       "goToApps": "「アプリ」を開く",
       "updates": "各アプリの新しいバージョン",
       "checkToolUpdates": "起動時に各アプリの新しいバージョンを確認",
-      "checkToolUpdatesHelp": "オンにすると、CC Switch の起動時にインストール済みのコマンドラインアプリの新しいバージョンを確認し、見つかればサイドバーの「アプリ」に点を表示します。自動でアップグレードはしません。",
+      "checkToolUpdatesHelp": "オンにすると、Viber Switch の起動時にインストール済みのコマンドラインアプリの新しいバージョンを確認し、見つかればサイドバーの「アプリ」に点を表示します。自動でアップグレードはしません。",
       "windowAndTerminal": "ウィンドウとターミナル",
       "trayStyle": "トレイの表示",
       "trayStylePanel": "パネル",
       "trayStyleMenu": "メニュー",
       "trayStyleHelp": "トレイアイコンをクリックしたときに開くものです（Windows では左クリックで常にメイン画面を開き、右クリックで選択した表示を開きます）。パネル：各アプリの使用中のプロバイダー、クォータ、使用量を表示し、検索して切り替えられます。メニュー：システム標準のメニュー。すぐに反映されます。",
-      "minimizeToTrayHelp": "オンのときは閉じるボタンでウィンドウを隠すだけで、CC Switch はシステムトレイで動き続けます（軽量モードはトレイメニューにあります）。オフのときは閉じるボタンで終了します。",
+      "minimizeToTrayHelp": "オンのときは閉じるボタンでウィンドウを隠すだけで、Viber Switch はシステムトレイで動き続けます（軽量モードはトレイメニューにあります）。オフのときは閉じるボタンで終了します。",
       "terminalHelp": "プロバイダーカードの「ターミナルを開く」で使うターミナルです。使えない場合はシステムの既定のターミナルを使います。"
     },
     "tabGeneral": "一般",
@@ -456,7 +492,8 @@
       "beta": "Beta",
       "copilotDescription": "GitHub Copilot アカウントを管理します",
       "codexOauthDescription": "ChatGPT アカウントを管理します",
-      "xaiOauthDescription": "xAI / Grok アカウントを管理します"
+      "xaiOauthDescription": "xAI / Grok アカウントを管理します",
+      "title": "OAuth 認証センター"
     },
     "advanced": {
       "configDir": {
@@ -485,7 +522,7 @@
       },
       "globalProxy": {
         "title": "グローバル送信プロキシ",
-        "description": "CC Switch が外部 API にアクセスする際のプロキシを設定"
+        "description": "Viber Switch が外部 API にアクセスする際のプロキシを設定"
       },
       "data": {
         "title": "データ管理",
@@ -512,7 +549,8 @@
         "mediaFallback": "非対応画像フォールバック",
         "mediaFallbackDescription": "プロバイダーが画像入力に対応していない場合（テキストのみの能力が宣言されている、または上流が画像非対応エラーを返した場合）、画像ブロックを [Unsupported Image] マーカーに自動置換し、会話を中断させません",
         "mediaHeuristic": "テキスト専用モデルの事前判定",
-        "mediaHeuristicDescription": "送信前に、内蔵の確認済みテキスト専用モデル登録に基づいて画像を除去します。オフにしても無効になるのはプロキシの登録ベース事前処理だけで、宣言済みテキスト専用モデルの処理と上流エラー時のフォールバックは残り、Codex モデルカタログの能力宣言は変わりません"
+        "mediaHeuristicDescription": "送信前に、内蔵の確認済みテキスト専用モデル登録に基づいて画像を除去します。オフにしても無効になるのはプロキシの登録ベース事前処理だけで、宣言済みテキスト専用モデルの処理と上流エラー時のフォールバックは残り、Codex モデルカタログの能力宣言は変わりません",
+        "enabledDescription": "マスタースイッチ、オフにするとすべての整流機能が無効になります"
       },
       "optimizer": {
         "title": "Bedrock リクエストオプティマイザー",
@@ -527,7 +565,7 @@
         "title": "アプリ診断ログ",
         "description": "アプリ診断ログの出力レベルを制御",
         "enabled": "診断ログを有効化",
-        "enabledDescription": "cc-switch.log を制御します。リクエスト使用量記録と crash.log には影響しません",
+        "enabledDescription": "アプリの実行ログを制御します。リクエスト使用量記録と crash.log は影響を受けません",
         "openLog": "ログを開く",
         "openLogFailed": "ログの場所を開けませんでした：{{error}}",
         "level": "ログレベル",
@@ -545,7 +583,8 @@
           "info": "一般的な操作情報（デフォルト）",
           "debug": "SSE ストリームとリクエスト/レスポンスを含む詳細情報",
           "trace": "すべてのログ、最も詳細"
-        }
+        },
+        "levelHint": "ログレベルの説明："
       }
     },
     "language": "言語",
@@ -556,7 +595,7 @@
     "themeDark": "月の裏側",
     "themeSystem": "システムに合わせる",
     "importExport": "SQL インポート/エクスポート",
-    "importExportHint": "移行や復元用にデータベースの SQL バックアップをインポート/エクスポートします（インポートは CC Switch がエクスポートしたバックアップのみ対応）。",
+    "importExportHint": "移行や復元用にデータベースの SQL バックアップをインポート/エクスポートします（インポートは Viber Switch がエクスポートしたバックアップのみ対応）。",
     "exportConfig": "SQL バックアップをエクスポート",
     "selectConfigFile": "SQL ファイルを選択",
     "noFileSelected": "ファイルが選択されていません。",
@@ -633,15 +672,15 @@
         },
         "codexHistoryUnifyRestore": {
           "name": "Codex セッション統合の復元バックアップ",
-          "hint": "「バックアップから復元」を実行する前のコピー。CC Switch が再び読み込むことはありません。"
+          "hint": "「バックアップから復元」を実行する前のコピー。Viber Switch が再び読み込むことはありません。"
         },
         "codexHistoryProviderMigration": {
           "name": "Codex セッショングループ移行バックアップ",
-          "hint": "セッショングループを移行する前のコピー。CC Switch が再び読み込むことはありません。"
+          "hint": "セッショングループを移行する前のコピー。Viber Switch が再び読み込むことはありません。"
         },
         "liveFirstWrite": {
           "name": "設定ファイル初回書き込みバックアップ",
-          "hint": "CC Switch が各クライアントの設定ファイルを初めて書き換える前の元ファイル。削除すると元のファイルは取り戻せません。次回の書き込み時にその時点のファイルが改めてバックアップされます。"
+          "hint": "Viber Switch が各クライアントの設定ファイルを初めて書き換える前の元ファイル。削除すると元のファイルは取り戻せません。次回の書き込み時にその時点のファイルが改めてバックアップされます。"
         },
         "hermes": {
           "name": "Hermes 設定のバックアップ",
@@ -653,7 +692,7 @@
         },
         "proxyLiveBackup": {
           "name": "旧ルーティング引き継ぎバックアップ",
-          "hint": "アップグレード時に旧ルーティング引き継ぎバックアップから移した設定のコピー。CC Switch が再び読み込むことはありません。"
+          "hint": "アップグレード時に旧ルーティング引き継ぎバックアップから移した設定のコピー。Viber Switch が再び読み込むことはありません。"
         },
         "envVars": {
           "name": "環境変数クリーンアップのバックアップ",
@@ -754,7 +793,10 @@
         "warning": "リモートの既存同期データが上書きされます",
         "legacyNotice": "旧レイアウトのリモートデータを検出しました。今回のアップロードは新しい v2/db-v6 パスに書き込み、旧パスは上書きしません。",
         "confirm": "アップロードを実行"
-      }
+      },
+      "description": "WebDAV を使ってデバイス間でデータベースとスキル設定を同期します。",
+      "remoteRootDefault": "デフォルト: cli-switch-sync",
+      "profileDefault": "デフォルト: default"
     },
     "syncType": {
       "label": "同期方式",
@@ -782,7 +824,7 @@
       "region": "リージョン",
       "regionPlaceholder": "例: us-east-1",
       "bucket": "バケット",
-      "bucketPlaceholder": "例: my-cc-switch-bucket",
+      "bucketPlaceholder": "例: my-config-sync-bucket",
       "accessKeyId": "Access Key ID",
       "accessKeyIdPlaceholder": "例: AKIA...",
       "secretAccessKey": "Secret Access Key",
@@ -853,7 +895,9 @@
         "createdAt": "アップロード日時",
         "warning": "この S3 パスにある既存の同期データが上書きされます",
         "confirm": "アップロードを実行"
-      }
+      },
+      "remoteRootDefault": "デフォルト: cli-switch-sync",
+      "profileDefault": "デフォルト: default"
     },
     "autoReload": "データを更新しました",
     "languageOptionChinese": "简体中文",
@@ -864,7 +908,7 @@
     "windowBehavior": "ウィンドウ動作",
     "windowBehaviorHint": "最小化動作や Claude プラグイン連携を設定します。",
     "launchOnStartup": "起動時に自動実行",
-    "launchOnStartupDescription": "システム起動時に CC Switch を自動起動します",
+    "launchOnStartupDescription": "システム起動時に Viber Switch を自動起動します",
     "silentStartup": "サイレント起動",
     "silentStartupDescription": "起動時にメインウィンドウを表示せず、トレイのみで起動",
     "autoLaunchFailed": "自動起動の設定に失敗しました",
@@ -885,7 +929,7 @@
     "codexStackClassicSubagentsDescription": "メインとサブのエージェントが別のプロバイダーを使う場合は必ずオンにしてください。オフだとサブエージェントにタスクが届きません。",
     "codexStackClassicSubagentsForcedV2": "Codex の config.toml で [features] multi_agent_v2 がオンになっています。こちらが優先されるため、この設定は効きません。",
     "codexSessionCompression": "Codex の古いセッションを圧縮",
-    "codexSessionCompressionDescription": "オンにすると、Codex は起動するたびに 7 日以上更新のないセッションファイルをバックグラウンドで圧縮し、ディスク使用量を大きく減らします。圧縮したセッションで会話を続けると Codex が自動的に展開します。CC Switch は圧縮されたセッションも通常どおり表示・集計しますが、一覧には最後の返信のプレビューが表示されません。Codex でまだ開発中の機能のため、オンの間は Codex の起動時に毎回通知が表示されます。新しめの Codex が必要で、Codex を再起動すると有効になります。オフにすると圧縮は止まりますが、圧縮済みのセッションはそのまま残ります。",
+    "codexSessionCompressionDescription": "オンにすると、Codex は起動するたびに 7 日以上更新のないセッションファイルをバックグラウンドで圧縮し、ディスク使用量を大きく減らします。圧縮したセッションで会話を続けると Codex が自動的に展開します。Viber Switch は圧縮されたセッションも通常どおり表示・集計しますが、一覧には最後の返信のプレビューが表示されません。Codex でまだ開発中の機能のため、オンの間は Codex の起動時に毎回通知が表示されます。新しめの Codex が必要で、Codex を再起動すると有効になります。オフにすると圧縮は止まりますが、圧縮済みのセッションはそのまま残ります。",
     "codexSessionCompressionUsage": "セッションの現在の使用量: {{size}}",
     "codexSessionCompressionFailed": "Codex セッション圧縮の設定を変更できませんでした",
     "unifyCodexHistoryRestoreCompleted": "バックアップから公式セッション履歴を復元しました（セッションファイル {{files}} 件、インデックス {{rows}} 行）",
@@ -937,9 +981,9 @@
     },
     "configDirectoryOverride": "設定ディレクトリの上書き（詳細）",
     "configDirectoryDescription": "WSL などで Claude Code や Codex を使う場合、ここで設定ディレクトリを WSL 側に合わせるとデータを揃えられます。",
-    "appConfigDir": "CC Switch 設定ディレクトリ",
-    "appConfigDirDescription": "CC Switch の保存場所をカスタマイズします（クラウド同期フォルダを指定すると設定を同期できます）",
-    "browsePlaceholderApp": "例: C:\\\\Users\\\\Administrator\\\\.cc-switch",
+    "appConfigDir": "Viber Switch 設定ディレクトリ",
+    "appConfigDirDescription": "Viber Switch の保存場所をカスタマイズします（クラウド同期フォルダを指定すると設定を同期できます）",
+    "browsePlaceholderApp": "例: C:\\Users\\Administrator\\AppData",
     "claudeConfigDir": "Claude Code 設定ディレクトリ",
     "claudeConfigDirDescription": "Claude の設定ディレクトリ（settings.json）を上書きします。カスタムディレクトリでは .claude.json（MCP）をその中に保存し、既定の ~/.claude では Claude Code の既定どおり ~/.claude.json を使います。",
     "codexConfigDir": "Codex 設定ディレクトリ",
@@ -974,7 +1018,7 @@
     "checking": "確認中...",
     "upToDate": "最新バージョンです",
     "aboutHint": "バージョン情報と更新状況を表示します。",
-    "portableMode": "ポータブルモード: 更新は手動ダウンロードが必要です。",
+    "portableMode": "ポータブルモード。",
     "portableUpdateHint": "ポータブル版：上のボタンで新しい zip をダウンロードし、展開して既存の cc-switch.exe を上書きしてください。設定とデータはユーザーフォルダの .cc-switch に保存されており、上書きしても失われません。",
     "updateAvailable": "新しいバージョンがあります: {{version}}",
     "updateBadge": "更新あり",
@@ -986,7 +1030,7 @@
     "viewCurrentReleaseNotes": "現在のバージョンのリリースノートを見る",
     "officialWebsite": "公式サイト",
     "github": "GitHub",
-    "starPrompt": "CC Switch がお役に立てたなら、GitHub でスターをお願いします。私たちにとって大きな励みになります",
+    "starPrompt": "Viber Switch がお役に立てたなら、GitHub でスターをお願いします。私たちにとって大きな励みになります",
     "starOnGithub": "GitHub でスター",
     "manualInstallCommands": "手動インストールコマンド",
     "manualUninstallCommands": "手動アンインストールコマンド",
@@ -1048,7 +1092,7 @@
     "toolUpgradeConfirmBtn": "アップグレードを実行",
     "toolUpgradeUnanchoredHint": "コマンドラインが実際に使用する箇所を特定できません。既定のアップグレードコマンドを実行します（PATH 上の最初の npm にインストールされる場合があります）。",
     "toolUpgradeUnmanagedTitle": "次のツールのアップグレードをスキップしました",
-    "toolUpgradeUnmanagedDetail": "{{tool}}（{{path}}）は npm または認識できるインストーラーでインストールされていないため、CC Switch ではアップグレード方法を判断できません。元のインストール方法でアップグレードしてください（例：winget、Scoop、公式インストールスクリプトの再実行）。",
+    "toolUpgradeUnmanagedDetail": "{{tool}}（{{path}}）は npm または認識できるインストーラーでインストールされていないため、Viber Switch ではアップグレード方法を判断できません。元のインストール方法でアップグレードしてください（例：winget、Scoop、公式インストールスクリプトの再実行）。",
     "envBadge": {
       "wsl": "WSL",
       "windows": "Win",
@@ -1062,7 +1106,7 @@
     "importFailedError": "設定のインポートに失敗しました: {{message}}",
     "exportFailedError": "設定のエクスポートに失敗しました:",
     "restartRequired": "再起動が必要です",
-    "restartRequiredMessage": "CC Switch の設定ディレクトリを変更すると再起動が必要です。今すぐ再起動しますか？",
+    "restartRequiredMessage": "Viber Switch の設定ディレクトリを変更すると再起動が必要です。今すぐ再起動しますか？",
     "restartNow": "今すぐ再起動",
     "restartLater": "後で再起動",
     "restartFailed": "アプリの再起動に失敗しました。手動で閉じて再度開いてください。",
@@ -1109,6 +1153,40 @@
     },
     "data": {
       "location": "保存場所"
+    },
+    "languageOptionVietnamese": "Tiếng Việt",
+    "skillStorage": {
+      "title": "スキル保存場所",
+      "description": "Viber Switch がスキルのマスターコピーを保存するディレクトリを選択します",
+      "ccSwitch": "Viber Switch",
+      "unified": "~/.agents/skills",
+      "ccSwitchHint": "Skills はアプリのデータディレクトリに保存され、シンボリックリンクまたはコピーで各アプリに同期されます。",
+      "unifiedHint": "スキルは ~/.agents/skills/ に保存されます（Agent Skills オープン標準）。対応ツール（Claude Code、Codex、Gemini CLI など）はこのディレクトリのスキルを直接検出します。",
+      "confirmTitle": "スキル保存場所の移行",
+      "confirmMessage": "{{count}} 個のスキルを新しい場所に移動します。続行しますか？",
+      "migrationSuccess": "{{count}} 個のスキルを移行しました",
+      "migrationPartial": "{{migrated}} 個のスキルを移行、{{errors}} 個のエラー。詳細はログを確認してください。"
+    },
+    "skillSync": {
+      "title": "スキル同期方式",
+      "description": "スキルファイルの同期方法を選択",
+      "symlink": "シンボリックリンク",
+      "copy": "ファイルコピー",
+      "symlinkHint": "シンボリックリンクはディスク容量を節約し、リアルタイム同期を有効にします。注意：Windowsでは管理者権限または開発者モードが必要な場合があります"
+    },
+    "appUpdate": {
+      "check": "更新を確認",
+      "checking": "更新を確認しています…",
+      "upToDate": "最新です",
+      "available": "v{{version}} が利用可能",
+      "install": "今すぐ更新",
+      "downloading": "更新をダウンロード中…",
+      "downloadingPct": "ダウンロード中 {{pct}}%",
+      "restarting": "再起動しています…",
+      "failed": "更新に失敗しました",
+      "confirmTitle": "更新をインストールしますか？",
+      "confirmBody": "v{{version}} をダウンロードしてインストールし、Viber Switch を再起動します。GitHub を開く必要はありません。",
+      "toastTitle": "Viber Switch v{{version}} をインストールできます"
     }
   },
   "apps": {
@@ -1202,7 +1280,7 @@
     },
     "current": {
       "readFailed": "Pi のプロバイダー設定を読み込めません",
-      "stateUnavailableHint": "CC Switch が Pi のプロバイダー設定を読み込むまで、プロバイダーの変更は無効です。"
+      "stateUnavailableHint": "Viber Switch が Pi のプロバイダー設定を読み込むまで、プロバイダーの変更は無効です。"
     },
     "prompts": {
       "globalTab": "ライブラリ",
@@ -1255,7 +1333,7 @@
       "libraryLabel": "Pi のライブラリ",
       "systemFilesLabel": "Pi のシステムプロンプトファイル",
       "templatesLabel": "Pi のプロンプトテンプレート",
-      "externalTitle": "AGENTS.md が CC Switch の外で変更されています",
+      "externalTitle": "AGENTS.md が Viber Switch の外で変更されています",
       "externalDetail": "内容（{{size}}）がライブラリのどれとも異なるため、有効と表示されるものはありません。別のものを有効にする前にライブラリへ保存されます。",
       "saveToLibrary": "ライブラリに保存",
       "reloadAfterDelete": "開いている Pi ではアイドル時に /reload すると反映されます。",
@@ -1298,7 +1376,8 @@
     "keyFieldsHint": "デフォルトモデル（models.default）とそれが指すモデルテーブルはプロバイダーに合わせて切り替わります。それ以外は Grok Build のグローバル設定で、保存するとすべてのプロバイダーに適用されます。",
     "inactiveFieldsHint": "旧バージョンがこのプロバイダーに保存した設定で、切り替えでは反映されなくなりました。クリックすると TOML をコピーできるので、必要なら上に貼り付けてください。",
     "inactiveFieldCopied": "コピーしました",
-    "routeOnlySettingsHint": "以下の二つはルーティングモードでのみ有効です。"
+    "routeOnlySettingsHint": "以下の二つはルーティングモードでのみ有効です。",
+    "advancedSectionHint": "上流フォーマット、思考機能、カスタム User-Agent の設定を含みます。Chat Completions / Anthropic Messages プロトコルを使用するプロバイダーはルーティング引き継ぎの有効化が必要です。"
   },
   "sessionManager": {
     "searchPlaceholder": "タイトル・ディレクトリ・最初と最後のメッセージ・セッション ID で検索",
@@ -1332,7 +1411,7 @@
     "expandContent": "全文を表示",
     "collapseContent": "折りたたむ",
     "helpTitle": "セッションの出どころ",
-    "helpBody": "CC Switch は各アプリがこのコンピューターに保存しているセッション記録を読み取ります。保存場所は右上の ⋯ の「セッションの保存場所」で確認できます。Claude Desktop には独自のセッション記録はありません。",
+    "helpBody": "Viber Switch は各アプリがこのコンピューターに保存しているセッション記録を読み取ります。保存場所は右上の ⋯ の「セッションの保存場所」で確認できます。Claude Desktop には独自のセッション記録はありません。",
     "moreActions": "セッションのその他の操作",
     "refreshList": "一覧を更新",
     "listRefreshed": "セッション一覧を更新しました",
@@ -1340,7 +1419,7 @@
     "preferredTerminal": "優先ターミナル",
     "whereMenu": "セッションの保存場所",
     "whereTitle": "セッションの保存場所",
-    "whereLead": "CC Switch は次の場所からセッションを読み取ります。Claude Desktop には独自のセッション記録はありません。",
+    "whereLead": "Viber Switch は次の場所からセッションを読み取ります。Claude Desktop には独自のセッション記録はありません。",
     "whereNote": "設定で構成ディレクトリを変更したアプリは、変更後のディレクトリから読み取ります。",
     "appPrefix": "アプリ：",
     "chooseApp": "アプリを選択",
@@ -1384,7 +1463,7 @@
     "hermesLimit": "Hermes は最新 500 件のセッションのみ表示します",
     "emptyApp": "{{app}} のセッション記録はまだありません",
     "emptyAll": "セッション記録はまだありません",
-    "emptyAppHint": "CC Switch は {{path}} のセッションデータを読み取ります",
+    "emptyAppHint": "Viber Switch は {{path}} のセッションデータを読み取ります",
     "emptySearch": "タイトル・ディレクトリ・最初と最後のメッセージが「{{query}}」に一致するセッションはありません",
     "clearSearchAction": "検索をクリア",
     "backToList": "セッション一覧に戻る",
@@ -1573,7 +1652,36 @@
       "rawMatch": "原文での一致",
       "expandContent": "全文を表示",
       "collapseContent": "折りたたむ"
-    }
+    },
+    "title": "セッション管理",
+    "providerFilterAll": "すべて",
+    "providerFilterTooltip": "プロバイダーフィルター",
+    "viewModeTooltip": "表示方式",
+    "viewModeFlat": "一覧",
+    "viewModeGrouped": "分類",
+    "toggleProviderGroup": "{{provider}} プロバイダーグループを開閉",
+    "toggleDirectoryGroup": "{{directory}} ディレクトリグループを開閉",
+    "collapseAllGroups": "すべて折りたたむ",
+    "manageBatchTooltip": "一括管理に入る",
+    "exitBatchModeTooltip": "一括管理を終了",
+    "batchModeHint": "削除するセッションを選択",
+    "selectForBatch": "セッションを選択",
+    "selectedCount": "{{count}} 件を選択中",
+    "selectAllFiltered": "一覧を全選択",
+    "clearFilteredSelection": "全選択を解除",
+    "clearSelection": "クリア",
+    "deleteSelected": "削除",
+    "noSessions": "セッションが見つかりません",
+    "selectSession": "セッションを選択してください",
+    "projectDirCopied": "ディレクトリをコピーしました",
+    "delete": "セッションを削除",
+    "deleting": "削除中...",
+    "deleteTooltip": "このローカルセッション記録を完全に削除します",
+    "clickToCopyPath": "クリックしてパスをコピー",
+    "resume": "セッションを再開",
+    "resumeTooltip": "ターミナルでこのセッションを再開",
+    "copyCommand": "コマンドをコピー",
+    "conversationHistory": "会話履歴"
   },
   "console": {
     "providerSwitchReceived": "プロバイダー切り替えイベントを受信:",
@@ -1748,7 +1856,8 @@
     "stackModelPlaceholder": "例: deepseek-v4-pro",
     "stackModelDefault": "デフォルトモデル",
     "stackLayout": {
-      "noModels": "モデル一覧が空です：集約に追加してもモデル選択には表示されません"
+      "noModels": "モデル一覧が空です：集約に追加してもモデル選択には表示されません",
+      "advancedHint": "カスタム User-Agent とリクエスト上書き。通常は変更不要です。"
     },
     "modelRoleLabel": "モデル役割",
     "modelRoleSonnet": "Sonnet",
@@ -1813,7 +1922,21 @@
     "localProxyRequestOverridesHelp": "形式変換後に上流へ送るリクエストに適用されます。",
     "apiFormatHelp": "プロバイダーがネイティブ対応するプロトコルを選びます。Anthropic Messages はそのまま転送して変換なし、他の三つはルーティングが Anthropic Messages に変換します。",
     "directModeFormatInUse": "このカードは直結で使用中です。この形式で保存するとリクエストが失敗します。先にルーティングか集約に切り替えてください。",
-    "directModeFormatSwitch": "この形式は直結モードでは使えません。ルーティングか集約に切り替えるとこのカードを使えます。"
+    "directModeFormatSwitch": "この形式は直結モードでは使えません。ルーティングか集約に切り替えるとこのカードを使えます。",
+    "apiFormatHint": "プロバイダーがネイティブ Anthropic Messages API なら Anthropic Messages を選択（直結、フォーマット変換なし）。Chat Completions プロトコルなら Chat、Responses API なら Responses、Gemini generateContent プロトコルなら Gemini Native を選択。Chat、Responses、Gemini Native は Anthropic Messages への変換にルーティング引き継ぎの有効化が必要です。",
+    "customUserAgentHint": "ルーティングモードでのみ有効で、プロバイダー API へ転送するリクエストの User-Agent を置き換えます。",
+    "localProxyRequestOverridesHint": "ルーティングモードでのみ有効で、形式変換後の上流リクエストへ適用されます。",
+    "fullUrlEnabled": "フル URL モード",
+    "fullUrlDisabled": "フル URL として設定",
+    "fullUrlHint": "💡 完全なリクエスト URL を入力してください。このモードはルーティングを有効にして使用する必要があり、ルーティングはこの URL をそのまま使用し、パスを追加しません",
+    "fullUrlHintGeminiNative": "💡 Gemini Native のフル URL モードでは 2 種類の入力を扱えます。1. 公式/構造化された Gemini URL は、要求されたモデルやストリーミング方式に合わせて正規化されます。2. カスタム relay の opaque な完全 URL は、主にそのまま使用され、必要なクエリだけ追加されます",
+    "stackModelsHint": "これらのモデルは Claude Code の /model に表示され、選ぶとリクエストがこのプロバイダーへ直接送られます。先頭（★）がこのプロバイダーのデフォルトモデルで、このプロバイダーがデフォルトのとき Claude Code の起動時とバックグラウンドタスクで使われます。",
+    "stackModelMakeDefault": "デフォルトモデルにする",
+    "fallbackModelHint": "Sonnet・Opus・Fable・Haiku のいずれにも明確に対応しないリクエストのフォールバックです。サードパーティ/中継エンドポイントでは設定を推奨します。設定しないと、これらのリクエスト（Haiku のバックグラウンドサブタスクを含む）が元の Claude モデル名のまま上流へ転送され、上流に該当モデルが無い場合は失敗することがあります。公式エンドポイントでは空欄で構いません。",
+    "advancedOptionsHint": "API フォーマット、認証フィールド、モデルマッピングの設定を含みます。通常はデフォルトのままで問題ありません。",
+    "fetchedModelsTitle": "利用可能なモデル（{{count}}件）",
+    "modelAlreadyAdded": "追加済み",
+    "addSelectedModels": "選択したモデルを追加（{{count}}件）"
   },
   "copilot": {
     "automaticFormat": "モデルに応じてルーティングが自動選択",
@@ -1853,7 +1976,8 @@
     "deploymentType": "GitHub デプロイメントタイプ",
     "deploymentGitHubCom": "GitHub.com",
     "deploymentEnterprise": "GitHub Enterprise Server",
-    "enterpriseDomainPlaceholder": "例: company.ghe.com"
+    "enterpriseDomainPlaceholder": "例: company.ghe.com",
+    "logoutAll": "すべてのアカウントをログアウト"
   },
   "codexOauth": {
     "authStatus": "認証状態",
@@ -1897,7 +2021,9 @@
     "browserLogin": "ブラウザでログイン",
     "deviceCodeLogin": "デバイスコードでログイン",
     "openBrowserLogin": "ブラウザのログイン画面を開く",
-    "loginExpired": "ログインの有効期限が切れました。もう一度お試しください。"
+    "loginExpired": "ログインの有効期限が切れました。もう一度お試しください。",
+    "loginWithChatGPT": "ChatGPT でログイン",
+    "reauthTitle": "再ログインが必要なアカウントがあります"
   },
   "xaiOauth": {
     "authStatus": "xAI OAuth 認証",
@@ -1929,8 +2055,8 @@
     "remove": {
       "titleOne": "アカウント「{{login}}」を削除しますか？",
       "titleAll": "{{service}} のアカウントをすべて削除しますか？",
-      "leadOne": "CC Switch に保存されているこのアカウントのログイン情報を削除します。元に戻せません。",
-      "leadAll": "CC Switch に保存されているこれら {{count}} 件のアカウントのログイン情報を削除します。元に戻せません。",
+      "leadOne": "Viber Switch に保存されているこのアカウントのログイン情報を削除します。元に戻せません。",
+      "leadAll": "Viber Switch に保存されているこれら {{count}} 件のアカウントのログイン情報を削除します。元に戻せません。",
       "brokenOne": "次のプロバイダーは、再ログインするか別のアカウントを選ぶまで使えなくなります：",
       "brokenAll": "次のプロバイダーは、再ログインするまで使えなくなります：",
       "moved": "次のプロバイダーはデフォルトのアカウントを使っているため、新しいデフォルトのアカウントに切り替わります：",
@@ -2051,7 +2177,28 @@
     "inactiveFieldCopied": "コピーしました",
     "upstreamFormatCopilotRouteHint": "どのモードでもルーティングが必要で、ルーティングが Copilot アカウントの認証情報を注入します。手動指定したプロトコルにモデルが対応していないとエラーになります。",
     "maxOutputTokensWarning": "モデルやゲートウェイの実際の出力上限を超えないでください。超えると 400 が返ります。",
-    "routeOnlySettingsHint": "以下の二つはルーティングモードと集約モードでのみ有効です。"
+    "routeOnlySettingsHint": "以下の二つはルーティングモードと集約モードでのみ有効です。",
+    "extractFailed": "抽出に失敗しました: {{error}}",
+    "modelNameHint": "使用するモデルを指定します。config.toml に自動更新されます",
+    "modelName": "モデル名",
+    "upstreamModelName": "上流モデル名",
+    "upstreamModelNameHint": "Chat 形式ではここに実際の上流モデルを入力します。ルーティングで Codex の Responses リクエストを Chat Completions に変換し、このモデルを維持します。",
+    "modelNamePlaceholder": "例: gpt-5-codex",
+    "contextWindow": "コンテキストウィンドウ",
+    "autoCompactLimitHint": "コンテキストトークン数がこのしきい値に達すると履歴を自動圧縮",
+    "modelMetadataAdvanced": "モデルメタデータ詳細オプション",
+    "modelMetadataAdvancedHint": "未知のモデル向けに Codex メタデータを上書きします。空にすると対応する config.toml 設定を削除します。",
+    "defaultModelNotInCatalog": "このモデルはモデルマッピングにないため、Codex の /model メニューには表示されません（直接リクエストは有効です）。",
+    "addToModelMapping": "マッピングに追加",
+    "modelMappingTitle": "モデルマッピング",
+    "modelMappingHint": "Codex model_catalog_json を生成し、/model コマンドでこれらの第三者モデル名を表示できるようにします。リストの内容はそのまま保存されます。変更後、モデルリストを更新するには Codex の再起動が必要です。",
+    "stackModelListHint": "これらのモデルは Codex の /model に表示され、選ぶとリクエストがこのプロバイダーへ直接送られます。★ の付いたモデルがこのプロバイダーのデフォルトモデルで、このプロバイダーがデフォルトのとき Codex はこれを既定で使います。変更後は Codex を再起動してください。",
+    "stackDefaultNotInList": "デフォルトモデル {{model}} は一覧にありません。Codex は既定でこれをリクエストしますが、/model には表示されません。",
+    "stackAdvancedHint": "思考能力、Anthropic 固有の項目、カスタム User-Agent とリクエスト上書き。通常は変更不要です。",
+    "catalogDisplayName": "表示名",
+    "catalogModelId": "モデル ID",
+    "reasoningSectionHint": "プリセットの供給元は自動的に設定され、カスタム供給元は名前/URL から自動推論されます。自動識別が正しくない場合のみ手動で上書きしてください。",
+    "advancedSectionHint": "上流フォーマット、モデルマッピング、思考能力、カスタム User-Agent の設定を含みます。Chat Completions プロトコルを使用するプロバイダーはルーティング引き継ぎの有効化が必要です。"
   },
   "geminiConfig": {
     "envFile": "環境変数 (.env)",
@@ -2092,7 +2239,7 @@
     "headerName": "ヘッダー",
     "headerValue": "値",
     "headerNamePlaceholder": "X-Title",
-    "headerValuePlaceholder": "CC Switch",
+    "headerValuePlaceholder": "Viber Switch",
     "removeHeader": "ヘッダーを削除",
     "noHeaders": "カスタムヘッダーはありません",
     "extraOptions": "追加オプション",
@@ -2112,7 +2259,10 @@
     "modelExtraFieldKeyPlaceholder": "variants",
     "sdkOptions": "SDK オプション",
     "modelOptionKeyPlaceholder": "provider",
-    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}"
+    "modelOptionValuePlaceholder": "{\"order\": [\"baseten\"]}",
+    "npmPackageHint": "AI サービスの API フォーマットを選択",
+    "baseUrlHint": "カスタム API エンドポイント URL",
+    "modelsHint": "利用可能なモデルとその表示名を設定"
   },
   "providerPreset": {
     "label": "プロバイダータイプ",
@@ -2194,7 +2344,9 @@
       "intl": "グローバル"
     },
     "planLabel": "プラン",
-    "regionLabel": "地域"
+    "regionLabel": "地域",
+    "unofficial": "非公式",
+    "unofficialAriaLabel": "非公式プロバイダーの表示を切り替え"
   },
   "usage": {
     "title": "利用統計",
@@ -2383,11 +2535,11 @@
     "modelsDevDefaultHint": "最新リリース順に {{shown}} 件を表示しています（全 {{total}} 件）。キーワード入力で全件検索できます",
     "modelsDevAutoSync": {
       "title": "models.dev 料金の自動同期",
-      "description": "有効にすると、CC Switch の起動時に選択したモデルの最新料金を定期的に取得し、ローカル料金ファイルに保存します。",
+      "description": "有効にすると、Viber Switch の起動時に選択したモデルの最新料金を定期的に取得し、ローカル料金ファイルに保存します。",
       "enabled": "有効",
       "disabled": "無効",
       "enableConfirmTitle": "料金の自動同期を有効にしますか？",
-      "enableConfirmMessage": "有効にすると、CC Switch の起動時に models.dev から選択したモデルの料金を定期的に更新します（最大 6 時間に 1 回）。同じモデル ID の内蔵料金と手動設定した料金は上書きされます。",
+      "enableConfirmMessage": "有効にすると、Viber Switch の起動時に models.dev から選択したモデルの料金を定期的に更新します（最大 6 時間に 1 回）。同じモデル ID の内蔵料金と手動設定した料金は上書きされます。",
       "enableConfirmAction": "自動同期を有効にする",
       "configure": "モデルを選択",
       "configureTitle": "料金を自動同期するモデルを選択",
@@ -2422,10 +2574,15 @@
       "minutesAgo": "{{count}} 分前に同期",
       "syncing": "同期中…",
       "tip": "クリックして今すぐ同期",
-      "tipOff": "自動スキャンはオフです。クリックして今すぐ同期"
+      "tipOff": "自動スキャンはオフです。クリックして今すぐ同期",
+      "auto": "セッションログ · 自動スキャン",
+      "off": "セッションログ · 自動スキャンはオフ",
+      "tipAuto": "セッションログを 60 秒ごとにスキャンします"
     },
     "refreshMenu": {
-      "label": "{{seconds}} 秒ごとにスキャン"
+      "label": "{{seconds}} 秒ごとにスキャン",
+      "off": "自動更新オフ",
+      "seconds": "{{seconds}} 秒"
     },
     "dataSources": "データソース",
     "display": {
@@ -2539,12 +2696,13 @@
       "speedEstimateTooFew": "出力が 200 トークン未満のため速度は推定しません",
       "noTimingSession": "セッションログには計測データがありません",
       "noFirstToken": "最初のトークンの計測がないため速度は出しません",
-      "providerId": "プロバイダー ID"
+      "providerId": "プロバイダー ID",
+      "sourceSession": "セッションログ"
     },
     "sources": {
       "scanTitle": "セッションログを自動スキャン",
       "scanHelpTitle": "セッションログとは",
-      "scanHelp": "各アプリがこのコンピューターに書き込む会話記録です。CC Switch はここから使用量を読み取るので、ルーティングなしでもデータがあります。",
+      "scanHelp": "各アプリがこのコンピューターに書き込む会話記録です。Viber Switch はここから使用量を読み取るので、ルーティングなしでもデータがあります。",
       "coverage": "対象の 7 アプリ：{{apps}}",
       "cadenceOn": "起動時とバックグラウンドで 10 分ごとにスキャン。使用量ページを開くとすぐにスキャンし、その後は選択した間隔でスキャン",
       "cadenceOff": "自動スキャンはオフです。「今すぐ同期」を押したときだけスキャンします",
@@ -2588,7 +2746,9 @@
       "title": "使用量の設定",
       "pricingSummary": "モデルごとに 100 万トークンあたりの料金を設定します。models.dev から同期することもできます",
       "managePricing": "料金を管理…"
-    }
+    },
+    "refreshOff": "オフ",
+    "sortedByRequests": "リクエスト数順"
   },
   "usageScript": {
     "title": "利用状況を設定",
@@ -2682,7 +2842,7 @@
   },
   "dbUpgrade": {
     "title": "データベースのバージョンが新しすぎます",
-    "description": "このデータベースは新しいバージョンの CC Switch で作成されています。続行するにはアプリを更新してください。更新してもデータは削除されません。",
+    "description": "このデータベースは新しいバージョンの Viber Switch で作成されています。続行するにはアプリを更新してください。更新してもデータは削除されません。",
     "versionInfo": "データベース v{{db}} · アプリ対応 v{{supported}}",
     "dbPath": "データベースファイル",
     "checking": "利用可能な更新を確認中…",
@@ -2728,7 +2888,7 @@
       "deleteConfirm": "サーバー「{{id}}」を削除しますか？この操作は元に戻せません。",
       "noServers": "まだサーバーがありません",
       "enabledApps": "有効なアプリ",
-      "noImportFound": "インポートする MCP サーバーが見つかりませんでした。すべてのサーバーは CC Switch で管理されています。",
+      "noImportFound": "インポートする MCP サーバーが見つかりませんでした。すべてのサーバーは Viber Switch で管理されています。",
       "importSuccess": "{{count}} 個の MCP サーバーをインポートしました",
       "searchPlaceholder": "MCP の名前、説明、タグ、コマンドを検索...",
       "searchAriaLabel": "管理中の MCP サーバーを検索",
@@ -2871,7 +3031,8 @@
         "name": "@upstash/context7-mcp",
         "description": "最新のライブラリドキュメントとコード例を提供する Context7 ドキュメント検索ツール。キー設定で上限が拡張されます"
       }
-    }
+    },
+    "unsupported": "{{app}} は MCP に対応していません"
   },
   "prompts": {
     "add": "プロンプトを追加",
@@ -2886,7 +3047,7 @@
     "name": "名前",
     "namePlaceholder": "例: チームのコーディング規約",
     "description": "説明",
-    "descriptionPlaceholder": "任意。CC Switch 内でのみ表示",
+    "descriptionPlaceholder": "任意。Viber Switch 内でのみ表示",
     "content": "本文",
     "contentPlaceholder": "# {{filename}}\n\n{{appName}} への常設の指示を Markdown で…",
     "loadFailed": "プロンプトの読み込みに失敗しました",
@@ -2946,7 +3107,7 @@
     "deleteBlocked": "有効なものは削除できません。先に無効にしてください",
     "emptyTitle": "{{app}} のプロンプトはまだありません",
     "emptyTarget": "有効にしたものが {{path}} に書き込まれます。",
-    "emptyFile": "{{path}} には CC Switch にまだない {{size}} の内容があります",
+    "emptyFile": "{{path}} には Viber Switch にまだない {{size}} の内容があります",
     "importExisting": "既存の内容を取り込む",
     "formDescription": "名前、説明、{{file}} に書き込む本文",
     "requiredMark": "（必須）",
@@ -2987,13 +3148,15 @@
       "savedActive": "「{{name}}」を保存し、{{path}} を上書きしました",
       "savedActivePi": "「{{name}}」を保存し、AGENTS.md に書き込みました",
       "deleted": "「{{name}}」を削除しました",
-      "deletedSub": "CC Switch からのみ削除しました。{{path}} は変更していません",
+      "deletedSub": "Viber Switch からのみ削除しました。{{path}} は変更していません",
       "deletedPiSub": "ライブラリからのみ削除しました。AGENTS.md は変更していません",
       "restored": "「{{name}}」を復元しました",
       "imported": "{{path}} の内容を取り込みました。ファイルは変更していません",
       "importedPi": "AGENTS.md をライブラリに保存しました。ファイルは変更していません",
       "copied": "「{{name}}」を {{apps}} にコピーしました"
-    }
+    },
+    "manage": "プロンプト",
+    "title": "{{appName}} プロンプト管理"
   },
   "profiles": {
     "switcherAriaLabel": "プロジェクト：{{name}}",
@@ -3068,7 +3231,8 @@
       "noSearchResults": "検索に一致するデイリーメモリーはありません。",
       "searching": "検索中...",
       "searchFailed": "検索に失敗しました",
-      "matchCount": "{{count}}件一致"
+      "matchCount": "{{count}}件一致",
+      "cardDescription": "デイリーメモリーの閲覧・管理"
     }
   },
   "openclaw": {
@@ -3117,7 +3281,8 @@
       "saveSuccess": "環境変数を保存しました",
       "saveFailed": "環境変数の保存に失敗しました",
       "loadFailed": "環境変数の読み込みに失敗しました",
-      "duplicateKey": "重複する変数名が検出されました: {{key}}"
+      "duplicateKey": "重複する変数名が検出されました: {{key}}",
+      "description": "openclaw.json の環境変数設定を管理（APIキー、カスタム変数など）"
     },
     "tools": {
       "title": "ツール権限",
@@ -3137,7 +3302,8 @@
       "addDeny": "拒否を追加",
       "saveSuccess": "ツール権限を保存しました",
       "saveFailed": "ツール権限の保存に失敗しました",
-      "loadFailed": "ツール権限の読み込みに失敗しました"
+      "loadFailed": "ツール権限の読み込みに失敗しました",
+      "description": "openclaw.json のツール権限設定を管理（許可/拒否リスト）"
     },
     "agents": {
       "title": "Agents 設定",
@@ -3169,7 +3335,8 @@
       "stringifiedEnvVars": "env.vars はオブジェクトである必要がありますが、現在の値は文字列化または破損しているようです。",
       "stringifiedShellEnv": "env.shellEnv はオブジェクトである必要がありますが、現在の値は文字列化または破損しているようです。",
       "parseFailed": "openclaw.json を有効な JSON5 として解析できませんでした。ここで編集する前にファイルを修正してください。"
-    }
+    },
+    "baseUrlHint": "プロバイダーの API エンドポイントアドレス。"
   },
   "hermes": {
     "form": {
@@ -3204,7 +3371,9 @@
       "removeModel": "モデルを削除",
       "modelsHint": "現在のプロバイダーとして有効にすると、最初のモデルが Hermes のデフォルトモデルになります。",
       "rateLimitDelay": "リクエスト間隔（秒）",
-      "rateLimitDelayHint": "連続したリクエスト間の最小待機秒数（任意）。空欄の場合は制限なし。"
+      "rateLimitDelayHint": "連続したリクエスト間の最小待機秒数（任意）。空欄の場合は制限なし。",
+      "baseUrlHint": "プロバイダーの API エンドポイント URL。",
+      "apiModeHint": "プロバイダーの API プロトコル。エンドポイントに合わせて正しい形式を選択してください。"
     },
     "webui": {
       "open": "Hermes Web UI を開く",
@@ -3241,7 +3410,8 @@
       "remaining": "残り {{remaining}} / {{limit}} 文字",
       "overLimitBy": "上限を {{over}} 文字超えています。Hermes は次回読み込み時に切り詰めます",
       "toggledOn": "{{name}}を有効にしました。Hermes の再起動または新規セッション時に反映されます。",
-      "toggledOff": "{{name}}を無効にしました。Hermes の再起動または新規セッション時に反映されます。"
+      "toggledOff": "{{name}}を無効にしました。Hermes の再起動または新規セッション時に反映されます。",
+      "title": "メモリ"
     }
   },
   "env": {
@@ -3306,7 +3476,7 @@
     "installSuccess": "スキル {{name}} をインストールしました",
     "installFailed": "インストールに失敗しました",
     "uninstallSuccess": "スキル {{name}} をアンインストールしました",
-    "uninstallPiPreserved": "Pi のコピーが CC Switch 管理下であることを確認できなかったため、そのまま残しました: {{path}}",
+    "uninstallPiPreserved": "Pi のコピーが Viber Switch 管理下であることを確認できなかったため、そのまま残しました: {{path}}",
     "uninstallPiCleanupIncomplete": "Pi のクリーンアップを完了できませんでした。Pi Skills ディレクトリにコピーが残っていないか手動で確認してください。",
     "uninstallFailed": "アンインストールに失敗しました",
     "update": "更新",
@@ -3388,10 +3558,12 @@
       "searchPlaceholder": "skills.sh を検索（2文字以上）...",
       "installs": "{{count}} インストール",
       "loadMore": "さらに読み込む",
-      "loading": "skills.sh を検索中...",
+      "loading": "skills.sh を読み込み中...",
       "noResults": "\"{{query}}\" に該当するスキルがありません",
       "error": "skills.sh の検索に失敗しました",
-      "poweredBy": "Powered by skills.sh"
+      "poweredBy": "Powered by skills.sh",
+      "trending": "トレンド（24時間）",
+      "noTrending": "トレンドのスキルがありません"
     },
     "filter": {
       "placeholder": "状態で絞り込み",
@@ -3404,12 +3576,12 @@
     "noResults": "一致するスキルが見つかりませんでした",
     "noInstalled": "インストールされたスキルがありません",
     "noInstalledDescription": "リポジトリからスキルを発見してインストールするか、既存のスキルをインポートしてください",
-    "discover": "スキルを発見",
+    "discover": "コミュニティスキル",
     "import": "既存をインポート",
-    "importDescription": "CC Switch 統合管理にインポートするスキルを選択してください",
+    "importDescription": "Viber Switch 統合管理にインポートするスキルを選択してください",
     "importSuccess": "{{count}} 件のスキルをインポートしました",
     "importSelected": "選択をインポート ({{count}})",
-    "noUnmanagedFound": "インポートするスキルが見つかりませんでした。すべてのスキルは CC Switch で管理されています。",
+    "noUnmanagedFound": "インポートするスキルが見つかりませんでした。すべてのスキルは Viber Switch で管理されています。",
     "unmanagedAvailable": "インポート可能なスキルがあります",
     "foundIn": "発見場所",
     "local": "ローカル",
@@ -3467,7 +3639,7 @@
       "resyncPartial": "{{count}} 個のアプリで同期が完了しませんでした：{{apps}}",
       "resyncSkillItem": "{{directory}}：{{error}}",
       "locationTitle": "マスターコピーの保存先",
-      "locationCcSwitch": "CC Switch フォルダ",
+      "locationCcSwitch": "Viber Switch フォルダ",
       "locationUnified": "共通フォルダ",
       "openFolder": "開く",
       "openFolderAria": "{{path}} を開く",
@@ -3475,7 +3647,7 @@
       "move": "移動して切り替え",
       "moving": "移動中…",
       "moveConfirmTitle": "{{count}} 個の Skill を {{path}} に移動しますか？",
-      "moveConfirmBody": "マスターコピーを 1 つずつ移動し、各アプリのリンクを新しい場所に向け直します。移動が終わるまで CC Switch を終了しないでください。",
+      "moveConfirmBody": "マスターコピーを 1 つずつ移動し、各アプリのリンクを新しい場所に向け直します。移動が終わるまで Viber Switch を終了しないでください。",
       "moveConfirmButton": "移動して切り替え",
       "moveDone": "{{count}} 個の Skill を {{path}} に移動しました",
       "movePartial": "{{migrated}} 個の Skill を移動、{{errors}} 個が失敗しました。詳細はログを確認してください。",
@@ -3487,11 +3659,25 @@
       "syncCopyDesc": "ディスク容量を多く使い、更新のたびにコピーし直します",
       "moveHint": "場所を切り替えると {{count}} 個の Skill を移動します。"
     },
-    "updatesIncomplete": "更新は見つかりませんでしたが、{{count}} 個のリポジトリを読み込めませんでした"
+    "updatesIncomplete": "更新は見つかりませんでしたが、{{count}} 個のリポジトリを読み込めませんでした",
+    "replace": "置き換え",
+    "replacing": "置き換え中...",
+    "replaceSuccess": "スキル {{name}} を置き換えました",
+    "replaceFailed": "置き換えに失敗しました",
+    "autoUpdateRunning": "バックグラウンドで更新中…",
+    "autoUpdateNever": "毎日自動更新",
+    "autoUpdateOk": "{{count}} 件を自動更新済み",
+    "autoUpdateFailed": "自動更新に失敗 ({{count}})",
+    "preview": "スキルをプレビュー",
+    "previewTitle": "スキルプレビュー",
+    "frontmatter": "YAML frontmatter",
+    "frontmatterEmpty": "（空）",
+    "frontmatterMissing": "（YAML frontmatter なし）",
+    "previewLoadFailed": "スキル内容の読み込みに失敗しました: {{error}}"
   },
   "deeplink": {
     "confirmImport": "プロバイダーのインポートを確認",
-    "confirmImportDescription": "次の設定をディープリンクから CC Switch へインポートします",
+    "confirmImportDescription": "次の設定をディープリンクから Viber Switch へインポートします",
     "importPrompt": "プロンプトをインポート",
     "importPromptDescription": "このシステムプロンプトをインポートするか確認してください",
     "importMcp": "MCP サーバーをインポート",
@@ -3780,7 +3966,7 @@
         "authTitle": "Codex が以前のアカウントをキャッシュしている可能性があります。新しいログインを読み込むにはバックグラウンドサーバーを再起動してください",
         "title": "Codex が古いモデル一覧を使っているため、切り替え後のモデルが表示されません",
         "unverifiedTitle": "切り替え前から開いている Codex は、以前のアカウントやモデル一覧を使い続けている可能性があります",
-        "unverifiedHint": "CC Switch からはデスクトップ版やエディター拡張が起動中かどうか確認できません。開いていなければ、この通知を閉じてください。",
+        "unverifiedHint": "Viber Switch からはデスクトップ版やエディター拡張が起動中かどうか確認できません。開いていなければ、この通知を閉じてください。",
         "daemon": "CLI：codex を開き直すだけでは反映されません。バックグラウンドのデーモンを再起動する必要があります。",
         "others": "デスクトップ版：完全に終了してから開き直してください（macOS では ⌘Q。ウィンドウを閉じるだけでは不十分です）。エディター拡張：エディターのウィンドウを開き直してください。",
         "restart": "Codex デーモンを再起動",
@@ -3790,6 +3976,10 @@
         "restarted": "Codex デーモンを再起動しました。codex を開き直して現在のアカウントとモデル一覧を読み込んでください",
         "notRunning": "Codex デーモンは動いていません。次に起動したときに現在のログインとモデル一覧が読み込まれます",
         "failed": "Codex デーモンの再起動に失敗しました：{{error}}"
+      },
+      "tooltip": {
+        "active": "{{appLabel}} の Stack モードがオンです：追加したプロバイダーのモデルがモデル一覧に表示されます（クライアント再起動後に反映）",
+        "inactive": "Stack モードに入る：複数のプロバイダーを追加し、それらのモデルをすべて {{appLabel}} のモデル一覧に表示します"
       }
     },
     "failover": {
@@ -4191,13 +4381,16 @@
     "appsTitle": "アプリ：インストール、アップグレード、サイドバーに表示するもの",
     "appsHasUpdate": "アプリ · 更新があります",
     "settings": "設定",
-    "settingsHasUpdate": "設定 · CC Switch の新しいバージョンがあります",
+    "settingsHasUpdate": "設定 · Viber Switch の新しいバージョンがあります",
     "mode": {
       "route": "ルーティング",
-      "stack": "集約"
+      "stack": "集約",
+      "mapping": "マッピング",
+      "mappingFull": "モデルマッピング"
     },
     "needsAttention": "対応が必要",
-    "back": "戻る"
+    "back": "戻る",
+    "todayCost": "今日 {{cost}}"
   },
   "appsPage": {
     "showInSidebar": "{{name}} をサイドバーに表示",
@@ -4216,7 +4409,7 @@
     "columnVersion": "バージョン",
     "columnVisible": "表示",
     "visibleHelp": "オフにすると、このアプリはサイドバー、トレイメニュー、MCP / Skills のアプリ列、プロンプトとセッションのアプリ選択に表示されなくなります。表示しないだけで、プロバイダーや MCP などの設定はそのまま残り、アプリ自身の設定ファイルも変更されません。",
-    "desktopHelp": "Claude Desktop はデスクトップアプリのため、ここではインストールやアップグレードはできません。CC Switch は設定ファイル経由で接続します。",
+    "desktopHelp": "Claude Desktop はデスクトップアプリのため、ここではインストールやアップグレードはできません。Viber Switch は設定ファイル経由で接続します。",
     "desktopUnsupported": "このシステムには対応していません",
     "desktopConnected": "接続済み",
     "desktopNotConnected": "未接続",
@@ -4238,6 +4431,20 @@
       "mcode": "公式インストールスクリプトで入れ、失敗したら npm を使います",
       "agy": "公式インストールスクリプトでインストール",
       "omp": "公式インストールスクリプトでインストール"
+    },
+    "uninstall": "このインストールを削除",
+    "uninstallConfirmTitle": "このインストールを削除しますか？",
+    "uninstallConfirmDesc": "{{path}} のインストールだけを削除します。もう一方は残ります。ターミナルが使っているのがこれなら、コマンドは残りのインストールに切り替わります。",
+    "uninstallConfirmDescFile": "このインストールはパッケージマネージャー経由ではないため、実行ファイル {{path}} だけを削除します。もう一方は残ります。",
+    "uninstallConfirm": "削除",
+    "uninstallDone": "{{path}} を削除しました",
+    "uninstallFailed": "削除に失敗しました",
+    "uninstallError": {
+      "UNINSTALL_ONLY_INSTALL": "唯一のインストールのため、ここでは削除できません。",
+      "UNINSTALL_NOT_FOUND": "このインストールはすでに存在しません。更新してもう一度お試しください。",
+      "UNINSTALL_UNSUPPORTED": "Viber Switch が削除できるパッケージマネージャーで入れたものではありません。",
+      "UNINSTALL_INCOMPLETE": "パッケージマネージャーは完了しましたが、実行ファイルが残っており自動では削除できません。手動で削除してください。",
+      "UNINSTALL_IN_USE": "このインストールは使用中です。実行中の {{tool}}（ターミナル、エディター、バックグラウンドプロセス）をすべて閉じてからもう一度お試しください。"
     }
   },
   "appPage": {
@@ -4319,21 +4526,22 @@
       "clientConfigChanged": "クライアント設定も更新されました。更新後の設定を読み込むには {{app}} を再起動してください。",
       "defaultRemembered": "集約に切り替えると、{{provider}} が既定のプロバイダーになります。",
       "restartHint": "{{app}} の再起動後に反映されます。",
-      "failed": "切り替えに失敗しました：{{detail}}"
+      "failed": "切り替えに失敗しました：{{detail}}",
+      "undo": "元に戻す"
     },
     "dialog": {
       "routeTitle": "{{app}} でルーティングを使いますか？",
       "stackTitle": "{{app}} で集約を使いますか？",
       "switchTitle": "{{app}} を「{{from}}」から「{{to}}」に切り替えますか？",
-      "routeLead": "リクエストはまずこのマシンの CC Switch を経由し、選んだプロバイダーに転送されます。",
+      "routeLead": "リクエストはまずこのマシンの Viber Switch を経由し、選んだプロバイダーに転送されます。",
       "stackLead": "既定のプロバイダーがプレフィックスなしのリクエストを受けます。",
       "routeTo": "転送先",
       "stackDefault": "既定のプロバイダー",
       "officialOption": "{{name}}（公式）",
       "stackOfficialNote": "公式サブスクリプションを使っている場合は、公式アカウントを既定のプロバイダーにしてください。",
-      "routeNoteFile": "{{file}} のアドレスとキーを書き換えます。本物のキーは CC Switch に残り、ほかの設定は変わりません。",
+      "routeNoteFile": "{{file}} のアドレスとキーを書き換えます。本物のキーは Viber Switch に残り、ほかの設定は変わりません。",
       "routeNoteSwitch": "以後「ルーティング」タブでプロバイダーを変えても設定ファイルは書き換えません。",
-      "routeNoteKeepRunning": "CC Switch を起動したままにしてください。終了時に直接接続へ書き戻し、次回起動時に再接続します。",
+      "routeNoteKeepRunning": "Viber Switch を起動したままにしてください。終了時に直接接続へ書き戻し、次回起動時に再接続します。",
       "desktopRouteNoteModels": "Claude Desktop のモデル一覧がルーティング先のモデルに変わります。あとでルーティング先を変えると設定ファイルを書き換えます。",
       "desktopRouteNoteRestart": "{{app}} は起動時にしか設定を読みません。確認後に {{app}} を再起動してください。",
       "desktopRouteNoteKeepRunning": "{{app}} のリクエストを転送するため、CC Switch を起動したままにしてください。",
@@ -4356,14 +4564,16 @@
       "needsRouteTitle": "{{provider}} にはルーティングが必要です",
       "needsRouteLead": "{{provider}}：{{reason}}。直接接続で切り替えると {{app}} では使えません。",
       "switchAnyway": "それでも直接切り替える",
-      "routeAndUse": "ルーティングを開始して使う"
+      "routeAndUse": "ルーティングを開始して使う",
+      "stackToRouteNote": "集約したモデルは /model から外れます（リストは保持）。選択中の集約したモデルは通常のモデルに戻す必要があります。"
     },
     "help": {
       "title": "接続モードの違い",
       "direct": "直接接続：CC Switch はリクエストに一切関与せず、クライアントが選んだプロバイダーに直接つながる、最もネイティブな使い方です。",
-      "route": "ルーティング：リクエストはこのマシンの CC Switch を経由し、プロバイダーのホットスイッチ、フェイルオーバー、フォーマット変換などの高度な機能が使えます。",
+      "route": "ルーティング：リクエストはこのマシンの Viber Switch を経由し、プロバイダーのホットスイッチ、フェイルオーバー、フォーマット変換などの高度な機能が使えます。",
       "stack": "集約：複数のプロバイダーのモデルが /model に並び、クライアント内でシームレスに切り替えられます。"
-    }
+    },
+    "copyEndpoint": "エンドポイント URL をコピー"
   },
   "providerCard": {
     "status": {
@@ -4371,7 +4581,8 @@
       "routing": "転送中",
       "currentDefault": "現在の既定",
       "defaultAfterSwitch": "切り替え後の既定",
-      "default": "既定"
+      "default": "既定",
+      "current": "現在"
     },
     "action": {
       "switch": "切り替え",
@@ -4399,7 +4610,8 @@
       "noModels": "モデルなし",
       "direct": "直接接続",
       "hermesManaged": "Hermes 管理",
-      "defaultModel": "既定モデル {{model}}"
+      "defaultModel": "既定モデル {{model}}",
+      "mapping": "モデルマッピング"
     },
     "reason": {
       "noRoute": "公式サブスクリプションはルーティングを通りません。直接接続に戻すと使えます。",
@@ -4410,7 +4622,8 @@
       "defaultCannotRemove": "既定のプロバイダーは削除できません。先にほかを既定にしてください。",
       "inUseCannotDelete": "使用中のプロバイダーは削除できません。先にほかへ切り替えてください。",
       "directDefaultCannotDelete": "ルーティングを終了するとこのプロバイダーに戻るため、削除できません。先に直接接続ページでほかのプロバイダーの「直接接続に戻して使う」を選んでください。",
-      "noFailover": "公式アカウントはフェイルオーバーキューに入れられません。クライアント自身のログインを使うため、ほかと交代できません。"
+      "noFailover": "公式アカウントはフェイルオーバーキューに入れられません。クライアント自身のログインを使うため、ほかと交代できません。",
+      "currentCannotRemove": "使用中のプロバイダーは削除できません。先にほかを有効にしてください。"
     },
     "section": {
       "queue": "キュー · 優先順（{{count}}）",
@@ -4465,7 +4678,9 @@
     "exitAllTitle": "すべてのアプリを直接接続に戻しますか？",
     "exitAllMessage": "ルーティング・集約モードのアプリに直接接続の設定を書き戻し、ルーティングサービスを停止します。転送先・キュー・集約のリストは保持されます。",
     "exitAllConfirm": "すべて直接接続に戻す",
-    "failoverHelp": "ここでは各アプリのタイムアウト・再試行・サーキットブレーカーを調整します。キューは各アプリページの「ルーティング」タブで管理します。"
+    "failoverHelp": "ここでは各アプリのタイムアウト・再試行・サーキットブレーカーを調整します。キューは各アプリページの「ルーティング」タブで管理します。",
+    "desktopMode": "モデルマッピング · 自動で稼働を維持",
+    "desktopDetail": "現在のプロバイダー {{name}}"
   },
   "quota": {
     "tierShort": "{{label}} {{value}}%",
@@ -4507,7 +4722,8 @@
     "windows": {
       "title": "各枠の残量",
       "showAll": "各枠の残量を表示"
-    }
+    },
+    "balanceUsedUp": "残高なし"
   },
   "appMatrix": {
     "clearSearch": "検索をクリア",
@@ -4557,7 +4773,7 @@
     "failNoticeTitle": "{{app}} の設定に書き込めません",
     "failNoticeBody": "{{error}}。ファイルを直してから「再試行」を押してください。",
     "loadFailed": "MCP リストを読み込めませんでした",
-    "noFilesChanged": "CC Switch はファイルを変更していません。",
+    "noFilesChanged": "Viber Switch はファイルを変更していません。",
     "emptyTitle": "MCP サーバーはまだありません",
     "emptyBody": "アプリで設定済みの MCP はそのまま取り込めます",
     "importHelpTitle": "取り込みで読む設定",
@@ -4577,8 +4793,8 @@
     "disableEverywhere": "すべてオフ",
     "deleteEllipsis": "削除",
     "deleteTitle": "{{id}} を削除しますか？",
-    "deleteBodyApps": "CC Switch と {{apps}} の設定ファイルからこの項目を削除します。元に戻せません。",
-    "deleteBody": "CC Switch からこの項目を削除します。元に戻せません。",
+    "deleteBodyApps": "Viber Switch と {{apps}} の設定ファイルからこの項目を削除します。元に戻せません。",
+    "deleteBody": "Viber Switch からこの項目を削除します。元に戻せません。",
     "toast": {
       "written": "{{app}} に書き込みました",
       "rowAllOn": "{{id}} を全 {{count}} アプリで有効化しました",
@@ -4597,7 +4813,7 @@
       "title": "取り込み完了",
       "added": "MCP を {{count}} 件追加しました：{{names}}。",
       "none": "新しい MCP は見つかりませんでした。",
-      "sameName": "同名の MCP は該当アプリのスイッチをオンにしただけで、設定は CC Switch のものが優先されます。",
+      "sameName": "同名の MCP は該当アプリのスイッチをオンにしただけで、設定は Viber Switch のものが優先されます。",
       "failedTitle": "読み込めなかったアプリがあります",
       "filesTitle": "読み込んだファイル",
       "claudeNote": "（トップレベルの mcpServers）",
@@ -4697,7 +4913,7 @@
       "metaHint": "表示名・説明・タグ・ホームページ・ドキュメント",
       "displayName": "表示名",
       "displayNameHelpTitle": "表示名の使われ方",
-      "displayNameHelp": "CC Switch 内でだけ表示し、アプリの設定には書き込みません。",
+      "displayNameHelp": "Viber Switch 内でだけ表示し、アプリの設定には書き込みません。",
       "description": "説明",
       "tags": "タグ",
       "tagsPlaceholder": "カンマ区切り（例：docs, web）",
@@ -4709,7 +4925,7 @@
   "skillsPage": {
     "noun": "Skill",
     "helpTitle": "Skills の同期のしくみ",
-    "help": "本体は CC Switch のフォルダーに置き、チェックしたアプリへ同期します。Claude Desktop と OpenClaw は Skills 非対応のため列がありません。",
+    "help": "本体は Viber Switch のフォルダーに置き、チェックしたアプリへ同期します。Claude Desktop と OpenClaw は Skills 非対応のため列がありません。",
     "add": "Skill を追加",
     "addMenu": {
       "discover": "「見つける」で探す",
@@ -4728,7 +4944,7 @@
     "lastChecked": "前回の確認：{{when}}",
     "justNow": "たった今",
     "banner": {
-      "unmanaged": "このコンピューターに CC Switch の管理外の Skill が {{count}} 件あります。",
+      "unmanaged": "このコンピューターに Viber Switch の管理外の Skill が {{count}} 件あります。",
       "reviewImport": "確認して取り込む",
       "ignore": "無視",
       "close": "閉じる"
@@ -4778,7 +4994,7 @@
     "confirm": {
       "uninstallOne": "{{name}} をアンインストールしますか？",
       "uninstallMany": "{{count}} 件の Skill をアンインストールしますか？",
-      "uninstallBody": "すべてのアプリから外し、CC Switch の本体も削除します。削除前に {{path}} へ自動でバックアップします。",
+      "uninstallBody": "すべてのアプリから外し、Viber Switch の本体も削除します。削除前に {{path}} へ自動でバックアップします。",
       "uninstallManyButton": "{{count}} 件をアンインストール",
       "updateAll": "{{count}} 件の Skill を更新しますか？",
       "updateBody": "更新するとローカルのフォルダーをリポジトリの内容で置き換えます。ローカルの変更はバックアップ（{{path}}）にだけ残ります。",
@@ -4796,7 +5012,8 @@
       "noUpdatesInSelection": "選択した Skill に更新はありません",
       "selectionAlreadyOn": "選択した {{count}} 件の Skill は既に {{app}} で有効です",
       "selectionAlreadyOff": "選択した {{count}} 件の Skill はどれも {{app}} で有効ではありません",
-      "disabledSelection": "{{app}} で {{count}} 件の {{noun}} をオフにしました"
+      "disabledSelection": "{{app}} で {{count}} 件の {{noun}} をオフにしました",
+      "copiedDir": "フォルダー名 {{dir}} をコピーしました"
     },
     "installTo": {
       "prefix": "インストール先：",
@@ -4848,14 +5065,14 @@
     "import": {
       "title": "このコンピューターの Skill を取り込む",
       "helpTitle": "対象になるもの",
-      "help": "SKILL.md があり、まだ CC Switch が管理していないフォルダーです。",
-      "lead": "取り込むと CC Switch のフォルダーにコピーします。元のファイルはそのままです。",
+      "help": "SKILL.md があり、まだ Viber Switch が管理していないフォルダーです。",
+      "lead": "取り込むと Viber Switch のフォルダーにコピーします。元のファイルはそのままです。",
       "searchPlaceholder": "名前か場所を検索",
       "searchAria": "取り込む Skill を検索",
       "selectAll": "すべて選択",
       "selectNone": "選択を解除",
       "foundIn": "見つかった場所：{{places}}",
-      "foundCcSwitch": "CC Switch のフォルダー",
+      "foundCcSwitch": "Viber Switch のフォルダー",
       "appsTitle": "取り込み後に有効にするアプリ",
       "appsHelpTitle": "既定でチェックされるアプリ",
       "appsHelp": "「見つかった場所」のアプリは既定でチェックされ、そこで見つかった Skill だけを有効にします。追加でチェックしたアプリでは取り込むすべての Skill を有効にします。Pi はフォルダーで判定するためここにはありません。",
@@ -4874,7 +5091,8 @@
     "headerUpdatesShow": "更新がある Skill だけを表示",
     "headerUpdatesClear": "すべての Skill を表示",
     "updateAllCount": "すべて更新（{{count}} 件）",
-    "updatingProgress": "更新中 {{done}}/{{total}}…"
+    "updatingProgress": "更新中 {{done}}/{{total}}…",
+    "copyDir": "フォルダー名をコピー"
   },
   "newLayoutNotice": {
     "title": "画面が新しくなりました",
@@ -4936,7 +5154,8 @@
       "open": "認可ページを開く",
       "note": "ブラウザで認可ページを開きました。完了するとここが自動で更新されます。{{service}} の利用規約にご注意ください。",
       "browserNote": "ブラウザで {{service}} のログインページを開きました。ログインしてアクセスを許可すると、ここが自動で更新されます。",
-      "reopen": "ログインページを再度開く"
+      "reopen": "ログインページを再度開く",
+      "login": "{{service}} にログイン · 認可を待っています…"
     },
     "toast": {
       "added": "{{service}} アカウントを追加しました。",
@@ -4973,7 +5192,9 @@
       "empty": "Claude アカウントはまだありません。複数のサブスクリプションアカウントを切り替えるときはここでログインします。",
       "removeNote": "CC Switch がこのアカウント用に保存したログインだけを削除します。他の場所でログアウトされることはなく、Claude Code の現在のログイン（~/.claude）も変わりません。このアカウントを使うカードは Claude Code の現在のログインに切り替わります。",
       "wslUnsupported": "Claude の設定フォルダーが WSL にあるため、Claude アカウントの追加と切り替えにはまだ対応していません。"
-    }
+    },
+    "groupMenu": "{{service}} のその他の操作",
+    "removeAll": "すべてのアカウントを削除"
   },
   "kimi": {
     "oauth": {
@@ -5076,5 +5297,23 @@
       "description": "接続先 URL、API キー、モデルを設定します。既存のカスタムプロバイダーは自動的にここに表示されます。"
     },
     "deleteSessionHint": "履歴の整合性を保つため、DeepSeek Harness でこのセッションを削除してください。"
+  },
+  "agents": {
+    "title": "エージェント"
+  },
+  "languagePicker": {
+    "title": "言語を選択",
+    "hint": "あとから設定で変更できます。"
+  },
+  "desktopAccess": {
+    "current": "現在：{{name}} · {{mode}}",
+    "noCurrent": "プロバイダーが選ばれていません",
+    "helpTitle": "接続方法",
+    "help": "Claude Desktop の接続方法はプロバイダーごとに設定します。直接接続のプロバイダーは Desktop の設定に直接書き込み、モデルマッピングのプロバイダーはルーティングサービス経由で転送します（使用中はサービスが自動で動き続けます）。",
+    "service": "ルーティングサービス",
+    "running": "実行中",
+    "notRunning": "ルーティングサービスを起動できませんでした",
+    "changePort": "ポートを変更",
+    "notNeeded": "ルーティングサービス：現在のプロバイダーには不要"
   }
 }

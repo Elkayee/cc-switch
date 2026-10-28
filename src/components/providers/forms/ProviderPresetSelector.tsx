@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { Search, SlidersHorizontal, X, Zap } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Search,
+  SlidersHorizontal,
+  X,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ClaudeIcon, CodexIcon, GeminiIcon } from "@/components/BrandIcons";
@@ -34,6 +41,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   PRESET_GROUP_ORDER,
@@ -41,6 +53,7 @@ import {
   groupPresetRows,
   loginAccountKey,
   matchPresetRow,
+  partitionPresetRows,
   presetDisplayName,
   presetDomain,
   presetGroup,
@@ -60,6 +73,12 @@ import {
   sortPresetsByName,
   type PresetGroup,
   type PresetRowItem,
+} from "./presetGroups";
+
+export {
+  isOfficialCompanyPreset,
+  isOfficialCompanyRow,
+  partitionPresetEntries,
 } from "./presetGroups";
 
 type PresetTranslator = (key: string) => unknown;
@@ -99,7 +118,7 @@ export function filterPresetEntries(
   return entries.filter((entry) => presetMatches(entry, query, t));
 }
 
-/** 一律按名称排（中文名按拼音插进字母序），不再有官方 / 赞助商置顶 */
+/** 一律按名称排（中文名按拼音插进字母序）；官方公司 / 非官方的分组在显示时再分 */
 export function getVisiblePresetEntries(
   entries: PresetEntry[],
   { query, t }: { query: string; t: PresetTranslator },
@@ -183,7 +202,7 @@ export function ProviderPresetSelector({
     const versions = entry ? presetVersions(presetEntries, entry) : [];
     return (
       <div className="space-y-3" data-preset-selector="">
-        <div className="h-[420px] overflow-hidden rounded-panel border border-border">
+        <div className="h-[420px] overflow-hidden rounded-[8px] border border-border-default">
           <PresetPicker
             entries={presetEntries}
             onPick={onPresetChange}
@@ -226,15 +245,18 @@ function PresetIconBox({ preset }: { preset?: AnyPreset }) {
         icon={preset.icon}
         name={preset.name}
         color={preset.iconColor}
-        className="bg-surface"
-        iconClassName="shrink-0 text-fg-1"
+        className="bg-background"
+        iconClassName="shrink-0 text-foreground"
       />
     );
   }
   let inner: React.ReactNode;
   if (!preset) {
     inner = (
-      <SlidersHorizontal className="h-4 w-4 text-fg-2" strokeWidth={1.5} />
+      <SlidersHorizontal
+        className="h-4 w-4 text-muted-foreground"
+        strokeWidth={1.5}
+      />
     );
   } else if (preset.theme?.icon === "claude") {
     inner = <ClaudeIcon size={16} />;
@@ -243,10 +265,10 @@ function PresetIconBox({ preset }: { preset?: AnyPreset }) {
   } else if (preset.theme?.icon === "gemini") {
     inner = <GeminiIcon size={16} />;
   } else if (preset.theme?.icon === "generic") {
-    inner = <Zap className="h-4 w-4 text-fg-2" strokeWidth={1.5} />;
+    inner = <Zap className="h-4 w-4 text-muted-foreground" strokeWidth={1.5} />;
   } else {
     inner = (
-      <span className="text-caption font-semibold text-fg-2">
+      <span className="text-ui font-semibold text-muted-foreground">
         {presetDisplayName(preset, t).slice(0, 1).toUpperCase()}
       </span>
     );
@@ -254,7 +276,7 @@ function PresetIconBox({ preset }: { preset?: AnyPreset }) {
   return (
     <span
       aria-hidden="true"
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-border bg-surface"
+      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] border border-border-default bg-background"
     >
       {inner}
     </span>
@@ -290,25 +312,30 @@ function PresetBar({
   return (
     <div
       data-preset-selector=""
-      className="flex flex-col gap-3 rounded-panel bg-subtle px-3.5 py-3"
+      className="flex flex-col gap-2 rounded-[8px] bg-muted p-2"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <PresetIconBox preset={entry?.preset} />
         <div className="min-w-0 flex-1">
           {entry ? (
             <>
               <div className="flex min-w-0 items-center gap-1.5">
-                <span className="truncate text-strong text-fg-1" title={name}>
+                <span
+                  className="truncate text-ui font-medium text-foreground"
+                  title={name}
+                >
                   {name}
                 </span>
                 {presetNeedsRouting(appId, entry) && <NeedsRouteBadge />}
               </div>
               {domain && (
-                <div className="truncate text-caption text-fg-2">{domain}</div>
+                <div className="truncate text-ui text-muted-foreground">
+                  {domain}
+                </div>
               )}
             </>
           ) : (
-            <div className="truncate text-strong text-fg-1">
+            <div className="truncate text-ui font-medium text-foreground">
               {t("providerPreset.customBar")}
             </div>
           )}
@@ -414,7 +441,7 @@ function VersionSwitch({
   };
 
   const segmentClass =
-    "h-auto min-w-0 flex-wrap gap-0.5 border border-border-strong bg-transparent p-0.5";
+    "h-auto min-w-0 flex-wrap gap-0.5 border border-border-default bg-transparent p-0.5";
 
   return (
     <div
@@ -433,7 +460,7 @@ function VersionSwitch({
             items={layout.plans.map((plan) => ({
               value: plan,
               label: presetPlanLabel(plan, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -450,7 +477,7 @@ function VersionSwitch({
             items={layout.regions.map((region) => ({
               value: region,
               label: presetRegionLabel(region, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -465,7 +492,7 @@ function VersionSwitch({
             items={versions.map((version) => ({
               value: version.id,
               label: presetVersionShortLabel(version, layout.dimension, t),
-              className: "h-[30px]",
+              className: "h-6",
             }))}
             className={cn(segmentClass, "justify-self-start")}
           />
@@ -476,7 +503,7 @@ function VersionSwitch({
           <Select value={entry.id} onValueChange={request}>
             <SelectTrigger
               aria-label={t("providerPreset.versionLabel")}
-              className="h-9 w-auto min-w-[220px] max-w-full justify-self-start rounded-control text-body"
+              className="h-9 w-auto min-w-[220px] max-w-full justify-self-start rounded-[4px] text-ui"
             >
               <SelectValue />
             </SelectTrigger>
@@ -514,7 +541,7 @@ function DimensionLabel({ children }: { children: React.ReactNode }) {
   return (
     <span
       aria-hidden="true"
-      className="min-w-8 whitespace-nowrap text-center text-caption leading-[36px] text-fg-2"
+      className="min-w-8 whitespace-nowrap text-center text-ui leading-[36px] text-muted-foreground"
     >
       {children}
     </span>
@@ -524,7 +551,7 @@ function DimensionLabel({ children }: { children: React.ReactNode }) {
 function NeedsRouteBadge() {
   const { t } = useTranslation();
   return (
-    <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-border-strong px-1.5 text-badge text-fg-2">
+    <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-border-default px-1.5 text-ui text-muted-foreground">
       {t("providerCard.chip.needsRoute")}
     </span>
   );
@@ -552,6 +579,7 @@ function PresetPicker({
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<PickerCategory>("all");
+  const [unofficialOpen, setUnofficialOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -610,6 +638,24 @@ function PresetPicker({
         ? []
         : matching.filter((item) => presetRowGroup(item.row) === category);
 
+  // 官方公司常驻，其余（聚合 / 转售 / 第三方）折在「非官方」里；
+  // 搜索命中或选中的在里面时自动展开
+  const { official: officialShown, unofficial: unofficialShown } = useMemo(
+    () => partitionPresetRows(shown),
+    [shown],
+  );
+  const selectedInUnofficial = unofficialShown.some(({ row }) =>
+    row.versions.some((entry) => entry.id === selectedPresetId),
+  );
+  const searchingUnofficial = query.trim() !== "" && unofficialShown.length > 0;
+  useEffect(() => {
+    if (selectedInUnofficial || searchingUnofficial) {
+      setUnofficialOpen(true);
+    } else if (!query.trim()) {
+      setUnofficialOpen(false);
+    }
+  }, [query, selectedInUnofficial, searchingUnofficial]);
+
   const navItems: PickerCategory[] = [
     "all",
     ...PRESET_GROUP_ORDER.filter((group) => groups.has(group)),
@@ -642,6 +688,29 @@ function PresetPicker({
     );
   };
 
+  // 「全部」按左侧分类分段，段内按名称
+  const renderSections = (items: VisiblePresetRow[]) => (
+    <div className="flex flex-col gap-4">
+      {sectionPresetRows(items).map((section) => (
+        <section
+          key={section.group}
+          aria-labelledby={`preset-section-${section.group}`}
+          className="flex flex-col gap-2"
+        >
+          <h3
+            id={`preset-section-${section.group}`}
+            className="px-0.5 text-ui font-medium text-muted-foreground"
+          >
+            {t(`providerPreset.group.${section.group}`)}
+          </h3>
+          <div className="grid grid-cols-2 gap-2">
+            {section.items.map(renderRow)}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+
   const nothing =
     searching &&
     matching.length === 0 &&
@@ -649,10 +718,10 @@ function PresetPicker({
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="shrink-0 px-6 pb-3 pt-4">
+      <div className="shrink-0 p-2">
         <div className="relative">
           <Search
-            className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-3"
+            className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             strokeWidth={1.5}
           />
           <Input
@@ -677,7 +746,7 @@ function PresetPicker({
                 searchRef.current?.focus();
               }}
               aria-label={t("providerPreset.clearSearch")}
-              className="absolute end-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-control text-fg-3 hover:bg-subtle hover:text-fg-1"
+              className="absolute end-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-[4px] text-muted-foreground hover:bg-muted hover:text-foreground"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -685,7 +754,7 @@ function PresetPicker({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 gap-4 px-6 pb-4">
+      <div className="flex min-h-0 flex-1 gap-2 px-2 pb-2">
         <div
           role="group"
           aria-label={t("providerPreset.categoriesLabel")}
@@ -703,8 +772,8 @@ function PresetPicker({
           ))}
           {onUniversalPresetSelect && (
             <>
-              <div className="my-2 border-t border-border" />
-              <div className="px-2 pb-1 text-badge text-fg-3">
+              <div className="my-2 border-t border-border-default" />
+              <div className="px-2 pb-1 text-ui text-muted-foreground">
                 {t("providerPreset.crossApp")}
               </div>
               <CategoryButton
@@ -720,17 +789,17 @@ function PresetPicker({
 
         <div className="min-w-0 flex-1 overflow-y-auto">
           {category !== "all" && (
-            <p className="mb-2 text-caption text-fg-2">
+            <p className="mb-2 text-ui text-muted-foreground">
               {t(`providerPreset.groupHint.${category}`)}
             </p>
           )}
 
           {nothing ? (
             <div className="flex flex-col items-center gap-2 py-12 text-center">
-              <p className="text-body text-fg-1">
+              <p className="text-ui text-foreground">
                 {t("providerPreset.noResults", { query: query.trim() })}
               </p>
-              <p className="text-caption text-fg-2">
+              <p className="text-ui text-muted-foreground">
                 {t("providerPreset.noResultsHint")}
               </p>
               <Button
@@ -752,8 +821,8 @@ function PresetPicker({
                     <ProviderIconBox
                       icon={preset.icon}
                       name={preset.name}
-                      className="bg-surface"
-                      iconClassName="shrink-0 text-fg-1"
+                      className="bg-background"
+                      iconClassName="shrink-0 text-foreground"
                     />
                   }
                   name={preset.name}
@@ -765,38 +834,55 @@ function PresetPicker({
                 <button
                   type="button"
                   onClick={onManageUniversalProviders}
-                  className="col-span-2 justify-self-start text-caption text-fg-1 underline underline-offset-2 hover:text-fg-2"
+                  className="col-span-2 justify-self-start text-ui text-foreground underline underline-offset-2 hover:text-muted-foreground"
                 >
                   {t("providerPreset.manageUniversal")}
                 </button>
               )}
             </div>
-          ) : category === "all" ? (
-            // 「全部」按左侧分类分段，段内按名称；自定义配置固定在最上面
-            <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-2">{customRow}</div>
-              {sectionPresetRows(shown).map((section) => (
-                <section
-                  key={section.group}
-                  aria-labelledby={`preset-section-${section.group}`}
-                  className="flex flex-col gap-2"
-                >
-                  <h3
-                    id={`preset-section-${section.group}`}
-                    className="px-0.5 text-caption font-medium text-fg-2"
-                  >
-                    {t(`providerPreset.group.${section.group}`)}
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {section.items.map(renderRow)}
-                  </div>
-                </section>
-              ))}
-            </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
-              {customRow}
-              {shown.map(renderRow)}
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-2">
+                {customRow}
+                {category !== "all" && officialShown.map(renderRow)}
+              </div>
+              {category === "all" && renderSections(officialShown)}
+              {unofficialShown.length > 0 && (
+                <Collapsible
+                  open={unofficialOpen}
+                  onOpenChange={setUnofficialOpen}
+                >
+                  <CollapsibleTrigger asChild>
+                    <button
+                      type="button"
+                      aria-expanded={unofficialOpen}
+                      aria-label={t("providerPreset.unofficialAriaLabel")}
+                      className="flex h-6 w-full min-w-0 items-center justify-start gap-1.5 rounded-[4px] px-2 text-start text-ui font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                    >
+                      {unofficialOpen ? (
+                        <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                      ) : (
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                      )}
+                      <span className="min-w-0 truncate">
+                        {t("providerPreset.unofficial")} (
+                        {unofficialShown.length})
+                      </span>
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <div className="pt-2">
+                      {category === "all" ? (
+                        renderSections(unofficialShown)
+                      ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                          {unofficialShown.map(renderRow)}
+                        </div>
+                      )}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
             </div>
           )}
         </div>
@@ -859,13 +945,13 @@ function CategoryButton({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex h-8 items-center justify-between gap-2 rounded-control px-2 text-start text-body transition-colors",
-        active ? "bg-selected font-medium text-fg-1" : "hover:bg-subtle",
-        !active && (dim ? "text-fg-3" : "text-fg-1"),
+        "flex h-6 items-center justify-between gap-2 rounded-[4px] px-2 text-start text-[12.35px] leading-[1.3] transition-colors",
+        active ? "bg-selected font-medium text-foreground" : "hover:bg-muted",
+        !active && (dim ? "text-muted-foreground" : "text-foreground"),
       )}
     >
       <span className="truncate">{label}</span>
-      <span className="shrink-0 text-caption tabular-nums text-fg-3">
+      <span className="shrink-0 text-ui tabular-nums text-muted-foreground">
         {count}
       </span>
     </button>
@@ -895,21 +981,21 @@ function PresetRow({
       aria-label={name}
       aria-description={detail}
       className={cn(
-        "flex h-[52px] min-w-0 items-center gap-3 rounded-panel border bg-surface px-3 text-start transition-colors hover:bg-subtle",
-        selected ? "border-border-strong" : "border-border",
+        "flex h-12 min-w-0 items-center gap-2 rounded-[8px] border bg-background px-2 text-start text-[12.35px] leading-[1.3] transition-colors hover:bg-muted",
+        selected ? "border-border-default" : "border-border-default",
       )}
     >
       {icon}
-      <span className="min-w-0 flex-1">
+      <span className="min-w-0 flex-1 text-[12.35px] leading-[1.3]">
         <span
-          className="block truncate text-body font-medium text-fg-1"
+          className="block truncate text-ui font-medium text-foreground"
           title={name}
         >
           {name}
         </span>
         {detail && (
           <span
-            className="block truncate text-caption text-fg-2"
+            className="block truncate text-ui text-muted-foreground"
             title={detail}
           >
             {detail}

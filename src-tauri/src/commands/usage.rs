@@ -321,7 +321,7 @@ pub async fn sync_session_usage(
         crate::services::session_usage::sync_all_unlocked(&db)
     })
     .await
-    .map_err(|error| AppError::Message(format!("会话用量同步任务失败: {error}")))
+    .map_err(|error| AppError::Message(format!("Session usage sync failed: {error}")))
 }
 
 /// 会话日志扫描（后台定时或手动同步）最近一次完成的时间，毫秒时间戳；
@@ -357,7 +357,7 @@ pub async fn rebuild_codex_usage(
         finish_codex_rebuild(result)
     })
     .await
-    .map_err(|error| AppError::Message(format!("Codex 用量重建任务失败: {error}")))?
+    .map_err(|error| AppError::Message(format!("Codex usage rebuild failed: {error}")))?
 }
 
 /// 获取数据来源分布

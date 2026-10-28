@@ -379,6 +379,7 @@ describe("ClaudeDesktopProviderForm", () => {
     const onSubmit = vi.fn();
     renderForm(undefined, onSubmit);
 
+    await user.click(screen.getByRole("button", { name: /unofficial/i }));
     await user.click(screen.getByRole("button", { name: /PackyCode/ }));
 
     expect(screen.getByDisplayValue("claude-sonnet-5")).toBeInTheDocument();

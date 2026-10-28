@@ -109,7 +109,7 @@ pub fn get_app_mode(
 /// 已经在路由 / 聚合模式时当场生效。
 #[tauri::command]
 pub async fn set_proxy_route(
-    app_handle: tauri::AppHandle,
+    app_handle: tauri::AppHandle<crate::AppRuntime>,
     state: tauri::State<'_, AppState>,
     app_type: String,
     provider_id: String,
@@ -186,7 +186,7 @@ pub async fn acknowledge_codex_stale_clients() -> Result<(), String> {
 /// Stack 模型的提示；失败时 `partial` 为真表示已部分写入，下次操作或重启 CC Switch 时补完。
 #[tauri::command]
 pub async fn set_proxy_stack_member(
-    app_handle: tauri::AppHandle,
+    app_handle: tauri::AppHandle<crate::AppRuntime>,
     state: tauri::State<'_, AppState>,
     app_type: String,
     provider_id: String,
@@ -441,7 +441,7 @@ pub async fn get_provider_health(
 /// 2. 如果恢复的供应商在队列中优先级更高（queue_order 更小），则自动切换
 #[tauri::command]
 pub async fn reset_circuit_breaker(
-    app_handle: tauri::AppHandle,
+    app_handle: tauri::AppHandle<crate::AppRuntime>,
     state: tauri::State<'_, AppState>,
     provider_id: String,
     app_type: String,

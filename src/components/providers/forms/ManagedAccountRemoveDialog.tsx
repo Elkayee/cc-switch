@@ -62,15 +62,15 @@ export function ManagedAccountRemoveDialog({
   });
 
   const renderList = (lead: string, list: ManagedAccountUser[]) => (
-    <div className="flex flex-col gap-1.5">
-      <p className="m-0 text-body text-fg-1">{lead}</p>
-      <ul className="m-0 flex list-none flex-col gap-2 rounded-panel bg-subtle px-3.5 py-3">
+    <div className="flex flex-col gap-1">
+      <p className="m-0 text-[12.35px] leading-[1.3] text-fg-1">{lead}</p>
+      <ul className="m-0 flex list-none flex-col gap-2 rounded-[8px] bg-subtle p-2">
         {groupUsersByApp(list).map((group) => (
           <li
             key={group.appId}
-            className="flex items-start gap-2.5 text-caption"
+            className="flex items-start gap-2 text-[12.35px] leading-[1.3]"
           >
-            <span className="flex h-[18px] w-4 shrink-0 items-center">
+            <span className="flex h-4 w-4 shrink-0 items-center">
               <AppGlyph
                 app={group.appId}
                 size={14}
@@ -103,10 +103,10 @@ export function ManagedAccountRemoveDialog({
         <DialogContent
           role="alertdialog"
           zIndex="alert"
-          className="max-w-[480px] gap-4 rounded-dialog border-border bg-surface p-6 shadow-v7-lg sm:rounded-dialog"
+          className="max-w-[480px] gap-2 rounded-[8px] border-border bg-surface p-2 shadow-lg sm:rounded-[8px]"
         >
-          <div className="flex flex-col gap-1.5">
-            <DialogTitle className="text-title text-fg-1 [overflow-wrap:anywhere]">
+          <div className="flex flex-col gap-1">
+            <DialogTitle className="text-[12.35px] font-semibold leading-[1.3] text-fg-1 [overflow-wrap:anywhere]">
               {target.kind === "one"
                 ? t("managedAuth.remove.titleOne", {
                     defaultValue: "删除账号「{{login}}」？",
@@ -117,7 +117,7 @@ export function ManagedAccountRemoveDialog({
                     service: serviceName,
                   })}
             </DialogTitle>
-            <DialogDescription className="text-body text-fg-2">
+            <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
               {one
                 ? t("managedAuth.remove.leadOne", {
                     defaultValue:
@@ -133,7 +133,7 @@ export function ManagedAccountRemoveDialog({
           </div>
 
           {users.length === 0 ? (
-            <p className="m-0 text-body text-fg-2">
+            <p className="m-0 text-[12.35px] leading-[1.3] text-fg-2">
               {one
                 ? t("managedAuth.remove.noneOne", {
                     defaultValue: "没有供应商在用这个账号。",
@@ -167,11 +167,10 @@ export function ManagedAccountRemoveDialog({
             </>
           )}
 
-          <div className="flex flex-wrap justify-end gap-2 pt-1">
+          <div className="flex flex-wrap justify-end gap-2">
             <Button
               type="button"
               variant="neutral"
-              size="regular"
               autoFocus
               disabled={pending}
               onClick={onCancel}
@@ -181,7 +180,6 @@ export function ManagedAccountRemoveDialog({
             <Button
               type="button"
               variant="destructive"
-              size="regular"
               disabled={pending}
               onClick={onConfirm}
             >
@@ -212,7 +210,7 @@ export function ManagedAccountUsage({
   const names = users.map((user) => user.name);
   return (
     <span
-      className="shrink-0 whitespace-nowrap text-caption text-fg-2"
+      className="shrink-0 whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-2"
       title={t("managedAuth.usedByTitle", {
         defaultValue: "在用的供应商：{{names}}",
         names: Array.from(new Set(names)).join(

@@ -1,5 +1,8 @@
 import { CSS } from "@dnd-kit/utilities";
 import { DndContext, closestCenter, type Modifier } from "@dnd-kit/core";
+import { Search, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import {
   SortableContext,
   useSortable,
@@ -13,15 +16,14 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
 import type { OpenClawProviderConfig, Provider } from "@/types";
 import { getOpencodeDeclaredModels } from "@/components/providers/forms/helpers/opencodeFormUtils";
 import type { AppId } from "@/lib/api";
+import { isTauri } from "@tauri-apps/api/core";
+import { pinnedProxyUrl } from "@/lib/pinnedProxyUrl";
 import { providersApi } from "@/lib/api/providers";
 import {
   extractErrorMessage,
@@ -43,8 +45,8 @@ import {
   useCurrentOmoProviderId,
   useCurrentOmoSlimProviderId,
 } from "@/lib/query/omo";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { HelpTip } from "@/components/ui/help-tip";
 import { Notice } from "@/components/ui/notice";
 import { cn } from "@/lib/utils";
@@ -90,7 +92,10 @@ interface ProviderListProps {
   /** 切换式应用必传：按模式 tab 算卡片 */
   switchMode?: SwitchModeProps;
   isLoading?: boolean;
-  /** 搜索面板开关由页头按钮控制时传入；不传则列表自己管（只能 ⌘F 打开） */
+  /**
+   * 搜索框开关。由页头搜索按钮控制时传入（upstream）：为 true 才显示搜索框并过滤，
+   * Esc / ⌘F 通过 onSearchOpenChange 回写。不传（fork 默认）则搜索框常驻、始终过滤。
+   */
   searchOpen?: boolean;
   onSearchOpenChange?: (open: boolean) => void;
   /**
@@ -98,6 +103,11 @@ interface ProviderListProps {
    * 与第一个分组标题同行
    */
   searchSlot?: HTMLElement | null;
+  /** 固定路径路由（fork）：接管开启 + 代理运行时，卡片上出现「复制固定 URL」按钮 */
+  pinnedTakeoverOn?: boolean;
+  isProxyRunning?: boolean;
+  proxyListenAddress?: string;
+  proxyListenPort?: number;
 }
 
 export function ProviderList({
@@ -121,6 +131,10 @@ export function ProviderList({
   searchOpen,
   onSearchOpenChange,
   searchSlot,
+  pinnedTakeoverOn = false,
+  isProxyRunning = false,
+  proxyListenAddress = "",
+  proxyListenPort = 0,
 }: ProviderListProps) {
   const { t } = useTranslation();
   const { checkProvider, isChecking } = useStreamCheck(appId);
@@ -247,9 +261,6 @@ export function ProviderList({
   });
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [innerSearchOpen, setInnerSearchOpen] = useState(false);
-  const isSearchOpen = searchOpen ?? innerSearchOpen;
-  const setIsSearchOpen = onSearchOpenChange ?? setInnerSearchOpen;
   const searchInputRef = useRef<HTMLInputElement>(null);
   const focusSearch = useCallback(() => {
     const input = searchInputRef.current;
@@ -258,6 +269,7 @@ export function ProviderList({
     input.select();
     input.scrollIntoView?.({ block: "nearest" });
   }, []);
+  const isSearchVisible = searchOpen === undefined || searchOpen;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -265,34 +277,40 @@ export function ProviderList({
 
       const key = event.key.toLowerCase();
       if ((event.metaKey || event.ctrlKey) && key === "f") {
-        // 正在输入框/可编辑区域中时不抢占 Ctrl+F（例如添加供应商表单里
+        // 正在别的输入框/可编辑区域中时不抢占 Ctrl+F（例如添加供应商表单里
         // ProviderPresetSelector 的搜索框），避免与其同名快捷键冲突。
-        if (isTextEditableTarget(document.activeElement)) return;
+        if (
+          isTextEditableTarget(document.activeElement) &&
+          document.activeElement !== searchInputRef.current
+        ) {
+          return;
+        }
         event.preventDefault();
-        if (isSearchOpen) {
+        if (isSearchVisible) {
           // The list-row field may have scrolled out of view since it was opened.
           focusSearch();
         } else {
-          setIsSearchOpen(true);
+          onSearchOpenChange?.(true);
         }
         return;
       }
 
       if (key === "escape") {
-        setIsSearchOpen(false);
+        onSearchOpenChange?.(false);
       }
     };
 
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
-  }, [setIsSearchOpen, isSearchOpen, focusSearch]);
+  }, [isSearchVisible, focusSearch, onSearchOpenChange]);
 
+  // 页头按钮打开搜索框后聚焦
   useEffect(() => {
-    if (isSearchOpen) {
+    if (searchOpen) {
       const frame = requestAnimationFrame(focusSearch);
       return () => cancelAnimationFrame(frame);
     }
-  }, [isSearchOpen, focusSearch]);
+  }, [searchOpen, focusSearch]);
 
   // 每家可被搜到的文字：名称、备注、官网、请求地址（请求地址要解析配置，只随列表变化重算）
   const searchIndex = useMemo(
@@ -312,14 +330,14 @@ export function ProviderList({
     [sortedProviders],
   );
 
-  // 关掉面板就不再过滤：搜索词留着，下次打开还在，但列表不会悄悄少几家
+  // 搜索框关着（由页头控制时）就不再过滤：搜索词留着，下次打开还在，但列表不会悄悄少几家
   const filteredProviders = useMemo(() => {
-    const keyword = isSearchOpen ? searchTerm.trim().toLowerCase() : "";
+    const keyword = isSearchVisible ? searchTerm.trim().toLowerCase() : "";
     if (!keyword) return sortedProviders;
     return searchIndex
       .filter((entry) => entry.text.includes(keyword))
       .map((entry) => entry.provider);
-  }, [isSearchOpen, searchTerm, searchIndex, sortedProviders]);
+  }, [isSearchVisible, searchTerm, searchIndex, sortedProviders]);
 
   const sections = useMemo<ProviderSection[]>(() => {
     if (switchMode) {
@@ -442,7 +460,7 @@ export function ProviderList({
         {[0, 1, 2].map((index) => (
           <div
             key={index}
-            className="h-[60px] w-full rounded-panel border border-dashed border-border bg-subtle"
+            className="h-12 w-full rounded-[8px] border border-dashed border-border bg-subtle"
           />
         ))}
       </div>
@@ -451,7 +469,7 @@ export function ProviderList({
 
   if (sortedProviders.length === 0) {
     return (
-      <div className="space-y-4">
+      <div className="mt-2 space-y-2">
         {piStateErrorNotice}
         <ProviderEmptyState
           appId={appId}
@@ -481,6 +499,19 @@ export function ProviderList({
     return provider.id === currentProviderId;
   };
 
+  const pinnedUrlFor = (provider: Provider) =>
+    pinnedProxyUrl({
+      appId,
+      providerId: provider.id,
+      takeoverOn: pinnedTakeoverOn,
+      proxyRunning: isProxyRunning,
+      isTauri: isTauri(),
+      pageHostname:
+        typeof window === "undefined" ? "localhost" : window.location.hostname,
+      listenAddress: proxyListenAddress,
+      port: proxyListenPort,
+    }) ?? undefined;
+
   const renderCard = (provider: Provider, presentation: CardPresentation) => (
     <SortableProviderCard
       key={provider.id}
@@ -500,13 +531,14 @@ export function ProviderList({
       onOpenTerminal={appId === "agy" ? undefined : onOpenTerminal}
       onTest={handleTest}
       isTesting={isChecking(provider.id)}
+      copyProxyUrl={pinnedUrlFor(provider)}
     />
   );
 
   // 搜索框放在列表上方第一行的最右端，不盖住卡片、打开时卡片也不下移
   const searchField = (
     <AnimatePresence>
-      {isSearchOpen && (
+      {isSearchVisible && (
         <motion.div
           key="provider-search"
           initial={{ opacity: 0, x: 8 }}
@@ -548,7 +580,7 @@ export function ProviderList({
             variant="quiet"
             size="icon-compact"
             className="absolute end-1 top-1/2 h-6 w-6 -translate-y-1/2"
-            onClick={() => setIsSearchOpen(false)}
+            onClick={() => onSearchOpenChange?.(false)}
             aria-label={t("provider.searchCloseAriaLabel", {
               defaultValue: "Close provider search",
             })}
@@ -578,11 +610,11 @@ export function ProviderList({
     Boolean(leadSection?.title) &&
     filteredProviders.length > 0;
   const showListHeader =
-    !hostedSearch && (Boolean(leadSection?.title) || isSearchOpen);
+    !hostedSearch && (Boolean(leadSection?.title) || isSearchVisible);
 
   // 卡片列表铺满主区域，和页头同宽
   return (
-    <div className="space-y-4">
+    <div className="mt-2 space-y-3">
       {piStateErrorNotice}
       {searchSlot && createPortal(searchField, searchSlot)}
       {showListHeader && (
@@ -600,7 +632,7 @@ export function ProviderList({
       )}
 
       {filteredProviders.length === 0 ? (
-        <div className="rounded-panel border border-dashed border-border px-6 py-8 text-center text-body text-fg-2">
+        <div className="rounded-[8px] border border-dashed border-border px-2 py-2 text-center text-ui text-muted-foreground">
           {t("provider.noSearchResults", {
             defaultValue: "No providers match your search.",
           })}
@@ -618,7 +650,7 @@ export function ProviderList({
                 <div className="pt-1">{renderSectionTitle(section)}</div>
               )}
               {section.items.length === 0 && section.emptyText ? (
-                <div className="rounded-panel border border-dashed border-border px-4 py-3 text-caption text-fg-3">
+                <div className="rounded-[8px] border border-dashed border-border px-2 py-2 text-ui text-muted-foreground">
                   {section.emptyText}
                 </div>
               ) : (
@@ -655,6 +687,7 @@ interface SortableProviderCardProps {
   onOpenTerminal?: (provider: Provider) => void;
   onTest?: (provider: Provider) => void;
   isTesting: boolean;
+  copyProxyUrl?: string;
 }
 
 function SortableProviderCard(props: SortableProviderCardProps) {

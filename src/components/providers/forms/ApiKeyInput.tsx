@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { fieldClass } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input, fieldClass } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { REQUIRED_LABEL } from "./BasicFormFields";
 
@@ -39,7 +40,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
         <label
           htmlFor={id}
           className={cn(
-            "block text-caption font-medium text-fg-1",
+            "block text-[12.35px] leading-[1.3] font-medium text-foreground",
             required && REQUIRED_LABEL,
           )}
         >
@@ -48,7 +49,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
         {labelAside}
       </div>
       <div className="relative">
-        <input
+        <Input
           type={showKey ? "text" : "password"}
           id={id}
           value={value}
@@ -70,17 +71,19 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
           )}
         />
         {!disabled && value && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={() => setShowKey(!showKey)}
-            className="absolute inset-y-0 end-0 flex items-center pe-3 text-fg-3 transition-colors hover:text-fg-1"
+            className="absolute right-0 top-0"
             aria-label={showKey ? t("apiKeyInput.hide") : t("apiKeyInput.show")}
           >
             {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
+          </Button>
         )}
       </div>
-      {hint && <p className="text-caption text-fg-2">{hint}</p>}
+      {hint && <p className="text-ui text-muted-foreground">{hint}</p>}
     </div>
   );
 };

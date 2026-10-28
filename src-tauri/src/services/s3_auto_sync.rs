@@ -75,7 +75,11 @@ fn persist_auto_sync_error(settings: &mut S3SyncSettings, error: &AppError) {
     let _ = settings::update_s3_sync_status(settings.status.clone());
 }
 
-fn emit_auto_sync_status_updated(app: &AppHandle, status: &str, error: Option<&str>) {
+fn emit_auto_sync_status_updated(
+    app: &AppHandle<crate::AppRuntime>,
+    status: &str,
+    error: Option<&str>,
+) {
     let payload = match error {
         Some(message) => json!({
             "source": "auto",
@@ -95,7 +99,7 @@ fn emit_auto_sync_status_updated(app: &AppHandle, status: &str, error: Option<&s
 
 async fn run_auto_sync_upload(
     db: &crate::database::Database,
-    app: &AppHandle,
+    app: &AppHandle<crate::AppRuntime>,
 ) -> Result<(), AppError> {
     let mut settings = settings::get_s3_sync_settings();
     if !should_run_auto_sync(settings.as_ref()) {
@@ -134,7 +138,7 @@ pub fn notify_db_changed(table: &str) {
     let _ = enqueue_change_signal(tx, table);
 }
 
-pub fn start_worker(db: Arc<crate::database::Database>, app: tauri::AppHandle) {
+pub fn start_worker(db: Arc<crate::database::Database>, app: tauri::AppHandle<crate::AppRuntime>) {
     if DB_CHANGE_TX.get().is_some() {
         return;
     }
@@ -153,7 +157,7 @@ pub fn start_worker(db: Arc<crate::database::Database>, app: tauri::AppHandle) {
 async fn run_worker_loop(
     db: Arc<crate::database::Database>,
     mut rx: Receiver<String>,
-    app: tauri::AppHandle,
+    app: tauri::AppHandle<crate::AppRuntime>,
 ) {
     while let Some(first_table) = rx.recv().await {
         let started_at = Instant::now();

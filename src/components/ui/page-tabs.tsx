@@ -25,7 +25,7 @@ export interface PageTabsProps<T extends string> {
   /** 与 tabpanel 关联时传入 */
   controls?: string;
   /**
-   * default：一级页签（36 高、13px）；sm：一级页签下面的二级页签（32 高、12px、
+   * default：一级页签（行高 28、页签 24）；sm：一级页签下面的二级页签（24 高、
    * 不画整行底线，只在选中项下面画线），两层叠在一起时层级才分得清。
    */
   size?: "default" | "sm";
@@ -70,8 +70,8 @@ export function PageTabs<T extends string>({
     <div
       className={cn(
         small
-          ? "flex h-8 items-end gap-3"
-          : "flex h-9 items-end gap-4 border-b border-border",
+          ? "flex h-6 items-end gap-2"
+          : "flex h-7 items-end gap-2 border-b border-border",
         className,
       )}
     >
@@ -79,10 +79,7 @@ export function PageTabs<T extends string>({
         ref={indicator.ref}
         role="tablist"
         aria-label={rest["aria-label"]}
-        className={cn(
-          "relative flex h-full items-end",
-          small ? "gap-3" : "gap-4",
-        )}
+        className={cn("relative flex h-full items-end", "gap-2")}
       >
         {/* 下划线单独一条，切换时滑过去；一级页签压住整行底线 */}
         <TabUnderline
@@ -108,10 +105,10 @@ export function PageTabs<T extends string>({
               onClick={() => onValueChange(item.value)}
               onKeyDown={onKeyDown}
               className={cn(
-                "h-full whitespace-nowrap border-b-2 px-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:text-fg-3",
+                "h-6 whitespace-nowrap border-b-2 px-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:text-fg-3",
                 small
-                  ? "inline-flex items-center gap-1.5 text-caption"
-                  : "-mb-px text-body",
+                  ? "inline-flex items-center gap-1 text-[12.35px] leading-[1.3]"
+                  : "-mb-px text-[12.35px] leading-[1.3]",
                 "border-transparent",
                 selected
                   ? "font-semibold text-fg-1"

@@ -1,6 +1,13 @@
 node_modules/
 dist/
+dist-web/
 release/
+
+# Browser-mode npm packaging: CI stages prebuilt binaries and the frontend
+# build into the platform packages before publishing; they are never committed.
+npm/platforms/*/bin/*
+!npm/platforms/*/bin/.gitkeep
+npm/**/*.tgz
 .DS_Store
 *.log
 .env

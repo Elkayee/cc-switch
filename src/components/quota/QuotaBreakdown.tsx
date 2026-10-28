@@ -44,7 +44,7 @@ export function QuotaBreakdownRow({
           onClick={(event) => event.stopPropagation()}
           className={cn(
             className,
-            "group/breakdown -mx-1 rounded-control px-1 text-start transition-colors hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-subtle",
+            "group/breakdown -mx-1 rounded-[4px] px-1 text-start transition-colors hover:bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-subtle",
           )}
         >
           {children}
@@ -54,9 +54,9 @@ export function QuotaBreakdownRow({
         align={align}
         sideOffset={6}
         aria-label={breakdown.title}
-        className="w-[236px] rounded-panel border-border bg-surface p-3 shadow-v7-md"
+        className="w-[236px] rounded-[8px] border-border bg-surface p-2 shadow-sm"
       >
-        <div className="mb-2 flex items-baseline justify-between gap-3 text-caption">
+        <div className="mb-2 flex items-baseline justify-between gap-2 text-[12.35px] leading-[1.3]">
           <span className="font-medium text-fg-1">{breakdown.title}</span>
           {line && (
             <span className="whitespace-nowrap tabular-nums text-fg-2">
@@ -95,7 +95,12 @@ function BreakdownItems({
   className?: string;
 }) {
   return (
-    <ul className={cn("flex flex-col gap-1 text-caption", className)}>
+    <ul
+      className={cn(
+        "flex flex-col gap-1 text-[12.35px] leading-[1.3]",
+        className,
+      )}
+    >
       {items.map((item) => (
         <li key={item.key} className="flex items-center gap-2">
           <span

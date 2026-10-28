@@ -69,7 +69,7 @@ const CopilotQuotaFooter: React.FC<CopilotQuotaFooterProps> = ({
 
   return (
     <QuotaBars
-      className="mt-3"
+      className="mt-2"
       title={quota.plan || t("subscription.title")}
       rows={rows}
       queriedAt={quota.queriedAt}

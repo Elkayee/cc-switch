@@ -101,7 +101,6 @@ export function GrokBuildProviderForm({
   const [isPartner, setIsPartner] = useState(
     initialData?.meta?.isPartner ?? false,
   );
-  const [partnerPromotionKey, setPartnerPromotionKey] = useState<string>();
   const [profile, setProfile] = useState(initialConfig.model);
   const [upstreamModel, setUpstreamModel] = useState(
     initialConfig.upstreamModel ?? initialConfig.model,
@@ -252,7 +251,6 @@ export function GrokBuildProviderForm({
     if (presetId === "custom") {
       setCategory("custom");
       setIsPartner(false);
-      setPartnerPromotionKey(undefined);
       setPresetEndpoints([]);
       return;
     }
@@ -265,7 +263,6 @@ export function GrokBuildProviderForm({
       form.setValue("iconColor", grokBuildOfficialPreset.iconColor ?? "");
       setCategory("official");
       setIsPartner(false);
-      setPartnerPromotionKey(undefined);
       setPresetEndpoints([]);
       setRawConfig("");
       clearDraftProjection();
@@ -294,7 +291,6 @@ export function GrokBuildProviderForm({
     form.setValue("iconColor", preset.iconColor ?? "");
     setCategory(preset.category ?? "custom");
     setIsPartner(preset.isPartner ?? false);
-    setPartnerPromotionKey(preset.partnerPromotionKey);
     setBaseUrl(presetBaseUrl);
     setApiKey(presetApiKey);
     setUpstreamModel(presetModel);
@@ -414,7 +410,6 @@ export function GrokBuildProviderForm({
       isFullUrl,
       endpointAutoSelect,
       isPartner,
-      partnerPromotionKey,
       impersonateClaudeCode,
       promptCacheRouting,
       codexChatReasoning,
@@ -450,7 +445,7 @@ export function GrokBuildProviderForm({
       <form
         id="provider-form"
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-6"
+        className="space-y-2 rounded-[8px] p-2 border border-border-default"
       >
         {!initialData && (
           <ProviderPresetSelector
@@ -478,7 +473,6 @@ export function GrokBuildProviderForm({
               shouldShowApiKeyLink={Boolean(apiKeyLinkUrl)}
               websiteUrl={apiKeyLinkUrl}
               isPartner={isPartner}
-              partnerPromotionKey={partnerPromotionKey}
               shouldShowSpeedTest
               codexBaseUrl={baseUrl}
               onBaseUrlChange={(value) => {
@@ -545,7 +539,7 @@ export function GrokBuildProviderForm({
               <FormLabel htmlFor="grokbuild-config-toml">
                 {t("grokBuild.rawConfig", { defaultValue: "config.toml" })}
               </FormLabel>
-              <p className="text-xs text-fg-2">
+              <p className="text-ui text-muted-foreground">
                 {t("grokBuild.keyFieldsHint", {
                   defaultValue:
                     "默认模型（models.default）和它指向的模型表随供应商切换；其余是 Grok Build 全局设置，保存后对所有供应商生效。",
@@ -561,7 +555,7 @@ export function GrokBuildProviderForm({
                 language="javascript"
               />
               {rawConfigError && (
-                <p className="text-xs text-destructive">
+                <p className="text-ui text-destructive">
                   {t("grokBuild.invalidToml", {
                     error: rawConfigError,
                     defaultValue: `Invalid config.toml: ${rawConfigError}`,

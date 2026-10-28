@@ -353,7 +353,9 @@ export function EditProviderDialog({
           liveFile ? (
             <>
               {t("provider.editCurrentNoticeFile")}{" "}
-              <code className="font-mono text-caption">{liveFile}</code>
+              <code className="font-mono text-[12.35px] leading-[1.3]">
+                {liveFile}
+              </code>
               {t("provider.editCurrentNoticeFileEnd")}
             </>
           ) : (
@@ -383,19 +385,13 @@ export function EditProviderDialog({
       contentClassName={appId === "pi" ? "pb-0 pt-4" : "pt-4"}
       footer={
         <>
-          <Button
-            type="button"
-            variant="neutral"
-            size="regular"
-            onClick={closeDialog}
-          >
+          <Button type="button" variant="neutral" onClick={closeDialog}>
             {t("common.cancel")}
           </Button>
           <Button
             type="submit"
             form="provider-form"
             variant="solid"
-            size="regular"
             disabled={isFormSubmitting || !isFormReady}
           >
             {isFormSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -406,7 +402,7 @@ export function EditProviderDialog({
     >
       {currentNotice}
       {waitingForEditorView ? (
-        <div className="py-12 text-center text-body text-fg-2">
+        <div className="py-8 text-center text-[12.35px] leading-[1.3] text-fg-2">
           {t("common.loading")}
         </div>
       ) : (

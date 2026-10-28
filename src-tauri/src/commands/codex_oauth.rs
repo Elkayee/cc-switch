@@ -26,7 +26,7 @@ pub struct CodexOAuthState(pub Arc<CodexOAuthManager>);
 ///   与 Codex CLI 路径完全一致
 #[tauri::command(rename_all = "camelCase")]
 pub async fn get_codex_oauth_quota(
-    app: tauri::AppHandle,
+    app: tauri::AppHandle<crate::AppRuntime>,
     app_state: State<'_, crate::store::AppState>,
     account_id: Option<String>,
     state: State<'_, CodexOAuthState>,

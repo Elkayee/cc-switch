@@ -95,7 +95,10 @@ pub fn set_hermes_memory_enabled(
 /// there is no need (and no way) for CC Switch to inject it — we just open
 /// the URL and let Hermes handle auth.
 #[tauri::command]
-pub async fn open_hermes_web_ui(app: AppHandle, path: Option<String>) -> Result<(), String> {
+pub async fn open_hermes_web_ui(
+    app: AppHandle<crate::AppRuntime>,
+    path: Option<String>,
+) -> Result<(), String> {
     let port = std::env::var("HERMES_WEB_PORT")
         .ok()
         .and_then(|raw| raw.trim().parse::<u16>().ok())

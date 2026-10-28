@@ -39,8 +39,8 @@ describe("Codex preset pre-filled reasoning levels", () => {
   // 或让 Chat catalog 与预设 config.toml 的显式 high 一致（否则可能回落 max）。
   const EXPECTED: Array<[string, string, string[], string?]> = [
     // 火山官方 Codex 接入文档四份一致：low/medium/high
-    ["火山 Agent Plan", "ark-code-latest", ["low", "medium", "high"]],
-    ["火山 Coding Plan", "ark-code-latest", ["low", "medium", "high"]],
+    ["Volcengine Agent Plan", "ark-code-latest", ["low", "medium", "high"]],
+    ["Volcengine Coding Plan", "ark-code-latest", ["low", "medium", "high"]],
     // 方舟深度思考文档：本模型无限制的通用四档（minimal=关思考直接回答）
     [
       "Volcengine Doubao",
@@ -200,9 +200,9 @@ describe("Codex preset pre-filled reasoning levels", () => {
     // 位于套餐分页之前（help.aliyun.com/zh/model-studio/codex，2026-09-08
     // 核对）：qwen3.8-max 档位 low/medium/xhigh、默认 xhigh（≠ 模板回落的
     // none/high，故显式声明）；按量付费与 Token Plan 同源同一份
-    ["千问AI平台", "qwen3.8-max", ["low", "medium", "xhigh"], "xhigh"],
-    ["千问AI平台", "qwen3.8-2.4t-a95b", ["low", "medium", "xhigh"], "xhigh"],
-    ["千问AI平台", "qwen3.8-27b", ["low", "medium", "xhigh"], "xhigh"],
+    ["Qwen AI", "qwen3.8-max", ["low", "medium", "xhigh"], "xhigh"],
+    ["Qwen AI", "qwen3.8-2.4t-a95b", ["low", "medium", "xhigh"], "xhigh"],
+    ["Qwen AI", "qwen3.8-27b", ["low", "medium", "xhigh"], "xhigh"],
     ["QwenCloud", "qwen3.8-2.4t-a95b", ["low", "medium", "xhigh"], "xhigh"],
     ["QwenCloud", "qwen3.8-27b", ["low", "medium", "xhigh"], "xhigh"],
     // Ollama Cloud（原生 Responses 直连）：平台 /api/show 的 thinking.values

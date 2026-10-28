@@ -116,7 +116,9 @@ const ToolsPanel: React.FC = () => {
   if (isLoading) {
     return (
       <div className="px-6 pt-4 pb-8 flex items-center justify-center min-h-[200px]">
-        <div className="text-sm text-fg-2">{t("common.loading")}</div>
+        <div className="text-[12.35px] leading-[1.3] text-fg-2">
+          {t("common.loading")}
+        </div>
       </div>
     );
   }
@@ -194,7 +196,7 @@ const ToolsPanel: React.FC = () => {
                   updateListItem(setAllowList, index, e.target.value)
                 }
                 placeholder={t("openclaw.tools.patternPlaceholder")}
-                className="font-mono text-xs"
+                className="font-mono text-[12.35px] leading-[1.3]"
               />
               <HoverTip content={t("common.delete")}>
                 <Button
@@ -236,7 +238,7 @@ const ToolsPanel: React.FC = () => {
                   updateListItem(setDenyList, index, e.target.value)
                 }
                 placeholder={t("openclaw.tools.patternPlaceholder")}
-                className="font-mono text-xs"
+                className="font-mono text-[12.35px] leading-[1.3]"
               />
               <HoverTip content={t("common.delete")}>
                 <Button

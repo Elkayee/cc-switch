@@ -49,23 +49,23 @@ export function ToolUpgradeConfirmDialog({
       }}
     >
       <DialogContent
-        className="max-w-md"
+        className="w-full max-w-[480px] gap-2 rounded-[8px] p-2 text-ui sm:rounded-[8px]"
         zIndex="alert"
         onOpenAutoFocus={(event) => {
           event.preventDefault();
           titleRef.current?.focus();
         }}
       >
-        <DialogHeader className="space-y-2 border-b-0 bg-transparent pb-0">
+        <DialogHeader className="space-y-2 border-b-0 bg-transparent p-0">
           <DialogTitle
             ref={titleRef}
             tabIndex={-1}
-            className="flex items-center gap-2 text-base font-semibold"
+            className="flex items-center gap-2 text-ui font-semibold"
           >
-            <AlertTriangle className="h-5 w-5 text-warning-text" />
+            <AlertTriangle className="h-5 w-5 text-yellow-500" />
             {t("settings.toolUpgradeConfirmTitle")}
           </DialogTitle>
-          <DialogDescription className="text-sm leading-relaxed">
+          <DialogDescription className="text-ui leading-[1.3]">
             {t("settings.toolUpgradeConfirmHint")}
           </DialogDescription>
         </DialogHeader>
@@ -74,13 +74,13 @@ export function ToolUpgradeConfirmDialog({
           {plans.map((plan) => (
             <div
               key={plan.tool}
-              className="space-y-1.5 rounded-lg border border-transparent bg-warning-soft p-2.5"
+              className="space-y-1.5 rounded-[8px] border border-yellow-500/20 bg-yellow-500/5 p-2"
             >
-              <div className="text-xs font-medium">
+              <div className="text-ui font-medium">
                 {displayName(plan.tool)}
               </div>
               {!plan.anchored && (
-                <div className="text-badge leading-snug text-warning-text">
+                <div className="text-ui leading-[1.3] text-yellow-600 dark:text-yellow-400">
                   {t("settings.toolUpgradeUnanchoredHint")}
                 </div>
               )}
@@ -92,11 +92,11 @@ export function ToolUpgradeConfirmDialog({
                 ))}
               </ul>
               <div className="space-y-0.5">
-                <div className="text-badge text-fg-2">
+                <div className="text-ui text-muted-foreground">
                   {t("settings.toolUpgradeWillRun")}
                 </div>
                 <code
-                  className="block truncate rounded bg-surface px-1.5 py-0.5 font-mono text-badge text-fg-1"
+                  className="block truncate rounded-[8px] bg-background/80 px-1.5 py-0.5 font-mono text-ui text-foreground"
                   title={plan.command}
                 >
                   {plan.command}
@@ -106,7 +106,7 @@ export function ToolUpgradeConfirmDialog({
           ))}
         </div>
 
-        <DialogFooter className="flex gap-2 border-t-0 bg-transparent pt-2 sm:justify-end">
+        <DialogFooter className="gap-2 border-t-0 bg-transparent p-0 sm:justify-end">
           <Button
             variant="outline"
             onClick={(event) => {

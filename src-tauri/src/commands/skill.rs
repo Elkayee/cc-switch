@@ -33,6 +33,12 @@ pub fn get_installed_skills(app_state: State<'_, AppState>) -> Result<Vec<Instal
     SkillService::get_all_installed(&app_state.db).map_err(|e| e.to_string())
 }
 
+/// Read an installed Skill's SKILL.md (YAML frontmatter included).
+#[tauri::command]
+pub fn get_skill_content(id: String, app_state: State<'_, AppState>) -> Result<String, String> {
+    SkillService::read_content(&app_state.db, &id).map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 pub fn get_skill_backups() -> Result<Vec<SkillBackupEntry>, String> {
     SkillService::list_backups().map_err(|e| e.to_string())
@@ -144,6 +150,11 @@ pub async fn check_skill_updates(
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+pub fn get_skill_auto_update_status() -> crate::services::skill_auto_update::AutoUpdateStatus {
+    crate::services::skill_auto_update::current_status()
+}
+
 /// 立即重新同步：按数据库里的开关和当前同步方式，把 Skill 重新投影到各应用目录，
 /// 逐应用返回结果。只动 Skills 目录，不碰各应用的配置文件。
 #[tauri::command]
@@ -192,7 +203,9 @@ pub async fn get_cc_switch_skills_dir() -> Result<String, String> {
 
 /// 在系统文件管理器里打开 CC Switch 目录下的 Skills 目录（不存在就先建）
 #[tauri::command]
-pub async fn open_cc_switch_skills_dir(handle: AppHandle) -> Result<bool, String> {
+pub async fn open_cc_switch_skills_dir(
+    handle: AppHandle<crate::AppRuntime>,
+) -> Result<bool, String> {
     let dir = cc_switch_skills_dir();
     if !dir.exists() {
         std::fs::create_dir_all(&dir).map_err(|e| format!("创建目录失败: {e}"))?;
@@ -337,7 +350,7 @@ pub fn uninstall_skill_for_app(
     let skill = skills
         .into_iter()
         .find(|s| s.directory.eq_ignore_ascii_case(&directory))
-        .ok_or_else(|| format!("未找到已安装的 Skill: {directory}"))?;
+        .ok_or_else(|| format!("Installed skill not found: {directory}"))?;
 
     SkillService::uninstall(&app_state.db, &skill.id).map_err(|e| e.to_string())
 }

@@ -10,6 +10,8 @@ import {
   getPresetDisplayName,
   getVisiblePresetEntries,
   getVisiblePresetRows,
+  isOfficialCompanyPreset,
+  partitionPresetEntries,
   type PresetEntry,
 } from "@/components/providers/forms/ProviderPresetSelector";
 import {
@@ -209,6 +211,50 @@ describe("preset helpers", () => {
     expect(ids("bigmodel")).toEqual(["zhipu"]);
     expect(ids("com")).toEqual([]);
     expect(getPresetDisplayName(entries[1].preset, t)).toBe("Alpha 本地名");
+  });
+});
+
+describe("official company partition", () => {
+  const raw = (name: string, category: ProviderCategory, extra = {}) =>
+    preset(name, category, "https://example.com", extra);
+
+  it("treats official / cn_official / cloud_provider and first-party names as official", () => {
+    expect(isOfficialCompanyPreset(raw("Alpha", "official"))).toBe(true);
+    expect(isOfficialCompanyPreset(raw("Beta", "cn_official"))).toBe(true);
+    expect(isOfficialCompanyPreset(raw("AWS Bedrock", "cloud_provider"))).toBe(
+      true,
+    );
+    expect(isOfficialCompanyPreset(raw("OpenCode Go", "third_party", {}))).toBe(
+      true,
+    );
+    expect(
+      isOfficialCompanyPreset(
+        raw("Custom Go", "third_party", { isOfficial: true }),
+      ),
+    ).toBe(true);
+    for (const name of [
+      "Nvidia",
+      "OpenRouter",
+      "Command Code",
+      "GitHub Copilot",
+    ]) {
+      expect(isOfficialCompanyPreset(raw(name, "aggregator")), name).toBe(true);
+    }
+    expect(isOfficialCompanyPreset(raw("PackyCode", "third_party"))).toBe(
+      false,
+    );
+  });
+
+  it("splits entries into official and unofficial, keeping order", () => {
+    const { official, unofficial } = partitionPresetEntries(entries);
+    expect(official.map((entry) => entry.id)).toEqual([
+      "alpha",
+      "huoshan",
+      "zhipu",
+      "bedrock",
+      "copilot",
+    ]);
+    expect(unofficial.map((entry) => entry.id)).toEqual(["gamma"]);
   });
 });
 
@@ -450,10 +496,10 @@ describe("ProviderPresetSelector", () => {
     ).toEqual([
       "providerPreset.group.login",
       "providerPreset.group.vendor",
-      "providerPreset.group.thirdparty",
       "providerPreset.group.cloud",
       "providerPreset.group.local",
     ]);
+    expect(within(host).queryByText("Gamma")).not.toBeInTheDocument();
     const login = within(host).getByRole("region", {
       name: "providerPreset.group.login",
     });
@@ -729,5 +775,70 @@ describe("ProviderPresetSelector", () => {
       within(host).getByRole("button", { name: "providerPreset.useCustom" }),
     );
     await waitFor(() => expect(onPresetChange).toHaveBeenCalledWith("custom"));
+  });
+
+  it("folds unofficial presets behind a toggle that shows the count", async () => {
+    const user = userEvent.setup();
+    render(<TwoSteps onPresetChange={vi.fn()} />);
+    const host = await screen.findByTestId("host");
+
+    const toggle = within(host).getByRole("button", {
+      name: "providerPreset.unofficialAriaLabel",
+    });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveTextContent("(1)");
+    expect(within(host).queryByText("Gamma")).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(host).getByText("Gamma")).toBeInTheDocument();
+    expect(
+      within(host).getByRole("heading", {
+        name: "providerPreset.group.thirdparty",
+      }),
+    ).toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(within(host).queryByText("Gamma")).not.toBeInTheDocument();
+  });
+
+  it("opens the fold when a search hits an unofficial preset", async () => {
+    const user = userEvent.setup();
+    render(<TwoSteps onPresetChange={vi.fn()} />);
+    const host = await screen.findByTestId("host");
+
+    await user.type(
+      within(host).getByRole("textbox", {
+        name: "providerPreset.searchAriaLabel",
+      }),
+      "gamma",
+    );
+    expect(
+      within(host).getByRole("button", {
+        name: "providerPreset.unofficialAriaLabel",
+      }),
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(within(host).getByText("Gamma")).toBeInTheDocument();
+    expect(within(host).queryByText("preset.alpha")).not.toBeInTheDocument();
+  });
+
+  it("keeps the fold inside a category view", async () => {
+    const user = userEvent.setup();
+    render(<TwoSteps onPresetChange={vi.fn()} />);
+    const host = await screen.findByTestId("host");
+
+    await user.click(
+      within(host).getByRole("button", {
+        name: /providerPreset.group.thirdparty/,
+      }),
+    );
+    // 第三方平台里官方的（GitHub Copilot 走账号登录，不在这一类）之外全是非官方
+    expect(within(host).queryByText("Gamma")).not.toBeInTheDocument();
+    await user.click(
+      within(host).getByRole("button", {
+        name: "providerPreset.unofficialAriaLabel",
+      }),
+    );
+    expect(within(host).getByText("Gamma")).toBeInTheDocument();
   });
 });

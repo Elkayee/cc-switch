@@ -40,7 +40,7 @@ export function V7Dialog({
           aria-describedby={describedBy}
           style={{ maxWidth: width }}
           className={cn(
-            "max-h-[calc(100vh-48px)] gap-4 rounded-dialog border-border bg-surface p-6 text-fg-1 shadow-v7-lg sm:rounded-dialog",
+            "max-h-[calc(100vh-48px)] gap-2 rounded-[8px] border-border bg-surface p-2 text-fg-1 shadow-sm sm:rounded-[8px]",
             className,
           )}
         >
@@ -83,19 +83,18 @@ export function V7ConfirmDialog({
       }}
     >
       <div className="flex flex-col gap-1.5">
-        <DialogTitle className="text-section [overflow-wrap:anywhere]">
+        <DialogTitle className="text-[12.35px] leading-[1.3] font-semibold [overflow-wrap:anywhere]">
           {title}
         </DialogTitle>
-        <DialogDescription className="text-body text-fg-2">
+        <DialogDescription className="text-[12.35px] leading-[1.3] text-fg-2">
           {body}
         </DialogDescription>
       </div>
       {details}
-      <div className="flex flex-wrap justify-end gap-2 pt-1">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button
           type="button"
           variant="neutral"
-          size="regular"
           autoFocus
           disabled={pending}
           onClick={onCancel}
@@ -105,7 +104,6 @@ export function V7ConfirmDialog({
         <Button
           type="button"
           variant={danger ? "destructive" : "solid"}
-          size="regular"
           disabled={pending}
           onClick={onConfirm}
         >
@@ -121,16 +119,19 @@ export function V7ConfirmDialog({
 /** 和 Input 同一套外观（ui/input.tsx 的 fieldClass），只读时换浅底 */
 export const FIELD_CLASS = cn(
   fieldClass,
-  "h-8 min-w-0 read-only:bg-subtle read-only:text-fg-2 dark:[color-scheme:dark]",
+  "min-w-0 read-only:bg-subtle read-only:text-fg-2 dark:[color-scheme:dark]",
 );
 
-export const MONO_FIELD_CLASS = cn(FIELD_CLASS, "font-mono text-caption");
+export const MONO_FIELD_CLASS = cn(
+  FIELD_CLASS,
+  "font-mono text-[12.35px] leading-[1.3]",
+);
 
 /** 原生勾选框 / 单选框的统一外观（index.css 的 ui-checkbox / ui-radio） */
 export const CHECKBOX_CLASS = "ui-checkbox";
 export const RADIO_CLASS = "ui-radio";
 
-export const LABEL_CLASS = "text-body font-medium text-fg-1";
+export const LABEL_CLASS = "text-[12.35px] leading-[1.3] font-medium text-fg-1";
 
 export function FieldError({
   id,
@@ -142,7 +143,7 @@ export function FieldError({
   return (
     <span
       id={id}
-      className="flex items-start gap-1 text-caption text-danger-text"
+      className="flex items-start gap-1 text-[12.35px] leading-[1.3] text-danger-text"
     >
       <CircleAlert
         aria-hidden="true"
@@ -186,18 +187,20 @@ export function DisclosureButton({
       aria-expanded={open}
       aria-controls={controls}
       onClick={onToggle}
-      className="-ms-1 inline-flex h-8 items-center gap-1.5 self-start whitespace-nowrap rounded-control pe-2 ps-1 text-body font-medium text-fg-1 transition-colors hover:bg-subtle"
+      className="-ms-1 inline-flex h-6 items-center gap-1 self-start whitespace-nowrap rounded-[4px] pe-2 ps-1 text-[12.35px] leading-[1.3] font-medium text-fg-1 transition-colors hover:bg-subtle"
     >
-      <Icon aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
+      <Icon aria-hidden="true" className="h-4 w-4" strokeWidth={2} />
       {children}
       {hint && (
-        <span className="text-caption font-normal text-fg-2">{hint}</span>
+        <span className="text-[12.35px] leading-[1.3] font-normal text-fg-2">
+          {hint}
+        </span>
       )}
     </button>
   );
 }
 
-/** 小号分段（高 28，用在批量粘贴的「跳过 / 覆盖」） */
+/** 小号分段（高 24，用在批量粘贴的「跳过 / 覆盖」） */
 export function MiniSegmented<T extends string>({
   items,
   value,
@@ -218,12 +221,12 @@ export function MiniSegmented<T extends string>({
       role="group"
       aria-label={label}
       ref={indicator.ref}
-      className="relative flex h-7 shrink-0 gap-0.5 rounded-[7px] bg-subtle p-0.5"
+      className="relative flex h-6 shrink-0 gap-0 rounded-[4px] bg-subtle p-0.5"
     >
       <SegmentThumb
         rect={indicator.rect}
         animate={indicator.animate}
-        className="rounded-[5px]"
+        className="rounded-[3px]"
       />
       {items.map((item) => {
         const pressed = item.value === value;
@@ -234,7 +237,7 @@ export function MiniSegmented<T extends string>({
             aria-pressed={pressed}
             onClick={() => onValueChange(item.value)}
             className={cn(
-              "relative h-6 rounded-[5px] px-2.5 text-caption font-medium text-fg-2 transition-colors",
+              "relative h-5 rounded-[3px] px-2 text-[12.35px] leading-[1.3] font-medium text-fg-2 transition-colors",
               pressed && "font-semibold text-fg-1",
             )}
           >

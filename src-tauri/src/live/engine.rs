@@ -33,7 +33,7 @@ pub struct DeviceStore {
 
 impl DeviceStore {
     pub fn for_device() -> Self {
-        Self::at(crate::config::get_home_dir().join(".cc-switch"))
+        Self::at(crate::config::device_dir())
     }
 
     pub fn at(root: impl Into<PathBuf>) -> Self {

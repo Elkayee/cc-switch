@@ -1,0 +1,38 @@
+# Local-only image for check-linux.sh — not part of the shipped build, not
+# referenced by CI. Mirrors release.yml's Linux system deps so a "type-checks
+# here" result actually predicts what the GitHub runner will see.
+#
+# Source is COPYed rather than bind-mounted: Docker Desktop file sharing is not
+# reliably available here, and COPY works regardless of host mount config.
+# Build context is the repo root (see check-linux.sh) so `tauri.conf.json`,
+# icons and `dist/` resolve exactly as they do in CI.
+FROM rust:1.95-slim-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential pkg-config libssl-dev \
+    libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev \
+    libwebkit2gtk-4.1-dev libsoup-3.0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work
+
+# Dependency manifests first so the expensive dependency check layer is reused
+# whenever only our own sources change.
+COPY src-tauri/Cargo.toml src-tauri/Cargo.lock rust-toolchain.toml ./src-tauri/
+COPY rust-toolchain.toml ./
+
+# `generate_context!()` reads tauri.conf.json and the icons at compile time.
+COPY src-tauri/tauri.conf.json ./src-tauri/
+COPY src-tauri/capabilities ./src-tauri/capabilities
+COPY src-tauri/icons ./src-tauri/icons
+COPY src-tauri/build.rs ./src-tauri/
+
+# tauri.conf.json points frontendDist at ../dist, which must exist for
+# `generate_context!()` to succeed. CI does this with a real `bun run build:web`;
+# an empty dir is enough for a type check.
+RUN mkdir -p dist && touch dist/index.html
+
+COPY src-tauri/src ./src-tauri/src
+COPY src-tauri/tests ./src-tauri/tests
+
+WORKDIR /work/src-tauri

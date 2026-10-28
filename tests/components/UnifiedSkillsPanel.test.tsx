@@ -8,6 +8,7 @@ import UnifiedSkillsPanel from "@/components/skills/UnifiedSkillsPanel";
 import { settingsApi, skillsApi } from "@/lib/api";
 import type {
   InstalledSkill,
+  SkillAutoUpdateStatus,
   SkillBackupEntry,
   SkillRepoFailure,
   SkillUpdateInfo,
@@ -34,6 +35,7 @@ const m = vi.hoisted(() => ({
   updates: [] as SkillUpdateInfo[],
   repoFailures: [] as SkillRepoFailure[],
   checking: false,
+  autoUpdate: undefined as SkillAutoUpdateStatus | undefined,
   visibleApps: ["claude", "codex", "pi"] as string[],
 }));
 
@@ -49,6 +51,10 @@ vi.mock("sonner", () => ({
 vi.mock("@/components/mcp/useVisibleAppIds", () => ({
   useVisibleAppIds: (ids: string[]) =>
     ids.filter((id) => m.visibleApps.includes(id)),
+}));
+
+vi.mock("@/components/skills/SkillPreviewDialog", () => ({
+  SkillPreviewDialog: () => null,
 }));
 
 vi.mock("@/components/skills/SkillsStorageSheet", () => ({
@@ -111,6 +117,7 @@ vi.mock("@/hooks/useSkills", () => ({
     mutateAsync: m.updateSkill,
     isPending: false,
   }),
+  useSkillAutoUpdateStatus: () => ({ data: m.autoUpdate }),
   useDiscoverableSkills: () => ({ data: [], refetch: vi.fn() }),
   useDiscoverableSkillsFailures: () => ({ data: [] }),
   useSkillRepos: () => ({ data: [], refetch: vi.fn() }),
@@ -170,6 +177,7 @@ describe("UnifiedSkillsPanel", () => {
     m.updates = [];
     m.repoFailures = [];
     m.checking = false;
+    m.autoUpdate = undefined;
     m.visibleApps = ["claude", "codex", "pi"];
     m.scanUnmanaged.mockReset().mockResolvedValue({
       data: [
@@ -229,6 +237,38 @@ describe("UnifiedSkillsPanel", () => {
         enabled: false,
       }),
     );
+  });
+
+  it("shows the daily auto-update status", () => {
+    m.installed = [makeSkill()];
+    m.autoUpdate = {
+      lastRunAt: 1_700_000_000,
+      running: false,
+      updatedCount: 2,
+      failures: [],
+    };
+    const { unmount } = renderPanel();
+    expect(screen.getByText("skills.autoUpdateOk")).toBeInTheDocument();
+    unmount();
+
+    m.autoUpdate = {
+      lastRunAt: null,
+      running: true,
+      updatedCount: 0,
+      failures: [],
+    };
+    const running = renderPanel();
+    expect(screen.getByText("skills.autoUpdateRunning")).toBeInTheDocument();
+    running.unmount();
+
+    m.autoUpdate = {
+      lastRunAt: 99,
+      running: false,
+      updatedCount: 0,
+      failures: ["humanizer: conflict"],
+    };
+    renderPanel();
+    expect(screen.getByText("skills.autoUpdateFailed")).toBeInTheDocument();
   });
 
   it("hides the Pi column only when Pi is hidden on the Apps page", () => {

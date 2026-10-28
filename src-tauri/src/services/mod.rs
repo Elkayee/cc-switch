@@ -29,6 +29,7 @@ pub mod session_usage_grokbuild;
 pub mod session_usage_opencode;
 pub mod session_usage_pi;
 pub mod skill;
+pub mod skill_auto_update;
 pub mod speedtest;
 pub mod sql_helpers;
 pub mod stream_check;

@@ -10,7 +10,7 @@ const expectedChatPresets = new Map<
   string,
   { baseUrl: string; contextWindows: Record<string, number> }
 >([
-  // 火山 Agent Plan / Coding Plan 与 BytePlus 国际站（coding/v3）、智谱 GLM、
+  // Volcengine Agent Plan / Coding Plan 与 BytePlus 国际站（coding/v3）、智谱 GLM、
   // Kimi 两条（开放平台 + Kimi Code）均已切原生 Responses，见下方 native 清单
   [
     "Baidu Qianfan Coding Plan",
@@ -158,7 +158,7 @@ describe("Codex Chat provider presets", () => {
   });
 
   it("keeps open-weight Qwen models scoped to pay-as-you-go catalogs", () => {
-    for (const name of ["千问AI平台", "QwenCloud"]) {
+    for (const name of ["Qwen AI", "QwenCloud"]) {
       const preset = codexProviderPresets.find((item) => item.name === name);
       expect(preset, name).toBeDefined();
       expect(preset?.modelCatalog).toEqual(
@@ -174,7 +174,7 @@ describe("Codex Chat provider presets", () => {
         ]),
       );
     }
-    for (const name of ["千问AI平台 Token Plan", "QwenCloud Token Plan"]) {
+    for (const name of ["Qwen AI Token Plan", "QwenCloud Token Plan"]) {
       const preset = codexProviderPresets.find((item) => item.name === name);
       expect(preset, name).toBeDefined();
       const models = preset?.modelCatalog?.map((row) => row.model) ?? [];
@@ -215,15 +215,15 @@ describe("Codex Chat provider presets", () => {
       // 官方 Codex 文档确认 Agent Plan /api/plan/v3 与 Coding Plan
       // /api/coding/v3 均支持 Responses API；BytePlus 国际站 coding/v3
       // 同（docs.byteplus.com/en/docs/ModelArk/2556056，2026-08-15 核实）
-      ["火山 Agent Plan", { contextWindows: { "ark-code-latest": 256000 } }],
-      ["火山 Coding Plan", { contextWindows: { "ark-code-latest": 256000 } }],
+      ["Volcengine Agent Plan", { contextWindows: { "ark-code-latest": 256000 } }],
+      ["Volcengine Coding Plan", { contextWindows: { "ark-code-latest": 256000 } }],
       ["BytePlus", { contextWindows: { "ark-code-latest": 256000 } }],
       [
         "Volcengine Doubao",
         { contextWindows: { "doubao-seed-2-1-pro-260915": 262144 } },
       ],
       [
-        "千问AI平台",
+        "Qwen AI",
         {
           contextWindows: {
             "qwen3.8-max": 983616,

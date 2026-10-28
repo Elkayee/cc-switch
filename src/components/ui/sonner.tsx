@@ -20,10 +20,10 @@ export function Toaster() {
         unstyled: true,
         classNames: {
           toast:
-            "group flex w-full items-center gap-2.5 rounded-panel border border-border bg-surface py-2.5 pe-3.5 ps-3 text-body text-fg-1 shadow-v7-lg",
+            "group flex w-full items-center gap-2 rounded-[8px] border border-border bg-surface p-2 text-[12.35px] leading-[1.3] text-fg-1 shadow-sm",
           content: "flex min-w-0 flex-1 flex-col gap-0.5",
-          title: "text-body font-medium",
-          description: "text-caption text-fg-2",
+          title: "text-[12.35px] font-medium leading-[1.3]",
+          description: "text-[12.35px] leading-[1.3] text-fg-2",
           // 状态靠图标颜色区分：成功绿、失败红、警告琥珀、提示灰
           icon: "flex h-4 w-4 shrink-0 items-center justify-center [&>svg]:h-4 [&>svg]:w-4",
           success: "[&_[data-icon]]:text-success",
@@ -33,11 +33,11 @@ export function Toaster() {
           loading: "[&_[data-icon]]:text-fg-2",
           // 关闭按钮在右上角，压在角上（RTL 时到左上角）
           closeButton:
-            "absolute -end-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-fg-2 shadow-v7-sm transition-colors hover:text-fg-1 [&>svg]:h-3 [&>svg]:w-3",
+            "absolute -end-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-surface text-fg-2 shadow-sm transition-colors hover:text-fg-1 [&>svg]:h-3 [&>svg]:w-3",
           actionButton:
-            "h-6 shrink-0 rounded-control px-2 text-caption font-medium text-action-text transition-colors hover:bg-subtle",
+            "h-6 shrink-0 rounded-[4px] px-2 text-[12.35px] font-medium leading-[1.3] text-action-text transition-colors hover:bg-subtle",
           cancelButton:
-            "h-6 shrink-0 rounded-control px-2 text-caption text-fg-2 transition-colors hover:bg-subtle",
+            "h-6 shrink-0 rounded-[4px] px-2 text-[12.35px] leading-[1.3] text-fg-2 transition-colors hover:bg-subtle",
         },
       }}
     />

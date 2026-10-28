@@ -444,6 +444,35 @@ pub async fn auth_list_accounts(
     }
 }
 
+/// Current access token of a managed OAuth provider (xAI, ChatGPT, Copilot), for the
+/// connect popup. Reports no rejection, so it only renews a token that has under an
+/// hour left (see `proxy::direct_token::lease`); a plain open does not rotate a healthy one.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn get_provider_direct_token(
+    app: String,
+    provider_id: String,
+    state: State<'_, AppState>,
+    xai_state: State<'_, XaiOAuthState>,
+    codex_state: State<'_, CodexOAuthState>,
+    copilot_state: State<'_, CopilotAuthState>,
+) -> Result<crate::proxy::direct_token::TokenGrant, String> {
+    let provider = state
+        .db
+        .get_provider_by_id(&provider_id, &app)
+        .map_err(|error| error.to_string())?
+        .ok_or_else(|| format!("provider {provider_id} not found for {app}"))?;
+    let xai = xai_state.0.read().await;
+    let copilot = copilot_state.0.read().await;
+    let managers = crate::proxy::direct_token::Managers {
+        xai: &xai,
+        codex: &codex_state.0,
+        copilot: &copilot,
+    };
+    crate::proxy::direct_token::grant_provider_token(managers, &provider, None)
+        .await
+        .map_err(|error| error.message())
+}
+
 #[tauri::command(rename_all = "camelCase")]
 pub async fn auth_get_status(
     auth_provider: String,

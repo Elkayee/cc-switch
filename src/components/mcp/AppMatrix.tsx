@@ -88,6 +88,9 @@ function useColumnTracking(app: AppId | undefined) {
   }, [app, setColumn]);
 }
 
+/** 列宽只在这里定：列头与每行单元格共用，保证对齐（40 = 单行列头 icon 16 + 两位数） */
+export const MATRIX_COLUMN_CLASS = "flex w-10 shrink-0 justify-center";
+
 // ─── 单元格 ─────────────────────────────────────────────────────────────
 export type MatrixCellState = "on" | "off" | "fail";
 
@@ -102,7 +105,7 @@ interface MatrixCellProps {
 }
 
 /**
- * 勾选框：开、关、写入失败三种状态是同一个 16px 圆角方框、同一个 28px 点击区，
+ * 勾选框：开、关、写入失败三种状态是同一个 16px 圆角方框、同一个 24px 点击区，
  * 只换填充和里面的符号（关 = 淡描边空框，开 = 操作色实心 + 勾，失败 = 警告描边 + ⚠）。
  */
 export function MatrixCell({
@@ -114,7 +117,7 @@ export function MatrixCell({
 }: MatrixCellProps) {
   const tracking = useColumnTracking(app);
   return (
-    <span className="flex w-9 shrink-0 justify-center" {...tracking}>
+    <span className={MATRIX_COLUMN_CLASS} {...tracking}>
       <HoverTip content={label}>
         <button
           type="button"
@@ -126,7 +129,7 @@ export function MatrixCell({
             event.stopPropagation();
             onClick();
           }}
-          className="group/cell flex h-7 w-7 items-center justify-center rounded-control outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45"
+          className="group/cell flex h-6 w-6 items-center justify-center rounded-[4px] outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-45"
         >
           <span
             aria-hidden="true"
@@ -248,7 +251,7 @@ export function MatrixColumnHeader({
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
       <span
-        className="relative flex w-9 shrink-0 justify-center"
+        className={cn("relative", MATRIX_COLUMN_CLASS)}
         data-column={app}
         {...tracking}
       >
@@ -265,7 +268,7 @@ export function MatrixColumnHeader({
               })}
               data-highlighted={highlighted ? "" : undefined}
               className={cn(
-                "flex h-10 w-[34px] flex-col items-center justify-center gap-0.5 rounded-control text-fg-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60",
+                "flex h-6 w-full flex-row items-center justify-center gap-1 rounded-[4px] text-[12.35px] leading-[1.3] text-fg-2 outline-none transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60",
                 highlighted && "bg-selected text-fg-1",
               )}
             >
@@ -276,7 +279,7 @@ export function MatrixColumnHeader({
               />
               <span
                 className={cn(
-                  "text-badge tabular-nums",
+                  "text-[12.35px] leading-[1.3] tabular-nums",
                   highlighted ? "font-semibold" : "font-medium",
                 )}
               >
@@ -290,7 +293,7 @@ export function MatrixColumnHeader({
           <span
             aria-hidden="true"
             data-testid="matrix-column-name"
-            className="pointer-events-none absolute left-1/2 top-full z-20 mt-0.5 -translate-x-1/2 whitespace-nowrap rounded-control bg-inverse px-2 py-0.5 text-caption font-medium text-inverse-fg shadow-v7-sm"
+            className="pointer-events-none absolute left-1/2 top-full z-20 mt-0.5 -translate-x-1/2 whitespace-nowrap rounded-[4px] bg-inverse px-2 py-0.5 text-[12.35px] leading-[1.3] font-medium text-inverse-fg shadow-sm"
           >
             {name}
           </span>
@@ -301,15 +304,20 @@ export function MatrixColumnHeader({
           align="end"
           sideOffset={4}
           collisionPadding={8}
-          className="z-[110] flex w-[260px] flex-col gap-2.5 rounded-panel border border-border bg-surface px-3.5 pb-3.5 pt-3 text-fg-1 shadow-v7-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+          className="z-[110] flex w-[260px] flex-col gap-2 rounded-[8px] border border-border bg-surface p-2 text-fg-1 shadow-sm outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
         >
           <div className="flex items-center gap-2">
             <AppGlyph app={app} size={16} badgeClassName="bg-surface" />
-            <span className="text-body font-semibold">{name}</span>
+            <span className="text-[12.35px] leading-[1.3] font-semibold">
+              {name}
+            </span>
             {help && <HelpTip title={help.title}>{help.body}</HelpTip>}
           </div>
           <div className="flex flex-col">
-            <span id={countId} className="text-caption text-fg-2">
+            <span
+              id={countId}
+              className="text-[12.35px] leading-[1.3] text-fg-2"
+            >
               {t("appMatrix.pop.count", {
                 on: scopeEnabled,
                 total: scopeTotal,
@@ -317,7 +325,7 @@ export function MatrixColumnHeader({
               })}
             </span>
             {scopeFailed > 0 && (
-              <span className="text-caption text-warning-text">
+              <span className="text-[12.35px] leading-[1.3] text-warning-text">
                 {t("appMatrix.pop.failCount", { count: scopeFailed })}
               </span>
             )}
@@ -358,7 +366,7 @@ export function MatrixColumnHeader({
             <button
               type="button"
               onClick={() => run(extraAction.onClick)}
-              className="self-start text-body font-medium text-fg-1 underline underline-offset-[3px] hover:text-fg-2"
+              className="self-start text-[12.35px] leading-[1.3] font-medium text-fg-1 underline underline-offset-4 hover:text-fg-2"
             >
               {extraAction.label}
             </button>
@@ -371,13 +379,13 @@ export function MatrixColumnHeader({
                   .openExternal(docsLink.url)
                   .catch(() => undefined)
               }
-              className="inline-flex items-start gap-1 self-start text-left text-caption text-fg-2 underline-offset-2 hover:text-fg-1 hover:underline"
+              className="inline-flex items-start gap-1 self-start text-left text-[12.35px] leading-[1.3] text-fg-2 underline-offset-2 hover:text-fg-1 hover:underline"
             >
               <BookOpen className="mt-0.5 h-3 w-3 shrink-0" />
               {docsLink.label}
             </button>
           )}
-          <span className="text-caption text-fg-3">
+          <span className="text-[12.35px] leading-[1.3] text-fg-3">
             {scopeKind === "search"
               ? t("appMatrix.pop.scopeSearch", { count: scopeTotal })
               : scopeKind === "filter"
@@ -452,7 +460,7 @@ export function NeutralBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-border-strong px-1.5 text-badge font-medium text-fg-2",
+        "inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-border-strong px-1.5 text-[12.35px] leading-[1.3] font-medium text-fg-2",
         mono && "font-mono",
         className,
       )}

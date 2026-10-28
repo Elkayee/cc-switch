@@ -34,14 +34,14 @@ pub fn parse_base_url(raw: &str) -> Result<Url, AppError> {
     if trimmed.is_empty() {
         return Err(AppError::localized(
             "webdav.base_url.required",
-            "WebDAV 地址不能为空",
+            "WebDAV URL is required.",
             "WebDAV URL is required.",
         ));
     }
     let url = Url::parse(trimmed).map_err(|e| {
         AppError::localized(
             "webdav.base_url.invalid",
-            format!("WebDAV 地址无效: {e}"),
+            format!("Invalid WebDAV URL: {e}"),
             format!("Invalid WebDAV URL: {e}"),
         )
     })?;
@@ -49,7 +49,7 @@ pub fn parse_base_url(raw: &str) -> Result<Url, AppError> {
         "http" | "https" => Ok(url),
         _ => Err(AppError::localized(
             "webdav.base_url.scheme_invalid",
-            "WebDAV 仅支持 http/https 地址",
+            "WebDAV URL must use http or https.",
             "WebDAV URL must use http or https.",
         )),
     }
@@ -64,7 +64,7 @@ pub fn build_remote_url(base_url: &str, segments: &[String]) -> Result<String, A
         let mut path = url.path_segments_mut().map_err(|_| {
             AppError::localized(
                 "webdav.base_url.unusable",
-                "WebDAV 地址格式不支持追加路径",
+                "WebDAV URL format does not support appending path segments.",
                 "WebDAV URL format does not support appending path segments.",
             )
         })?;
@@ -108,19 +108,19 @@ fn webdav_transport_error(
     err: &reqwest::Error,
 ) -> AppError {
     let (zh_reason, en_reason) = if err.is_timeout() {
-        ("请求超时", "request timed out")
+        ("request timed out", "request timed out")
     } else if err.is_connect() {
-        ("连接失败", "connection failed")
+        ("connection failed", "connection failed")
     } else if err.is_request() {
-        ("请求构造失败", "request build failed")
+        ("request build failed", "request build failed")
     } else {
-        ("网络请求失败", "network request failed")
+        ("network request failed", "network request failed")
     };
 
     let safe_url = redact_url(target_url);
     AppError::localized(
         key,
-        format!("WebDAV {op_zh}失败（{zh_reason}）: {safe_url}"),
+        format!("WebDAV {op_zh} failed ({zh_reason}): {safe_url}"),
         format!("WebDAV {op_en} failed ({en_reason}): {safe_url}"),
     )
 }
@@ -154,7 +154,7 @@ pub async fn test_connection(base_url: &str, auth: &WebDavAuth) -> Result<(), Ap
     .map_err(|e| {
         webdav_transport_error(
             "webdav.connection_failed",
-            "连接",
+            "connection",
             "connection",
             base_url,
             &e,
@@ -201,7 +201,7 @@ pub async fn ensure_remote_directories(
         .map_err(|e| {
             webdav_transport_error(
                 "webdav.mkcol_failed",
-                "MKCOL 请求",
+                "MKCOL request",
                 "MKCOL request",
                 &dir_url,
                 &e,
@@ -248,7 +248,9 @@ pub async fn put_bytes(
     )
     .send()
     .await
-    .map_err(|e| webdav_transport_error("webdav.put_failed", "PUT 请求", "PUT request", url, &e))?;
+    .map_err(|e| {
+        webdav_transport_error("webdav.put_failed", "PUT request", "PUT request", url, &e)
+    })?;
 
     if resp.status().is_success() {
         return Ok(());
@@ -306,7 +308,7 @@ pub async fn get_bytes(
         let chunk = chunk.map_err(|e| {
             AppError::localized(
                 "webdav.response_read_failed",
-                format!("读取 WebDAV 响应失败: {e}"),
+                format!("Failed to read WebDAV response: {e}"),
                 format!("Failed to read WebDAV response: {e}"),
             )
         })?;
@@ -330,7 +332,13 @@ pub async fn head_etag(url: &str, auth: &WebDavAuth) -> Result<Option<String>, A
     .send()
     .await
     .map_err(|e| {
-        webdav_transport_error("webdav.head_failed", "HEAD 请求", "HEAD request", url, &e)
+        webdav_transport_error(
+            "webdav.head_failed",
+            "HEAD request",
+            "HEAD request",
+            url,
+            &e,
+        )
     })?;
 
     if resp.status() == StatusCode::NOT_FOUND {
@@ -389,7 +397,7 @@ pub fn is_jianguoyun(url: &str) -> bool {
 /// Build an `AppError` with service-specific hints for WebDAV failures.
 pub fn webdav_status_error(op: &str, status: StatusCode, url: &str) -> AppError {
     let safe_url = redact_url(url);
-    let mut zh = format!("WebDAV {op} 失败: {status} ({safe_url})");
+    let mut zh = format!("Failed to WebDAV {op}: {status} ({safe_url})");
     let mut en = format!("WebDAV {op} failed: {status} ({safe_url})");
     let jgy = is_jianguoyun(url);
 
@@ -430,7 +438,7 @@ fn response_too_large_error(url: &str, max_bytes: usize) -> AppError {
     AppError::localized(
         "webdav.response_too_large",
         format!(
-            "WebDAV 响应体超过上限（{} MB）: {}",
+            "WebDAV response body exceeds limit ({} MB): {}",
             max_mb,
             redact_url(url)
         ),
@@ -544,7 +552,9 @@ mod tests {
         let err = ensure_content_length_within_limit(&large, 1024, "https://dav.example.com")
             .expect_err("oversized response should be rejected");
         assert!(
-            err.to_string().contains("too large") || err.to_string().contains("超过"),
+            err.to_string().contains("too large")
+                || err.to_string().contains("exceeds")
+                || err.to_string().contains("超过"),
             "unexpected error: {err}"
         );
     }

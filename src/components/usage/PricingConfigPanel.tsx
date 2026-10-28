@@ -172,17 +172,17 @@ function BillingDefaultsDialog({
             {t("settings.globalProxy.pricingDefaultsDescription")}
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col px-6 py-2">
+        <div className="flex flex-col px-2 py-2">
           {PRICING_APPS.map((app, index) => (
             <div
               key={app}
               className={cn(
-                "flex h-11 items-center gap-3",
+                "flex h-11 items-center gap-2",
                 index < PRICING_APPS.length - 1 && "border-b border-border",
               )}
             >
-              <AppGlyph app={app} size={16} badgeClassName="bg-surface" />
-              <span className="flex-1 text-body text-fg-1">
+              <AppGlyph app={app} size={16} badgeClassName="bg-card" />
+              <span className="flex-1 text-ui text-foreground">
                 {APP_DISPLAY_NAME[app]}
               </span>
               <Select
@@ -196,7 +196,7 @@ function BillingDefaultsDialog({
                 disabled={isSaving}
               >
                 <SelectTrigger
-                  className="h-7 w-36 text-body"
+                  className="h-7 w-36 text-ui"
                   aria-label={`${APP_DISPLAY_NAME[app]} · ${t("settings.globalProxy.pricingModelSourceLabel")}`}
                 >
                   <SelectValue />
@@ -268,22 +268,25 @@ function BillingDefaultsRow() {
 
   return (
     <>
-      <div className="flex items-center gap-3 rounded-panel border border-border px-4 py-2.5">
+      <div className="flex items-center gap-2 rounded-[8px] border border-border px-2 py-2">
         <Info
           aria-hidden="true"
-          className="h-4 w-4 shrink-0 text-fg-2"
+          className="h-4 w-4 shrink-0 text-muted-foreground"
           strokeWidth={1.5}
         />
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex min-w-0 items-center gap-0.5">
-            <span className="truncate text-body font-semibold text-fg-1">
+            <span className="truncate text-ui font-semibold text-foreground">
               {t("settings.globalProxy.pricingDefaultsTitle")}
             </span>
             <HelpTip title={t("usage.pricing.billingHelpTitle")}>
               {t("usage.pricing.billingHelp")}
             </HelpTip>
           </div>
-          <span className="truncate text-caption text-fg-2" title={summary}>
+          <span
+            className="truncate text-ui text-muted-foreground"
+            title={summary}
+          >
             {isLoading ? "…" : summary}
           </span>
         </div>
@@ -333,20 +336,20 @@ export function PricingConfigPanel() {
   const pagination = useClientPagination(rows);
 
   return (
-    <div className="flex flex-col gap-3 pt-3">
+    <div className="flex flex-col gap-2 pt-2">
       <ModelsDevAutoSyncPanel />
       <BillingDefaultsRow />
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-2">
         <div className="flex items-center gap-0.5">
-          <h3 className="m-0 whitespace-nowrap text-strong font-semibold text-fg-1">
+          <h3 className="m-0 whitespace-nowrap text-ui font-medium font-semibold text-foreground">
             {t("usage.pricing.tableTitle", { count: rows.length })}
           </h3>
           <HelpTip title={t("usage.pricing.costHelpTitle")}>
             {t("usage.pricing.costHelp")}
           </HelpTip>
         </div>
-        <span className="whitespace-nowrap text-caption text-fg-3">
+        <span className="whitespace-nowrap text-ui text-muted-foreground">
           {t("usage.pricing.unit")}
         </span>
         <div className="flex-1" />
@@ -356,7 +359,7 @@ export function PricingConfigPanel() {
           size="compact"
           onClick={() => setPickerOpen(true)}
         >
-          <Globe className="h-3.5 w-3.5" />
+          <Globe className="h-4 w-4" />
           {t("usage.importFromModelsDev")}
         </Button>
         <Button
@@ -365,7 +368,7 @@ export function PricingConfigPanel() {
           size="compact"
           onClick={handleAddNew}
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-4 w-4" />
           {t("usage.addPricing")}
         </Button>
       </div>
@@ -413,12 +416,12 @@ export function PricingConfigPanel() {
                       <td className={usageTable.td}>
                         <span className="flex max-w-[340px] items-baseline gap-2">
                           {model.displayName && (
-                            <span className="truncate text-fg-1">
+                            <span className="truncate text-foreground">
                               {model.displayName}
                             </span>
                           )}
                           <span
-                            className="truncate font-mono text-caption text-fg-2"
+                            className="truncate font-mono text-ui text-muted-foreground"
                             title={model.modelId}
                           >
                             {model.modelId}
@@ -449,10 +452,7 @@ export function PricingConfigPanel() {
                               setEditingModel(model);
                             }}
                           >
-                            <Pencil
-                              className="h-3.5 w-3.5"
-                              strokeWidth={1.75}
-                            />
+                            <Pencil className="h-4 w-4" strokeWidth={1.75} />
                           </Button>
                         </HoverTip>
                         <HoverTip content={t("common.delete")}>
@@ -464,10 +464,7 @@ export function PricingConfigPanel() {
                             className="hover:text-danger-text"
                             onClick={() => setDeleteTarget(model)}
                           >
-                            <Trash2
-                              className="h-3.5 w-3.5"
-                              strokeWidth={1.75}
-                            />
+                            <Trash2 className="h-4 w-4" strokeWidth={1.75} />
                           </Button>
                         </HoverTip>
                       </td>

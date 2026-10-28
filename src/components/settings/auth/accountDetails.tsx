@@ -30,7 +30,7 @@ export function withMonoToken(text: string, token: string): ReactNode {
   if (parts.length === 1) return text;
   return parts.map((part, index) => (
     <Fragment key={index}>
-      {index > 0 && <code className="font-mono text-caption">{token}</code>}
+      {index > 0 && <code className="font-mono text-ui">{token}</code>}
       {part}
     </Fragment>
   ));

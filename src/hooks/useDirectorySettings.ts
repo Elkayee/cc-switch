@@ -71,6 +71,28 @@ const sanitizeDir = (value?: string | null): string | undefined => {
   return trimmed.length > 0 ? trimmed : undefined;
 };
 
+const applyDirSuffix = (path: string, suffix: string): string => {
+  if (!suffix) return path;
+  const stripped = path.replace(/[\\/]+$/, "");
+  const sepIndex = Math.max(
+    stripped.lastIndexOf("/"),
+    stripped.lastIndexOf("\\"),
+  );
+  const last = sepIndex >= 0 ? stripped.slice(sepIndex + 1) : stripped;
+  if (!last || last.endsWith(suffix)) return path;
+  const prefix = sepIndex >= 0 ? stripped.slice(0, sepIndex + 1) : "";
+  return prefix + last + suffix + path.slice(stripped.length);
+};
+
+const suffixedDefaultFolder = (folder: string, suffix: string): string => {
+  if (!suffix) return folder;
+  const parts = folder.split("/");
+  const last = parts[parts.length - 1];
+  if (!last || last.endsWith(suffix)) return folder;
+  parts[parts.length - 1] = last + suffix;
+  return parts.join("/");
+};
+
 const computeDefaultAppConfigDir = async (): Promise<string | undefined> => {
   try {
     const home = await homeDir();
@@ -86,10 +108,14 @@ const computeDefaultAppConfigDir = async (): Promise<string | undefined> => {
 
 const computeDefaultConfigDir = async (
   app: DirectoryAppId,
+  suffix = "",
 ): Promise<string | undefined> => {
   try {
     const home = await homeDir();
-    return await join(home, APP_DIRECTORY_META[app].defaultFolder);
+    return await join(
+      home,
+      suffixedDefaultFolder(APP_DIRECTORY_META[app].defaultFolder, suffix),
+    );
   } catch (error) {
     console.error(
       "[useDirectorySettings] Failed to resolve default config dir",
@@ -171,6 +197,7 @@ export function useDirectorySettings({
   // 已保存的数据目录（保存按钮和「需要重启」都和它比）。ref 给回调用，state 让比较它的
   // 组件在保存后重渲染：保存成功要把它更新成刚存的值，否则保存按钮一直在、改回去存不了
   const initialAppConfigDirRef = useRef<string | undefined>(undefined);
+  const dirSuffixRef = useRef("");
   const [initialAppConfigDir, setInitialAppConfigDir] = useState<
     string | undefined
   >(undefined);
@@ -188,6 +215,7 @@ export function useDirectorySettings({
       try {
         const [
           overrideRaw,
+          dirSuffixRaw,
           claudeDir,
           codexDir,
           geminiDir,
@@ -198,17 +226,9 @@ export function useDirectorySettings({
           piDir,
           ompDir,
           defaultAppConfig,
-          defaultClaudeDir,
-          defaultCodexDir,
-          defaultGeminiDir,
-          defaultGrokDir,
-          defaultOpencodeDir,
-          defaultOpenclawDir,
-          defaultHermesDir,
-          defaultPiDir,
-          defaultOmpDir,
         ] = await Promise.all([
           settingsApi.getAppConfigDirOverride(),
+          settingsApi.getDirSuffix(),
           settingsApi.getConfigDir("claude"),
           settingsApi.getConfigDir("codex"),
           settingsApi.getConfigDir("gemini"),
@@ -219,15 +239,33 @@ export function useDirectorySettings({
           settingsApi.getConfigDir("pi"),
           settingsApi.getConfigDir("omp"),
           computeDefaultAppConfigDir(),
-          computeDefaultConfigDir("claude"),
-          computeDefaultConfigDir("codex"),
-          computeDefaultConfigDir("gemini"),
-          computeDefaultConfigDir("grokbuild"),
-          computeDefaultConfigDir("opencode"),
-          computeDefaultConfigDir("openclaw"),
-          computeDefaultConfigDir("hermes"),
-          computeDefaultConfigDir("pi"),
-          computeDefaultConfigDir("omp"),
+        ]);
+
+        if (!active) return;
+
+        const dirSuffix = dirSuffixRaw?.trim() ?? "";
+        dirSuffixRef.current = dirSuffix;
+
+        const [
+          defaultClaudeDir,
+          defaultCodexDir,
+          defaultGeminiDir,
+          defaultGrokDir,
+          defaultOpencodeDir,
+          defaultOpenclawDir,
+          defaultHermesDir,
+          defaultPiDir,
+          defaultOmpDir,
+        ] = await Promise.all([
+          computeDefaultConfigDir("claude", dirSuffix),
+          computeDefaultConfigDir("codex", dirSuffix),
+          computeDefaultConfigDir("gemini", dirSuffix),
+          computeDefaultConfigDir("grokbuild", dirSuffix),
+          computeDefaultConfigDir("opencode", dirSuffix),
+          computeDefaultConfigDir("openclaw", dirSuffix),
+          computeDefaultConfigDir("hermes", dirSuffix),
+          computeDefaultConfigDir("pi", dirSuffix),
+          computeDefaultConfigDir("omp", dirSuffix),
         ]);
 
         if (!active) return;
@@ -235,7 +273,7 @@ export function useDirectorySettings({
         const normalizedOverride = sanitizeDir(overrideRaw ?? undefined);
 
         defaultsRef.current = {
-          appConfig: defaultAppConfig ?? "",
+          appConfig: applyDirSuffix(defaultAppConfig ?? "", dirSuffix),
           claude: defaultClaudeDir ?? "",
           codex: defaultCodexDir ?? "",
           gemini: defaultGeminiDir ?? "",
@@ -251,7 +289,10 @@ export function useDirectorySettings({
         commitAppConfigDir(normalizedOverride);
 
         setResolvedDirs({
-          appConfig: normalizedOverride ?? defaultsRef.current.appConfig,
+          appConfig: applyDirSuffix(
+            normalizedOverride ?? defaultsRef.current.appConfig,
+            dirSuffix,
+          ),
           claude: claudeDir || defaultsRef.current.claude,
           codex: codexDir || defaultsRef.current.codex,
           gemini: geminiDir || defaultsRef.current.gemini,
@@ -392,7 +433,10 @@ export function useDirectorySettings({
         const picked = await settingsApi.selectConfigDirectory(currentValue);
         const sanitized = sanitizeDir(picked ?? undefined);
         if (!sanitized) return;
-        updateDirectoryState(key, sanitized);
+        updateDirectoryState(
+          key,
+          applyDirSuffix(sanitized, dirSuffixRef.current),
+        );
       } catch (error) {
         console.error("[useDirectorySettings] Failed to pick directory", error);
         toast.error(
@@ -429,7 +473,10 @@ export function useDirectorySettings({
     async (app: DirectoryAppId) => {
       const key = APP_DIRECTORY_META[app].key;
       if (!defaultsRef.current[key]) {
-        const fallback = await computeDefaultConfigDir(app);
+        const fallback = await computeDefaultConfigDir(
+          app,
+          dirSuffixRef.current,
+        );
         if (fallback) {
           defaultsRef.current = {
             ...defaultsRef.current,
@@ -448,7 +495,7 @@ export function useDirectorySettings({
       if (fallback) {
         defaultsRef.current = {
           ...defaultsRef.current,
-          appConfig: fallback,
+          appConfig: applyDirSuffix(fallback, dirSuffixRef.current),
         };
       }
     }
@@ -463,8 +510,10 @@ export function useDirectorySettings({
       }
       setAppConfigDir(initialAppConfigDirRef.current);
       setResolvedDirs({
-        appConfig:
+        appConfig: applyDirSuffix(
           initialAppConfigDirRef.current ?? defaultsRef.current.appConfig,
+          dirSuffixRef.current,
+        ),
         claude: overrides?.claude ?? defaultsRef.current.claude,
         codex: overrides?.codex ?? defaultsRef.current.codex,
         gemini: overrides?.gemini ?? defaultsRef.current.gemini,

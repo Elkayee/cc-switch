@@ -42,6 +42,7 @@ import {
   useInstalledSkills,
   useRestoreSkillBackup,
   useScanUnmanagedSkills,
+  useSkillAutoUpdateStatus,
   useSkillBackups,
   useSkillRepos,
   useToggleSkillApp,
@@ -69,6 +70,7 @@ import { useVisibleAppIds } from "@/components/mcp/useVisibleAppIds";
 import { SkillsPage, useSkillRepoActions } from "./SkillsPage";
 import { RepoManagerPanel } from "./RepoManagerPanel";
 import { SkillImportDialog } from "./SkillImportDialog";
+import { SkillPreviewDialog } from "./SkillPreviewDialog";
 import { SkillRestoreDialog } from "./SkillRestoreDialog";
 import { SkillsStorageSheet } from "./SkillsStorageSheet";
 import { useSkillInstallTargets } from "./useSkillInstallTargets";
@@ -85,6 +87,34 @@ interface WriteFailure {
   error: string;
 }
 const failKey = (id: string, app: AppId) => `${id}\u0000${app}`;
+
+/** 每日自动更新的状态文案（fork 自有功能，后端 skill-auto-update-status 事件） */
+function autoUpdateStatusCopy(
+  status:
+    | {
+        lastRunAt?: number | null;
+        running: boolean;
+        updatedCount: number;
+        failures: string[];
+      }
+    | undefined,
+  t: (key: string, options?: { count: number }) => string,
+): { text: string; title?: string } {
+  if (status?.running) return { text: t("skills.autoUpdateRunning") };
+  if (!status || !status.lastRunAt) {
+    return { text: t("skills.autoUpdateNever") };
+  }
+  if (status.failures.length > 0) {
+    return {
+      text: t("skills.autoUpdateFailed", { count: status.failures.length }),
+      title: status.failures.join("\n"),
+    };
+  }
+  return {
+    text: t("skills.autoUpdateOk", { count: status.updatedCount }),
+    title: new Date(status.lastRunAt * 1000).toLocaleString(),
+  };
+}
 
 type ConfirmState =
   | { kind: "uninstall"; ids: string[] }
@@ -153,6 +183,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     null,
   );
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [previewSkill, setPreviewSkill] = useState<InstalledSkill | null>(null);
   const [writePending, setWritePending] = useState(false);
   const [isUpdatingMany, setIsUpdatingMany] = useState(false);
   // 更新进度：确认框点完就关，进度显示在搜索框旁的按钮上
@@ -194,6 +225,8 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
   const skillUpdates = updateCheck?.updates;
   const updateRepoFailures = updateCheck?.failures ?? [];
   const updateSkillMutation = useUpdateSkill();
+  const { data: autoUpdateStatus } = useSkillAutoUpdateStatus();
+  const autoUpdateCopy = autoUpdateStatusCopy(autoUpdateStatus, t);
 
   const mutationPending =
     deleteBackupMutation.isPending ||
@@ -921,7 +954,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
           </HelpTip>
           {/* 已安装数量只写在页签上；页头只留可点的「N 个可更新」 */}
           {loadOk && nUpdates > 0 && (
-            <span className="ms-2 flex items-center whitespace-nowrap text-body">
+            <span className="ms-2 flex items-center whitespace-nowrap text-[12.35px] leading-[1.3]">
               {/* 可点：把表格筛到可更新的项，再点恢复；「全部更新」在搜索框旁 */}
               <HoverTip
                 content={
@@ -935,7 +968,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                   aria-pressed={updatesOnly}
                   onClick={toggleUpdatesFilter}
                   className={cn(
-                    "-mx-1 inline-flex h-6 items-center rounded-control px-1.5 text-body font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "-mx-1 inline-flex h-6 items-center rounded-[4px] px-1.5 text-[12.35px] leading-[1.3] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     updatesOnly
                       ? "bg-selected text-fg-1"
                       : "text-fg-2 underline decoration-border-strong underline-offset-[3px] hover:bg-subtle hover:text-fg-1",
@@ -956,7 +989,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                 type="button"
                 variant="solid"
                 size="regular"
-                className="pe-2.5"
+                className="pe-2"
                 disabled={controlsDisabled}
               >
                 <Plus className="h-4 w-4" strokeWidth={2} />
@@ -973,7 +1006,9 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => void handleOpenImport()}>
                 <span className="flex-1">{t("skillsPage.addMenu.import")}</span>
-                {nUnmanaged > 0 && <NeutralBadge>{nUnmanaged}</NeutralBadge>}
+                {nUnmanaged > 0 && (
+                  <NeutralBadge className="h-4">{nUnmanaged}</NeutralBadge>
+                )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -984,7 +1019,6 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                   type="button"
                   variant="quiet"
                   size="icon-compact"
-                  className="h-8 w-8"
                   aria-label={t("skills.moreActions")}
                 >
                   <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
@@ -1032,7 +1066,6 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     <PageTabs<SkillsView>
       aria-label={t("skillsPage.viewAria")}
       idPrefix="skills-view"
-      className="h-11"
       value={view}
       onValueChange={(next) => {
         if (next === "discover" && navigationBlocked) return;
@@ -1068,19 +1101,21 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
   const renderInstalledBody = () => {
     if (isLoading) {
       return (
-        <div className="py-12 text-center text-body text-fg-2">
+        <div className="py-12 text-center text-[12.35px] leading-[1.3] text-fg-2">
           {t("skills.loading")}
         </div>
       );
     }
     if (isError) {
       return (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2.5 px-10 pb-12 text-center">
-          <h2 className="m-0 text-section">{t("skillsPage.loadFailed")}</h2>
-          <code className="max-w-[520px] rounded-[8px] bg-subtle px-3 py-2 text-left font-mono text-caption text-fg-2 [overflow-wrap:anywhere]">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
+          <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
+            {t("skillsPage.loadFailed")}
+          </h2>
+          <code className="max-w-[520px] rounded-[8px] bg-subtle px-3 py-2 text-left font-mono text-[12.35px] leading-[1.3] text-fg-2 [overflow-wrap:anywhere]">
             {extractErrorMessage(loadError) || String(loadError)}
           </code>
-          <p className="m-0 text-body text-fg-2">
+          <p className="m-0 text-[12.35px] leading-[1.3] text-fg-2">
             {t("mcpPage.noFilesChanged")}
           </p>
           <Button
@@ -1097,9 +1132,13 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     }
     if (nInstalled === 0) {
       return (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-10 pb-12 text-center">
-          <h2 className="m-0 text-section">{t("skillsPage.emptyTitle")}</h2>
-          <p className="m-0 text-body text-fg-2">{t("skillsPage.emptyBody")}</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 pb-12 text-center">
+          <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
+            {t("skillsPage.emptyTitle")}
+          </h2>
+          <p className="m-0 text-[12.35px] leading-[1.3] text-fg-2">
+            {t("skillsPage.emptyBody")}
+          </p>
           <div className="mt-2 flex gap-2">
             <Button
               type="button"
@@ -1134,11 +1173,11 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
     return (
       <div
         data-testid="skills-matrix"
-        className="min-h-0 overflow-auto scroll-stable rounded-panel border border-border bg-surface"
+        className="min-h-0 overflow-auto scroll-stable rounded-[8px] border border-border bg-surface"
       >
         <MatrixColumnHighlight>
           <div className="min-w-[600px]">
-            <div className="sticky top-0 z-10 flex h-11 items-center border-b border-border bg-subtle px-2">
+            <div className="sticky top-0 z-10 flex h-8 items-center border-b border-border bg-subtle px-2">
               <span className="flex w-6 shrink-0 justify-center">
                 <Checkbox
                   aria-label={t("skillsPage.selectAllAria")}
@@ -1166,7 +1205,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
               <div className="-ms-0.5 flex min-w-0 flex-1 items-center gap-0.5">
                 {selectionActive ? (
                   <>
-                    <span className="shrink-0 whitespace-nowrap pe-1.5 ps-2.5 text-body font-medium tabular-nums">
+                    <span className="shrink-0 whitespace-nowrap pe-1 ps-2 text-[12.35px] leading-[1.3] font-medium tabular-nums">
                       {t("skillsPage.bulk.selected", { count: selected.size })}
                     </span>
                     <AppMenuButton
@@ -1335,7 +1374,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
 
             {filteredSkills.length === 0 ? (
               <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-                <h2 className="m-0 text-section">
+                <h2 className="m-0 text-[12.35px] leading-[1.3] font-semibold">
                   {normalizedQuery
                     ? t("skillsPage.noMatch", { query: searchQuery.trim() })
                     : t("skillsPage.noFilterMatch")}
@@ -1428,6 +1467,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                     onOpenDocs={() => void openDocs(skill)}
                     onCopyName={() => void copyName(skill)}
                     onOpenDir={() => void openDirectory(skill)}
+                    onPreview={() => setPreviewSkill(skill)}
                     onUninstall={() => {
                       if (writeLockRef.current || interactionBlocked) return;
                       setConfirm({ kind: "uninstall", ids: [skill.id] });
@@ -1505,6 +1545,12 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                       : ""
                   }
                 />
+                <span
+                  className="max-w-[200px] shrink-0 truncate text-[12.35px] leading-[1.3] text-fg-2"
+                  title={autoUpdateCopy.title}
+                >
+                  {autoUpdateCopy.text}
+                </span>
                 <HoverTip
                   content={
                     lastCheckedText
@@ -1670,7 +1716,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
         details={
           <ul
             aria-label={t("skillsPage.confirm.updateListAria")}
-            className="max-h-60 divide-y divide-border overflow-y-auto rounded-control border border-border"
+            className="max-h-60 divide-y divide-border overflow-y-auto rounded-[4px] border border-border"
           >
             {applicableSkillUpdates.map((update) => {
               const skill = installedSkills.find(
@@ -1683,7 +1729,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
               return (
                 <li
                   key={update.id}
-                  className="flex items-baseline gap-2 px-3 py-2 text-body"
+                  className="flex items-baseline gap-2 px-3 py-2 text-[12.35px] leading-[1.3]"
                 >
                   <span className="min-w-0 truncate font-medium text-fg-1">
                     {skill?.name ?? update.name}
@@ -1693,7 +1739,7 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
                     <button
                       type="button"
                       onClick={() => void openDocs(skill)}
-                      className="ms-auto shrink-0 rounded-sm font-mono text-caption text-fg-3 underline decoration-border-strong underline-offset-[3px] hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="ms-auto shrink-0 rounded-sm font-mono text-[12.35px] leading-[1.3] text-fg-3 underline decoration-border-strong underline-offset-[3px] hover:text-fg-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {repo}
                     </button>
@@ -1762,6 +1808,11 @@ const UnifiedSkillsPanel: React.FC<UnifiedSkillsPanelProps> = ({
 
       <SkillsStorageSheet open={storageOpen} onOpenChange={setStorageOpen} />
 
+      <SkillPreviewDialog
+        skill={previewSkill}
+        onClose={() => setPreviewSkill(null)}
+      />
+
       {repoManagerOpen && (
         <RepoManagerContainer onClose={() => setRepoManagerOpen(false)} />
       )}
@@ -1791,6 +1842,7 @@ interface InstalledRowProps {
   onOpenDocs: () => void;
   onCopyName: () => void;
   onOpenDir: () => void;
+  onPreview: () => void;
   onUninstall: () => void;
 }
 
@@ -1813,6 +1865,7 @@ function InstalledRow({
   onOpenDocs,
   onCopyName,
   onOpenDir,
+  onPreview,
   onUninstall,
 }: InstalledRowProps) {
   const { t } = useTranslation();
@@ -1830,7 +1883,7 @@ function InstalledRow({
       id={`sk-row-${skill.id}`}
       tabIndex={-1}
       className={cn(
-        "group relative flex h-14 items-center px-2 outline-none transition-colors duration-150 hover:bg-subtle",
+        "group relative flex min-h-10 items-center px-2 py-1 outline-none transition-colors duration-150 hover:bg-subtle",
         !first && "border-t border-border",
         highlighted && "bg-subtle",
       )}
@@ -1845,31 +1898,31 @@ function InstalledRow({
           onChange={(event) => onPick(event.target.checked)}
         />
       </span>
-      <div className="ms-2 flex min-w-0 flex-1 flex-col pe-3">
+      <div className="ms-2 flex min-w-0 flex-1 flex-col pe-2">
         <div className="flex min-w-0 items-center gap-1.5">
           <button
             type="button"
             onClick={onCopyName}
-            className="min-w-0 cursor-copy truncate text-start text-body font-medium hover:text-fg-1 hover:underline hover:underline-offset-[3px]"
+            className="min-w-0 cursor-copy truncate text-start text-[12.35px] leading-[1.3] font-medium hover:text-fg-1 hover:underline hover:underline-offset-[3px]"
           >
             {skill.name}
           </button>
           {showDir && (
             <span
               title={skill.directory}
-              className="min-w-0 shrink truncate font-mono text-caption text-fg-3"
+              className="min-w-0 shrink truncate font-mono text-[12.35px] leading-[1.3] text-fg-3"
             >
               {skill.directory}
             </span>
           )}
           {hasUpdate && (
-            <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-transparent bg-warning-soft px-1.5 text-badge font-medium text-warning-text">
+            <span className="inline-flex h-[18px] shrink-0 items-center whitespace-nowrap rounded-full border border-transparent bg-warning-soft px-1.5 text-[12.35px] leading-[1.3] font-medium text-warning-text">
               {t("skills.updateAvailable")}
             </span>
           )}
           {!enabled && <NeutralBadge>{t("mcpPage.notEnabled")}</NeutralBadge>}
         </div>
-        <div className="flex min-w-0 whitespace-nowrap text-caption text-fg-2">
+        <div className="flex min-w-0 whitespace-nowrap text-[12.35px] leading-[1.3] text-fg-2">
           {skill.description && (
             <>
               <span className="min-w-0 truncate" title={skill.description}>
@@ -1963,6 +2016,9 @@ function InstalledRow({
                 {t("skills.update")}
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem onSelect={onPreview}>
+              {t("skills.preview")}
+            </DropdownMenuItem>
             {(skill.readmeUrl || hasRepo) && (
               <DropdownMenuItem onSelect={onOpenDocs}>
                 {t("mcpPage.openDocs")}
@@ -2010,7 +2066,7 @@ function FilterMenu({
           variant="quiet"
           size="compact"
           className={cn(
-            "shrink-0 pe-1.5 ps-2.5",
+            "shrink-0 pe-1 ps-2",
             active ? "text-fg-1" : "text-fg-2",
           )}
         >
@@ -2032,13 +2088,13 @@ function FilterMenu({
             <span
               className={cn(
                 "min-w-0 flex-1 truncate",
-                item.mono && "font-mono text-caption",
+                item.mono && "font-mono text-[12.35px] leading-[1.3]",
               )}
             >
               {item.label}
             </span>
             {item.count !== undefined && (
-              <span className="shrink-0 text-caption tabular-nums text-fg-3">
+              <span className="shrink-0 text-[12.35px] leading-[1.3] tabular-nums text-fg-3">
                 {item.count}
               </span>
             )}
